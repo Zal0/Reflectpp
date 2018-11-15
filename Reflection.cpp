@@ -49,7 +49,7 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS: {
 				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-				PrintReflectable(classObj, ((ReflectInfosFunc)(infos->id))(), depth);
+				PrintReflectable(classObj, ((ReflectInfosFunc)(infos->extra))(), depth);
 				break;
 			}
 
@@ -68,7 +68,7 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
 				printf("%s%s:\n", tabs, infos->id);
 				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-				PrintReflectable(classObj, classObj->ReflectInfos(), depth + 1);
+				PrintReflectable(classObj, ((ReflectInfosFunc)(infos->extra))(), depth + 1);
 				break;
 			}
 		}
@@ -98,8 +98,8 @@ int main()
 	PrintReflectable(r, r->ReflectInfos());
 
 	C c;
-	c.Ai = 0;
-	c.As = 1;
+	c.A::Ai = 0;
+	c.A::As = 1;
 	c.Bi = 2;
 	c.Bf = 3.0f;
 	c.B::test.Ai = 4;

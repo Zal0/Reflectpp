@@ -11,7 +11,7 @@ REFLECTION_DATA
 #define REFLECT_INT(A)	        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INT,   #A, OFFSET(A)),
 #define REFLECT_SHORT(A)        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
 #define REFLECT_FLOAT(A)        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
-#define REFLECT_CLASS(CLASS, A) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, #A, OFFSET(A)),
+#define REFLECT_CLASS(CLASS, A) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
 
 static ReflectInfo* ClassReflectInfos() {
 	static ReflectInfo info[] = {

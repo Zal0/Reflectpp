@@ -14,7 +14,7 @@ public:
 	#include "ReflectDecl.h"
 };
 
-REFLECTABLE_CLASS_INHERITS_1(B, A)
+REFLECTABLE_CLASS(B)
 public:
 	#define REFLECTION_DATA \
 		REFLECT_SHORT(Bi)     \
@@ -23,7 +23,16 @@ public:
 	#include "ReflectDecl.h"
 };
 
-void PrintReflectable(const Reflectable& reflectable, ReflectInfo* infos, int depth = 0) 
+REFLECTABLE_CLASS_INHERITS_2(C, A, B)
+public:
+	#define REFLECTION_DATA \
+		REFLECT_SHORT(Ci)     \
+		REFLECT_FLOAT(Cf)     \
+		REFLECT_CLASS(A, test)
+	#include "ReflectDecl.h"
+};
+
+void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0) 
 {
 	char* tabs = new char[depth + 1];
 	for(int i = 0; i < depth; ++i)
@@ -38,9 +47,11 @@ void PrintReflectable(const Reflectable& reflectable, ReflectInfo* infos, int de
 				PrintReflectable(reflectable, ((ReflectInfosFunc)(infos->ptr))(), depth);
 				break;
 
-			case ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS:
-				PrintReflectable(reflectable, ((ReflectInfosFunc)(infos->ptr))(), depth);
+			case ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS: {
+				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
+				PrintReflectable(classObj, ((ReflectInfosFunc)(infos->id))(), depth);
 				break;
+			}
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
 				printf("%s%s: %d\n", tabs, infos->id, *REFLECT_PTR(int, reflectable, infos->ptr));
@@ -57,7 +68,7 @@ void PrintReflectable(const Reflectable& reflectable, ReflectInfo* infos, int de
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
 				printf("%s%s:\n", tabs, infos->id);
 				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-				PrintReflectable(*classObj, classObj->ReflectInfos(), depth + 1);
+				PrintReflectable(classObj, classObj->ReflectInfos(), depth + 1);
 				break;
 			}
 		}
@@ -72,21 +83,33 @@ int main()
 	A a;
 	a.Ai = 12;
 	a.As = 34;
-	PrintReflectable(a, a.ReflectInfos());
+	PrintReflectable(&a, a.ReflectInfos());
 
 	B* b = new B();
-	b->Ai = 100;
-	b->As = 255;
 	b->Bf = 0.12345f;
 	b->Bi = 1;
 	b->test.Ai = 99;
 	b->test.As = 100;
 	printf("\n");
-	PrintReflectable(*b, b->ReflectInfos());
+	PrintReflectable(b, b->ReflectInfos());
 
 	Reflectable* r = &a;
 	printf("\n");
-	PrintReflectable(*r, r->ReflectInfos());
+	PrintReflectable(r, r->ReflectInfos());
+
+	C c;
+	c.Ai = 0;
+	c.As = 1;
+	c.Bi = 2;
+	c.Bf = 3.0f;
+	c.B::test.Ai = 4;
+	c.B::test.As = 5;
+	c.Ci = 6;
+	c.Cf = 7.0f;
+	c.test.Ai = 8;
+	c.test.As = 9;
+	printf("\n");
+	PrintReflectable(&c, c.ReflectInfos());
 
 	scanf_s("");
 	return 0;

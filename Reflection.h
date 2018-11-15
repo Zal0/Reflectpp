@@ -10,7 +10,7 @@
 //Calculates the offset of a member inside a class
 #define OFFSET(FIELD) ((PTR)&((ReflectClass())->FIELD) - (PTR)(ReflectClass()))
 
-//Calculates the offset of a class when using inheritance
+//Calculates the offset of a class when using inheritance (note: this doesn't work if the adrees is 0x0)
 #define CLASS_OFFSET(CLASS) ((PTR)((CLASS*)ReflectClass()) - (PTR)(ReflectClass()))
 
 //Returns a pointer casted to TYPE of the data stored in INSTANCE at OFFSET

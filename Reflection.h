@@ -7,6 +7,8 @@
 	typedef int PTR;
 #endif
 
+#define DUMMY_ADDRESS 0x10000
+
 //Calculates the offset of a member inside a class
 #define OFFSET(FIELD) ((PTR)&((ReflectClass())->FIELD) - (PTR)(ReflectClass()))
 

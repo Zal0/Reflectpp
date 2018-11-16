@@ -6,29 +6,37 @@
 
 #include "Reflection.h"
 
+
+#define VAR_TMP(ACCESS, TYPE, NAME) ACCESS: TYPE NAME;
+
+class Test0{
+	VAR_TMP(public, int, x);
+	VAR_TMP(private, int, y);
+};
+
 REFLECTABLE_CLASS(A)
 public:
 	#define REFLECTION_DATA \
-		REFLECT_INT(Ai, 1)    \
-		REFLECT_SHORT(As, 2)
+		REFLECT_INT(public, Ai, 1)    \
+		REFLECT_SHORT(public, As, 2)
 	#include "ReflectDecl.h"
 };
 
 REFLECTABLE_CLASS(B)
 public:
 	#define REFLECTION_DATA \
-		REFLECT_SHORT(Bi, 3)  \
-		REFLECT_FLOAT(Bf, 4)  \
-		REFLECT_CLASS(A, test)
+		REFLECT_SHORT(public, Bi, 3)  \
+		REFLECT_FLOAT(public, Bf, 4)  \
+		REFLECT_CLASS(public, A, test)
 	#include "ReflectDecl.h"
 };
 
 REFLECTABLE_CLASS_INHERITS_2(C, A, B)
 public:
 	#define REFLECTION_DATA   \
-		REFLECT_SHORT(Ci, 5)    \
-		REFLECT_FLOAT(Cf, 6.0f) \
-		REFLECT_CLASS(A, test)
+		REFLECT_SHORT(public, Ci, 5)    \
+		REFLECT_FLOAT(public, Cf, 6.0f) \
+		REFLECT_CLASS(private, A, test)
 	#include "ReflectDecl.h"
 };
 
@@ -78,63 +86,19 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 	delete[] tabs;
 }
 
-/*class Test0 {
-public:
-	int t0i;
-	Test0(){}
-	void Func() {
-		printf("t0");
-	}
-};
-class Test0_2 {
-public:
-	int t0i;
-	Test0_2();
-	void Func() {
-		printf("t1");
-	}
-};
-
-class Test1 : public Test0, public Test0_2 {
-public:
-	int t1i;
-	Test1() {
-		printf("none");
-	}
-	void Func() {
-		printf("me");
-	}
-};
-
-Test0_2::Test0_2()
-{
-	Test0* t0 = (Test0*)this;
-	t0->Func();
-	Test0_2* t0_2 = (Test0_2*)this;
-	t0_2->Func();
-	Test1* t1 = (Test1*)this;
-	t1->Func();
-}*/
-
 int main()
 {
-	//Test1 t1;
+	Reflectable* reflectables[3];
 
-	A a;
-	PrintReflectable(&a, a.ReflectInfos());
-	printf("\n");
-
-	B* b = new B();
-	PrintReflectable(b, b->ReflectInfos());
-	printf("\n");
-
-	Reflectable* r = &a;
-	PrintReflectable(r, r->ReflectInfos());
-	printf("\n");
-
-	C c;
-	PrintReflectable(&c, c.ReflectInfos());
-	printf("\n");
+	reflectables[0] = new A();
+	reflectables[1] = new B();
+	reflectables[2] = (A*)new C();
+	
+	for(int i = 0; i < 3; ++i)
+	{
+		PrintReflectable(reflectables[i], reflectables[i]->ReflectInfos());
+		printf("\n");
+	}
 
 	scanf_s("");
 	return 0;

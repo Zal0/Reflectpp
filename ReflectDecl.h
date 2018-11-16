@@ -1,17 +1,19 @@
-#define REFLECT_INT(A, DEFAULT) int A;	
-#define REFLECT_SHORT(A, DEFAULT) short A;
-#define REFLECT_FLOAT(A, DEFAULT) float A;
-#define REFLECT_CLASS(CLASS, name) CLASS name;
+#define REFLECT_INT(ACCESS, A, DEFAULT)    ACCESS: int A;	
+#define REFLECT_SHORT(ACCESS, A, DEFAULT)  ACCESS: short A;
+#define REFLECT_FLOAT(ACCESS, A, DEFAULT)  ACCESS: float A;
+#define REFLECT_CLASS(ACCESS, CLASS, name) ACCESS: CLASS name;
 REFLECTION_DATA
 #undef REFLECT_INT
 #undef REFLECT_SHORT
 #undef REFLECT_FLOAT
 #undef REFLECT_CLASS
 	
-#define REFLECT_INT(A, DEFAULT)	  ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INT,   #A, OFFSET(A)),
-#define REFLECT_SHORT(A, DEFAULT) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
-#define REFLECT_FLOAT(A, DEFAULT) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
-#define REFLECT_CLASS(CLASS, A)   ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
+#define REFLECT_INT(ACCESS, A, DEFAULT)	  ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INT,   #A, OFFSET(A)),
+#define REFLECT_SHORT(ACCESS, A, DEFAULT) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
+#define REFLECT_FLOAT(ACCESS, A, DEFAULT) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
+#define REFLECT_CLASS(ACCESS, CLASS, A)   ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
+
+public:
 
 static ReflectInfo* ClassReflectInfos() {
 	static ReflectInfo info[] = {
@@ -28,10 +30,10 @@ virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 #undef REFLECT_FLOAT
 #undef REFLECT_CLASS
 	
-#define REFLECT_INT(A, DEFAULT)	  A = DEFAULT;
-#define REFLECT_SHORT(A, DEFAULT) A = DEFAULT;
-#define REFLECT_FLOAT(A, DEFAULT) A = DEFAULT;
-#define REFLECT_CLASS(CLASS, A)
+#define REFLECT_INT(ACCESS, A, DEFAULT)	  A = DEFAULT;
+#define REFLECT_SHORT(ACCESS, A, DEFAULT) A = DEFAULT;
+#define REFLECT_FLOAT(ACCESS, A, DEFAULT) A = DEFAULT;
+#define REFLECT_CLASS(ACCESS, CLASS, A)
 void ReflectInit()
 {
 	REFLECTION_DATA

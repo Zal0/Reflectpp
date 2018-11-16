@@ -75,7 +75,7 @@ public:
 #define REFLECTABLE_CLASS(A)                                 \
 class A : public ReflectableInit< A >, public Reflectable {  \
 private:                                                     \
-	static A* ReflectClass() { return (A*)0x10000;}            \
+	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}      \
                                                              \
 	static ReflectInfo* InheritanceTable() {                   \
 			static ReflectInfo info[] = {                          \
@@ -84,23 +84,23 @@ private:                                                     \
 			return info;                                           \
 		}
 
-#define REFLECTABLE_CLASS_INHERITS_1(A, B)         \
-class A : public ReflectableInit< A >, public B {  \
-private:                                           \
-	static A* ReflectClass() { return (A*)0x10000;}  \
-                                                   \
-	static ReflectInfo* InheritanceTable() {         \
-		static ReflectInfo info[] = {                  \
-			REFLECT_INHERIT(B)                           \
-			ReflectInfo::End                             \
-		};                                             \
-		return info;                                   \
+#define REFLECTABLE_CLASS_INHERITS_1(A, B)              \
+class A : public ReflectableInit< A >, public B {       \
+private:                                                \
+	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;} \
+                                                        \
+	static ReflectInfo* InheritanceTable() {              \
+		static ReflectInfo info[] = {                       \
+			REFLECT_INHERIT(B)                                \
+			ReflectInfo::End                                  \
+		};                                                  \
+		return info;                                        \
 	}
 
 #define REFLECTABLE_CLASS_INHERITS_2(A, B, C)               \
 class A : public ReflectableInit< A >, public B, public C { \
 private:                                                    \
-	static A* ReflectClass() { return (A*)0x10000;}           \
+	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}     \
                                                             \
 	static ReflectInfo* InheritanceTable() {                  \
 		static ReflectInfo info[] = {                           \

@@ -43,6 +43,59 @@ public:
 ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0);
 typedef ReflectInfo*(*ReflectInfosFunc)();
 
+#include <vector>
+class ReflectInfoIterator {
+public:
+	class Reflectable_Info {
+	public:
+		void* reflectable;
+		ReflectInfo* infos;
+		Reflectable_Info(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
+	};
+	std::vector< Reflectable_Info > l;
+
+public:
+	ReflectInfoIterator(void* reflectable, ReflectInfo* infos)
+	{
+		l.push_back(Reflectable_Info(reflectable, infos));
+	}
+
+	ReflectInfo* Next() 
+	{
+		if(l.empty())
+			return 0;
+
+		void* reflectable  = l[l.size() -1].reflectable;
+		ReflectInfo* infos = (l[l.size() - 1].infos) ++;
+		if(infos->id == "")
+		{
+			l.pop_back();
+			return Next();
+		}
+
+		switch(infos->reflect_type)
+		{
+			case ReflectInfo::ReflectType::REFLECT_TYPE_INHERITANCE_TABLE:
+				l.push_back(Reflectable_Info(reflectable, ((ReflectInfosFunc)(infos->ptr))()));
+				return Next();
+
+			case ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS: {
+				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
+				l.push_back(Reflectable_Info(classObj, ((ReflectInfosFunc)(infos->extra))()));
+				return Next();
+			}
+
+			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
+			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
+			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
+			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS:
+			default:
+				return infos;
+		}
+	}
+};
+
+
 class Reflectable
 {
 public:

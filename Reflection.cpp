@@ -40,47 +40,38 @@ public:
 	#include "ReflectDecl.h"
 };
 
-void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0) 
+void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 {
 	char* tabs = new char[depth + 1];
 	for(int i = 0; i < depth; ++i)
 		tabs[i] = ' ';
 	tabs[depth] = '\0';
 
-	while(infos->id != "")
+	ReflectInfoIterator it(reflectable, infos);
+	ReflectInfo* info = 0;
+	while(info = it.Next())
 	{
-		switch(infos->reflect_type)
+		switch (info->reflect_type)
 		{
-			case ReflectInfo::ReflectType::REFLECT_TYPE_INHERITANCE_TABLE:
-				PrintReflectable(reflectable, ((ReflectInfosFunc)(infos->ptr))(), depth);
-				break;
-
-			case ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS: {
-				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-				PrintReflectable(classObj, ((ReflectInfosFunc)(infos->extra))(), depth);
-				break;
-			}
-
 			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-				printf("%s%s: %d\n", tabs, infos->id, *REFLECT_PTR(int, reflectable, infos->ptr));
+				printf("%s%s: %d\n", tabs, info->id, *REFLECT_PTR(int, reflectable, info->ptr));
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-				printf("%s%s: %d\n", tabs, infos->id, *REFLECT_PTR(short, reflectable, infos->ptr));
+				printf("%s%s: %d\n", tabs, info->id, *REFLECT_PTR(short, reflectable, info->ptr));
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-				printf("%s%s: %f\n", tabs, infos->id, *REFLECT_PTR(float, reflectable, infos->ptr));
+				printf("%s%s: %f\n", tabs, info->id, *REFLECT_PTR(float, reflectable, info->ptr));
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
-				printf("%s%s:\n", tabs, infos->id);
-				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-				PrintReflectable(classObj, ((ReflectInfosFunc)(infos->extra))(), depth + 1);
+				printf("%s%s:\n", tabs, info->id);
+				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, info->ptr);
+				PrintReflectable(classObj, ((ReflectInfosFunc)(info->extra))(), depth + 1);
 				break;
 			}
 		}
-		infos ++;
 	}
 
 	delete[] tabs;

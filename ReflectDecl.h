@@ -1,6 +1,6 @@
-#define REFLECT_INT(A) int A;	
-#define REFLECT_SHORT(A) short A;
-#define REFLECT_FLOAT(A) float A;
+#define REFLECT_INT(A, DEFAULT) int A;	
+#define REFLECT_SHORT(A, DEFAULT) short A;
+#define REFLECT_FLOAT(A, DEFAULT) float A;
 #define REFLECT_CLASS(CLASS, name) CLASS name;
 REFLECTION_DATA
 #undef REFLECT_INT
@@ -8,10 +8,10 @@ REFLECTION_DATA
 #undef REFLECT_FLOAT
 #undef REFLECT_CLASS
 	
-#define REFLECT_INT(A)	        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INT,   #A, OFFSET(A)),
-#define REFLECT_SHORT(A)        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
-#define REFLECT_FLOAT(A)        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
-#define REFLECT_CLASS(CLASS, A) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
+#define REFLECT_INT(A, DEFAULT)	  ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INT,   #A, OFFSET(A)),
+#define REFLECT_SHORT(A, DEFAULT) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
+#define REFLECT_FLOAT(A, DEFAULT) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
+#define REFLECT_CLASS(CLASS, A)   ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
 
 static ReflectInfo* ClassReflectInfos() {
 	static ReflectInfo info[] = {
@@ -22,6 +22,20 @@ static ReflectInfo* ClassReflectInfos() {
 	return info;
 }
 virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
+
+#undef REFLECT_INT
+#undef REFLECT_SHORT
+#undef REFLECT_FLOAT
+#undef REFLECT_CLASS
+	
+#define REFLECT_INT(A, DEFAULT)	  A = DEFAULT;
+#define REFLECT_SHORT(A, DEFAULT) A = DEFAULT;
+#define REFLECT_FLOAT(A, DEFAULT) A = DEFAULT;
+#define REFLECT_CLASS(CLASS, A)
+void ReflectInit()
+{
+	REFLECTION_DATA
+}
 
 #undef REFLECTION_DATA
 #undef REFLECTION_INHERITANCE_DATA

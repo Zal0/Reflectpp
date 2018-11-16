@@ -9,25 +9,25 @@
 REFLECTABLE_CLASS(A)
 public:
 	#define REFLECTION_DATA \
-		REFLECT_INT(Ai)       \
-		REFLECT_SHORT(As)
+		REFLECT_INT(Ai, 1)    \
+		REFLECT_SHORT(As, 2)
 	#include "ReflectDecl.h"
 };
 
 REFLECTABLE_CLASS(B)
 public:
 	#define REFLECTION_DATA \
-		REFLECT_SHORT(Bi)     \
-		REFLECT_FLOAT(Bf)     \
+		REFLECT_SHORT(Bi, 3)  \
+		REFLECT_FLOAT(Bf, 4)  \
 		REFLECT_CLASS(A, test)
 	#include "ReflectDecl.h"
 };
 
 REFLECTABLE_CLASS_INHERITS_2(C, A, B)
 public:
-	#define REFLECTION_DATA \
-		REFLECT_SHORT(Ci)     \
-		REFLECT_FLOAT(Cf)     \
+	#define REFLECTION_DATA   \
+		REFLECT_SHORT(Ci, 5)    \
+		REFLECT_FLOAT(Cf, 6.0f) \
 		REFLECT_CLASS(A, test)
 	#include "ReflectDecl.h"
 };
@@ -78,38 +78,63 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 	delete[] tabs;
 }
 
+/*class Test0 {
+public:
+	int t0i;
+	Test0(){}
+	void Func() {
+		printf("t0");
+	}
+};
+class Test0_2 {
+public:
+	int t0i;
+	Test0_2();
+	void Func() {
+		printf("t1");
+	}
+};
+
+class Test1 : public Test0, public Test0_2 {
+public:
+	int t1i;
+	Test1() {
+		printf("none");
+	}
+	void Func() {
+		printf("me");
+	}
+};
+
+Test0_2::Test0_2()
+{
+	Test0* t0 = (Test0*)this;
+	t0->Func();
+	Test0_2* t0_2 = (Test0_2*)this;
+	t0_2->Func();
+	Test1* t1 = (Test1*)this;
+	t1->Func();
+}*/
+
 int main()
 {
+	//Test1 t1;
+
 	A a;
-	a.Ai = 12;
-	a.As = 34;
 	PrintReflectable(&a, a.ReflectInfos());
+	printf("\n");
 
 	B* b = new B();
-	b->Bf = 0.12345f;
-	b->Bi = 1;
-	b->test.Ai = 99;
-	b->test.As = 100;
-	printf("\n");
 	PrintReflectable(b, b->ReflectInfos());
+	printf("\n");
 
 	Reflectable* r = &a;
-	printf("\n");
 	PrintReflectable(r, r->ReflectInfos());
+	printf("\n");
 
 	C c;
-	c.A::Ai = 0;
-	c.A::As = 1;
-	c.Bi = 2;
-	c.Bf = 3.0f;
-	c.B::test.Ai = 4;
-	c.B::test.As = 5;
-	c.Ci = 6;
-	c.Cf = 7.0f;
-	c.test.Ai = 8;
-	c.test.As = 9;
-	printf("\n");
 	PrintReflectable(&c, c.ReflectInfos());
+	printf("\n");
 
 	scanf_s("");
 	return 0;

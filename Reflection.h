@@ -54,8 +54,6 @@ public:
 	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 };
 
-#endif
-
 //Info for inherit classes requires a pointer to the function returning their ReflectInfos and the offset of the class
 //The pointer to the ReflectInfos function is not enough because the first inherited class shares its address with the class
 //and the compiler cast it to the latter (so in "class A : public B, public C"  A and B share the same offset (0) and calling
@@ -100,3 +98,5 @@ private:                                           \
 		};                                             \
 		return info;                                   \
 	}
+
+#endif

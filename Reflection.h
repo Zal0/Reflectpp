@@ -43,6 +43,19 @@ public:
 ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0);
 typedef ReflectInfo*(*ReflectInfosFunc)();
 
+class Reflectable
+{
+public:
+	static ReflectInfo* ClassReflectInfos() {
+		static ReflectInfo info[] = {
+			ReflectInfo::End
+		};
+		return info;
+	}
+
+	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
+};
+
 #include <vector>
 class ReflectInfoIterator {
 public:
@@ -93,20 +106,6 @@ public:
 				return infos;
 		}
 	}
-};
-
-
-class Reflectable
-{
-public:
-	static ReflectInfo* ClassReflectInfos() {
-		static ReflectInfo info[] = {
-			ReflectInfo::End
-		};
-		return info;
-	}
-
-	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 };
 
 template< class T >

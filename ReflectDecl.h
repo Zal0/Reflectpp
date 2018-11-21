@@ -25,6 +25,8 @@ static ReflectInfo* ClassReflectInfos() {
 }
 virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 
+virtual void* ClassAddress() {return this;}
+
 #undef REFLECT_INT
 #undef REFLECT_SHORT
 #undef REFLECT_FLOAT

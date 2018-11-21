@@ -54,6 +54,7 @@ public:
 	}
 
 	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
+	virtual void* ClassAddress() {return this;}
 };
 
 #include <vector>
@@ -131,7 +132,7 @@ public:
 #define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::ClassReflectInfos),
 
 #define REFLECTABLE_CLASS(A)                                 \
-class A : public ReflectableInit< A >, public Reflectable {  \
+class A : public ReflectableInit< A >, public virtual Reflectable {  \
 private:                                                     \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}      \
                                                              \

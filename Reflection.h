@@ -64,6 +64,12 @@ public:
 		void* reflectable;
 		ReflectInfo* infos;
 		Reflectable_Info(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
+
+		int& Int() {return *REFLECT_PTR(int, reflectable, infos->ptr);}
+		short& Short() {return *REFLECT_PTR(short, reflectable, infos->ptr);}
+		float& Float() {return *REFLECT_PTR(float, reflectable, infos->ptr);}
+		Reflectable* ClassPtr() {return REFLECT_PTR(Reflectable, reflectable, infos->ptr);}
+		ReflectInfo* ReflectInfos() {return ((ReflectInfosFunc)infos->extra)();}
 	};
 	std::vector< Reflectable_Info > l;
 

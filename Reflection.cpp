@@ -54,21 +54,20 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 		switch (info.infos->reflect_type)
 		{
 			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-				printf("%s%s: %d\n", tabs, info.infos->id, *REFLECT_PTR(int, info.reflectable, info.infos->ptr));
+				printf("%s%s: %d\n", tabs, info.infos->id, info.Int());
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-				printf("%s%s: %d\n", tabs, info.infos->id, *REFLECT_PTR(short, info.reflectable, info.infos->ptr));
+				printf("%s%s: %d\n", tabs, info.infos->id, info.Short());
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-				printf("%s%s: %f\n", tabs, info.infos->id, *REFLECT_PTR(float, info.reflectable, info.infos->ptr));
+				printf("%s%s: %f\n", tabs, info.infos->id, info.Float());
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
 				printf("%s%s:\n", tabs, info.infos->id);
-				Reflectable* classObj = REFLECT_PTR(Reflectable, info.reflectable, info.infos->ptr);
-				PrintReflectable(classObj, ((ReflectInfosFunc)(info.infos->extra))(), depth + 1);
+				PrintReflectable(info.ClassPtr(), info.ReflectInfos(), depth + 1);
 				break;
 			}
 		}

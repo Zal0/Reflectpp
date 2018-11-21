@@ -73,10 +73,10 @@ public:
 		l.push_back(Reflectable_Info(reflectable, infos));
 	}
 
-	ReflectInfo* Next() 
+	Reflectable_Info Next() 
 	{
 		if(l.empty())
-			return 0;
+			return Reflectable_Info(0, 0);
 
 		void* reflectable  = l[l.size() -1].reflectable;
 		ReflectInfo* infos = (l[l.size() - 1].infos) ++;
@@ -103,7 +103,7 @@ public:
 			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS:
 			default:
-				return infos;
+				return Reflectable_Info(reflectable, infos);
 		}
 	}
 };

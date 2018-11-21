@@ -48,27 +48,27 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 	tabs[depth] = '\0';
 
 	ReflectInfoIterator it(reflectable, infos);
-	ReflectInfo* info = 0;
-	while(info = it.Next())
+	ReflectInfoIterator::Reflectable_Info info(0,0);
+	while((info = it.Next()).reflectable)
 	{
-		switch (info->reflect_type)
+		switch (info.infos->reflect_type)
 		{
 			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-				printf("%s%s: %d\n", tabs, info->id, *REFLECT_PTR(int, reflectable, info->ptr));
+				printf("%s%s: %d\n", tabs, info.infos->id, *REFLECT_PTR(int, info.reflectable, info.infos->ptr));
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-				printf("%s%s: %d\n", tabs, info->id, *REFLECT_PTR(short, reflectable, info->ptr));
+				printf("%s%s: %d\n", tabs, info.infos->id, *REFLECT_PTR(short, info.reflectable, info.infos->ptr));
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-				printf("%s%s: %f\n", tabs, info->id, *REFLECT_PTR(float, reflectable, info->ptr));
+				printf("%s%s: %f\n", tabs, info.infos->id, *REFLECT_PTR(float, info.reflectable, info.infos->ptr));
 				break;
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
-				printf("%s%s:\n", tabs, info->id);
-				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, info->ptr);
-				PrintReflectable(classObj, ((ReflectInfosFunc)(info->extra))(), depth + 1);
+				printf("%s%s:\n", tabs, info.infos->id);
+				Reflectable* classObj = REFLECT_PTR(Reflectable, info.reflectable, info.infos->ptr);
+				PrintReflectable(classObj, ((ReflectInfosFunc)(info.infos->extra))(), depth + 1);
 				break;
 			}
 		}

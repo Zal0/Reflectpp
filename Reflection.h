@@ -1,6 +1,8 @@
 #ifndef REFLECTION_H
 #define REFLECTION_H
 
+#include <vector>
+
 #ifdef _WIN64
 	typedef long long PTR;
 #else
@@ -25,10 +27,13 @@ public:
 	{
 		REFLECT_TYPE_INHERITANCE_TABLE,
 		REFLECT_TYPE_PARENT_CLASS,
+
 		REFLECT_TYPE_INT,
 		REFLECT_TYPE_SHORT,
 		REFLECT_TYPE_FLOAT,
-		REFLECT_TYPE_CLASS
+		REFLECT_TYPE_CLASS,
+
+		REFLECT_TYPE_VECTOR_CLASS
 	};
 
 	ReflectType reflect_type;
@@ -42,6 +47,36 @@ public:
 };
 ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0);
 typedef ReflectInfo*(*ReflectInfosFunc)();
+
+class VectorHandlerI
+{
+public:
+	virtual int GetNumElems() = 0;
+	virtual void Push() = 0;
+	virtual void Pop() = 0;
+	virtual void* GetElem(int idx) = 0;
+	virtual ReflectInfo* GetItemsReflectInfos() = 0;
+};
+typedef std::auto_ptr< VectorHandlerI > VectorHandler;
+
+template< class T >
+class VectorHandlerT : public VectorHandlerI
+{
+private:
+	std::vector< T >& v;
+	VectorHandlerT(void* ptr) : v(*((std::vector< T >*)ptr)){}
+
+public:
+	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT<T>(ptr));}
+	
+	virtual int GetNumElems() {return v.size();}
+	virtual void Push() {v.push_back(T());}
+	virtual void Pop() {v.pop_back();}
+	virtual void* GetElem(int idx) {return &v[idx];}
+	virtual ReflectInfo* GetItemsReflectInfos() {return T::ClassReflectInfos();}
+};
+
+typedef VectorHandler(*VectorHandlerFunc)(void*);
 
 class Reflectable
 {
@@ -57,7 +92,6 @@ public:
 	virtual void* ClassAddress() {return this;}
 };
 
-#include <vector>
 class ReflectInfoIterator {
 public:
 	class Reflectable_Info {
@@ -71,6 +105,7 @@ public:
 		float& Float() {return *REFLECT_PTR(float, reflectable, infos->ptr);}
 		Reflectable* ClassPtr() {return REFLECT_PTR(Reflectable, reflectable, infos->ptr);}
 		ReflectInfo* ReflectInfos() {return ((ReflectInfosFunc)infos->extra)();}
+		VectorHandler GetVectorHandler() {return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));}
 	};
 	std::vector< Reflectable_Info > l;
 

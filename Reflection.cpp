@@ -16,9 +16,10 @@ class Test0{
 
 REFLECTABLE_CLASS(A)
 public:
-	#define REFLECTION_DATA \
-		REFLECT_INT(public, Ai, 1)    \
-		REFLECT_SHORT(public, As, 2)
+	#define REFLECTION_DATA       \
+		REFLECT_INT(public, Ai, 1)  \
+		REFLECT_SHORT(public, As, 2)\
+		REFLECT_VECTOR_CLASS(public, Test0, v_test0)
 	#include "ReflectDecl.h"
 };
 
@@ -68,6 +69,17 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
 				printf("%s%s:\n", tabs, info.infos->id);
 				PrintReflectable(info.ClassPtr(), info.ReflectInfos(), depth + 1);
+				break;
+			}
+
+			case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS: {
+				VectorHandler vector_handler = info.GetVectorHandler();
+				printf("%s%s[] size:%d\n", tabs, info.infos->id, vector_handler->GetNumElems());
+				for(int i = 0; i < vector_handler->GetNumElems(); ++i)
+				{
+					printf("%s [%d]\n", tabs, i);
+					PrintReflectable(vector_handler->GetElem(i), vector_handler->GetItemsReflectInfos(), depth + 2);
+				}
 				break;
 			}
 		}

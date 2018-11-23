@@ -6,12 +6,11 @@
 
 #include "Reflection.h"
 
-
-#define VAR_TMP(ACCESS, TYPE, NAME) ACCESS: TYPE NAME;
-
-class Test0{
-	VAR_TMP(public, int, x);
-	VAR_TMP(private, int, y);
+REFLECTABLE_CLASS(Test0)
+#define REFLECTION_DATA       \
+	REFLECT_INT(public, x, 10)  \
+	REFLECT_INT(public, y, 10)  
+#include "ReflectDecl.h"
 };
 
 REFLECTABLE_CLASS(A)
@@ -41,8 +40,14 @@ public:
 	#include "ReflectDecl.h"
 };
 
-void PrintReflectable(void* reflectable, ReflectInfo* infos, int depth = 0)
+void PrintReflectable(void* reflectable, ReflectInfo* infos = 0, int depth = 0)
 {
+	if(infos == 0)
+	{
+		infos = ((Reflectable*)reflectable)->ReflectInfos();
+		reflectable = ((Reflectable*)reflectable)->ClassAddress();//reflectable is pointing to Reflectable base (virtual) class, we need to make sure it points the this pointer
+	}
+
 	char* tabs = new char[depth + 1];
 	for(int i = 0; i < depth; ++i)
 		tabs[i] = ' ';
@@ -92,13 +97,18 @@ int main()
 {
 	Reflectable* reflectables[3];
 
-	reflectables[0] = new A();
+	A* a = new A();
+	a->v_test0.push_back(Test0());
+	a->v_test0.push_back(Test0());
+	a->v_test0.push_back(Test0());
+	reflectables[0] = a;
+
 	reflectables[1] = new B();
-	reflectables[2] = (A*)new C();
+	reflectables[2] = new C();
 	
 	for(int i = 0; i < 3; ++i)
 	{
-		PrintReflectable(reflectables[i], reflectables[i]->ReflectInfos());
+		PrintReflectable(reflectables[i]);
 		printf("\n");
 	}
 

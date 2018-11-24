@@ -43,9 +43,8 @@ public:
 
 public:
 	ReflectInfo(ReflectType reflect_type, const char* id, PTR ptr, PTR extra = 0) : reflect_type(reflect_type), id(id), ptr(ptr), extra(extra) {}
-	static ReflectInfo End; 
+	static ReflectInfo End() {return ReflectInfo(REFLECT_TYPE_INT, "", 0);} 
 };
-ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0);
 typedef ReflectInfo*(*ReflectInfosFunc)();
 
 class VectorHandlerI
@@ -83,7 +82,7 @@ class Reflectable
 public:
 	static ReflectInfo* ClassReflectInfos() {
 		static ReflectInfo info[] = {
-			ReflectInfo::End
+			ReflectInfo::End()
 		};
 		return info;
 	}
@@ -173,7 +172,7 @@ private:                                                     \
                                                              \
 	static ReflectInfo* InheritanceTable() {                   \
 			static ReflectInfo info[] = {                          \
-				ReflectInfo::End                                     \
+				ReflectInfo::End()                                   \
 			};                                                     \
 			return info;                                           \
 		}
@@ -186,7 +185,7 @@ private:                                                \
 	static ReflectInfo* InheritanceTable() {              \
 		static ReflectInfo info[] = {                       \
 			REFLECT_INHERIT(B)                                \
-			ReflectInfo::End                                  \
+			ReflectInfo::End()                                \
 		};                                                  \
 		return info;                                        \
 	}
@@ -200,7 +199,7 @@ private:                                                    \
 		static ReflectInfo info[] = {                           \
 			REFLECT_INHERIT(B)                                    \
 			REFLECT_INHERIT(C)                                    \
-			ReflectInfo::End                                      \
+			ReflectInfo::End()                                    \
 		};                                                      \
 		return info;                                            \
 	}

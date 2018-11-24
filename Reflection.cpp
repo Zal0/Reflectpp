@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "Reflection.h"
+#include "JsonTools.h"
 
 REFLECTABLE_CLASS(Test0)
 #define REFLECTION_DATA       \
@@ -36,7 +37,7 @@ public:
 	#define REFLECTION_DATA   \
 		REFLECT_SHORT(public, Ci, 5)    \
 		REFLECT_FLOAT(public, Cf, 6.0f) \
-		REFLECT_CLASS(private, A, test)
+		REFLECT_CLASS(private, A, testC)
 	#include "ReflectDecl.h"
 };
 
@@ -111,6 +112,8 @@ int main()
 		PrintReflectable(reflectables[i]);
 		printf("\n");
 	}
+
+	Serialize(reflectables[2], "test.json");
 
 	scanf_s("");
 	return 0;

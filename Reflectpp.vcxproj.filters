@@ -21,9 +21,15 @@
     <ClInclude Include="ReflectDecl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="JsonTools.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Reflection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

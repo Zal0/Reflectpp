@@ -142,10 +142,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="JsonTools.h" />
     <ClInclude Include="ReflectDecl.h" />
     <ClInclude Include="Reflection.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="JsonTools.cpp" />
     <ClCompile Include="Reflection.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

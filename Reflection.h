@@ -2,6 +2,7 @@
 #define REFLECTION_H
 
 #include <vector>
+#include <string.h>
 
 #ifdef _WIN64
 	typedef long long PTR;
@@ -77,20 +78,7 @@ public:
 
 typedef VectorHandler(*VectorHandlerFunc)(void*);
 
-class Reflectable
-{
-public:
-	static ReflectInfo* ClassReflectInfos() {
-		static ReflectInfo info[] = {
-			ReflectInfo::End()
-		};
-		return info;
-	}
-
-	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
-	virtual void* ClassAddress() {return this;}
-};
-
+class Reflectable;
 class ReflectInfoIterator {
 public:
 	class Reflectable_Info {
@@ -148,6 +136,79 @@ public:
 		}
 	}
 };
+
+
+class Reflectable
+{
+public:
+	static ReflectInfo* ClassReflectInfos() {
+		static ReflectInfo info[] = {
+			ReflectInfo::End()
+		};
+		return info;
+	}
+
+	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
+	virtual void* ClassAddress() {return this;}
+
+	ReflectInfoIterator::Reflectable_Info Get(const char* field)
+	{
+		return Get(field, ClassAddress(), ReflectInfos());
+	}
+
+	static int strcmpidx(const char* str0, const char* str1)
+	{
+		int ret = 0;
+		while(*str0 != '\0' && *str1 != '\0' && *str0 == *str1)
+		{
+			str0 ++;
+			str1 ++;
+			ret ++;
+		}
+		return ret;
+	}
+
+	static ReflectInfoIterator::Reflectable_Info Get(const char* field, void* reflectable, ReflectInfo* infos = 0)
+	{
+		ReflectInfoIterator it(reflectable, infos);
+		ReflectInfoIterator::Reflectable_Info info(0,0);
+		int n;
+		while((info = it.Next()).reflectable)
+		{
+			n = strcmpidx(info.infos->id, field);
+			if(info.infos->id[n] == '\0')
+			{
+				switch (info.infos->reflect_type)
+				{
+					case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
+					case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
+					case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
+						if(field[n] == '\0')
+							return info;
+
+					case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS:
+						if(field[n] == '.')
+						{
+							return Get(&field[n + 1], info.ClassPtr(), info.ReflectInfos());
+						}
+						break;
+
+					case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS:
+						if(field[n] == '[')
+						{
+							char* end;
+							int idx = strtol(field + n + 1, &end, 10);
+							VectorHandler vector_handler = info.GetVectorHandler();
+							return Get(end + 2, vector_handler->GetElem(idx), vector_handler->GetItemsReflectInfos());
+						}
+						break;
+				}
+			}
+		}
+	}
+};
+
+
 
 template< class T >
 class ReflectableInit

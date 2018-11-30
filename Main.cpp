@@ -113,6 +113,15 @@ int main()
 		printf("\n");
 	}
 
+	int& n = reflectables[0]->Get("v_test0[2].y").Int();
+	n = 12345;
+
+	ReflectInfoIterator::Reflectable_Info r = reflectables[0]->Get("v_test0[2]");
+	r.Get("x").Int() = 1010;
+	//Reflectable::Get("x", r.reflectable, r.infos).Int() = 1010;
+
+	ReflectInfoIterator::Reflectable_Info r_class = reflectables[2]->Get("test");
+
 	Serialize(reflectables[2], "test.json");
 
 	scanf_s("");

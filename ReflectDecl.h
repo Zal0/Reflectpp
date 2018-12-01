@@ -22,7 +22,7 @@ static ReflectInfo* ClassReflectInfos() {
 	static ReflectInfo info[] = {
 		ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INHERITANCE_TABLE, "rht", (PTR)InheritanceTable),
 		REFLECTION_DATA
-		ReflectInfo::End()
+		ReflectInfo::End
 	};
 	return info;
 }

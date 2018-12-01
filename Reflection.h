@@ -44,7 +44,7 @@ public:
 
 public:
 	ReflectInfo(ReflectType reflect_type, const char* id, PTR ptr, PTR extra = 0) : reflect_type(reflect_type), id(id), ptr(ptr), extra(extra) {}
-	static ReflectInfo End() {return ReflectInfo(REFLECT_TYPE_INT, "", 0);} 
+	static ReflectInfo End;
 };
 typedef ReflectInfo*(*ReflectInfosFunc)();
 
@@ -69,7 +69,7 @@ private:
 public:
 	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT<T>(ptr));}
 	
-	virtual int GetNumElems() {return v.size();}
+	virtual int GetNumElems() {return (int)v.size();}
 	virtual void Push() {v.push_back(T());}
 	virtual void Pop() {v.pop_back();}
 	virtual void* GetElem(int idx) {return &v[idx];}
@@ -80,11 +80,11 @@ typedef VectorHandler(*VectorHandlerFunc)(void*);
 class Reflectable;
 class ReflectInfoIterator {
 public:
-	class Reflectable_Info {
+	class ReflectField {
 	public:
 		void* reflectable;
 		ReflectInfo* infos;
-		Reflectable_Info(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
+		ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
 
 		int& Int() {return *REFLECT_PTR(int, reflectable, infos->ptr);}
 		short& Short() {return *REFLECT_PTR(short, reflectable, infos->ptr);}
@@ -92,58 +92,21 @@ public:
 		Reflectable* ClassPtr() {return REFLECT_PTR(Reflectable, reflectable, infos->ptr);}
 		ReflectInfo* ReflectInfos() {return ((ReflectInfosFunc)infos->extra)();}
 		VectorHandler GetVectorHandler() {return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));}
-		Reflectable_Info Get(const char* field);
+		ReflectField Get(const char* field);
 	};
-	std::vector< Reflectable_Info > l;
+	std::vector< ReflectField > l;
 
 public:
-	ReflectInfoIterator(void* reflectable, ReflectInfo* infos)
-	{
-		l.push_back(Reflectable_Info(reflectable, infos));
-	}
-
-	Reflectable_Info Next() 
-	{
-		if(l.empty())
-			return Reflectable_Info(0, 0);
-
-		void* reflectable  = l[l.size() -1].reflectable;
-		ReflectInfo* infos = (l[l.size() - 1].infos) ++;
-		if(infos->id == "")
-		{
-			l.pop_back();
-			return Next();
-		}
-
-		switch(infos->reflect_type)
-		{
-			case ReflectInfo::ReflectType::REFLECT_TYPE_INHERITANCE_TABLE:
-				l.push_back(Reflectable_Info(reflectable, ((ReflectInfosFunc)(infos->ptr))()));
-				return Next();
-
-			case ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS: {
-				Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-				l.push_back(Reflectable_Info(classObj, ((ReflectInfosFunc)(infos->extra))()));
-				return Next();
-			}
-
-			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS:
-			default:
-				return Reflectable_Info(reflectable, infos);
-		}
-	}
+	ReflectInfoIterator(void* reflectable, ReflectInfo* infos);
+	ReflectField Next();
 };
-
 
 class Reflectable
 {
 public:
 	static ReflectInfo* ClassReflectInfos() {
 		static ReflectInfo info[] = {
-			ReflectInfo::End()
+			ReflectInfo::End
 		};
 		return info;
 	}
@@ -151,62 +114,7 @@ public:
 	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 	virtual void* ClassAddress() {return this;}
 
-	ReflectInfoIterator::Reflectable_Info Get(const char* field)
-	{
-		return Get(field, ClassAddress(), ReflectInfos());
-	}
-
-	static int strcmpidx(const char* str0, const char* str1)
-	{
-		int ret = 0;
-		while(*str0 != '\0' && *str1 != '\0' && *str0 == *str1)
-		{
-			str0 ++;
-			str1 ++;
-			ret ++;
-		}
-		return ret;
-	}
-
-	static ReflectInfoIterator::Reflectable_Info Get(const char* field, void* reflectable, ReflectInfo* infos = 0)
-	{
-		ReflectInfoIterator it(reflectable, infos);
-		ReflectInfoIterator::Reflectable_Info info(0,0);
-		int n;
-		while((info = it.Next()).reflectable)
-		{
-			n = strcmpidx(info.infos->id, field);
-			if(info.infos->id[n] == '\0')
-			{
-				if(field[n] == '\0')
-				{
-					if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
-						return ReflectInfoIterator::Reflectable_Info(info.ClassPtr(), info.ReflectInfos());
-					else
-						return info;
-				}
-				else if(field[n] == '.')
-				{
-					if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
-						return Get(&field[n + 1], info.ClassPtr(), info.ReflectInfos());
-				}
-				else if(field[n] == '[')
-				{
-					if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS)
-					{
-						char* end;
-						int idx = strtol(field + n + 1, &end, 10);
-						VectorHandler vector_handler = info.GetVectorHandler();
-						if(*(end + 1) == '\0')
-							return ReflectInfoIterator::Reflectable_Info(vector_handler->GetElem(idx), vector_handler->GetItemsReflectInfos());
-						else
-							return Get(end + 2, vector_handler->GetElem(idx), vector_handler->GetItemsReflectInfos());
-					}
-				}
-			}
-		}
-		return ReflectInfoIterator::Reflectable_Info(0,0);
-	}
+	ReflectInfoIterator::ReflectField Get(const char* field);
 };
 
 template< class T >
@@ -225,16 +133,16 @@ public:
 //ReflectInfos to a Reflectable in that address will always return A:::ReflectInfos)
 #define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::ClassReflectInfos),
 
-#define REFLECTABLE_CLASS(A)                                 \
-class A : public ReflectableInit< A >, public virtual Reflectable {  \
-private:                                                     \
-	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}      \
-                                                             \
-	static ReflectInfo* InheritanceTable() {                   \
-			static ReflectInfo info[] = {                          \
-				ReflectInfo::End()                                   \
-			};                                                     \
-			return info;                                           \
+#define REFLECTABLE_CLASS(A)                                        \
+class A : public ReflectableInit< A >, public virtual Reflectable { \
+private:                                                            \
+	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}             \
+                                                                    \
+	static ReflectInfo* InheritanceTable() {                          \
+			static ReflectInfo info[] = {                                 \
+				ReflectInfo::End                                            \
+			};                                                            \
+			return info;                                                  \
 		}
 
 #define REFLECTABLE_CLASS_INHERITS_1(A, B)              \
@@ -245,7 +153,7 @@ private:                                                \
 	static ReflectInfo* InheritanceTable() {              \
 		static ReflectInfo info[] = {                       \
 			REFLECT_INHERIT(B)                                \
-			ReflectInfo::End()                                \
+			ReflectInfo::End                                  \
 		};                                                  \
 		return info;                                        \
 	}
@@ -259,7 +167,7 @@ private:                                                    \
 		static ReflectInfo info[] = {                           \
 			REFLECT_INHERIT(B)                                    \
 			REFLECT_INHERIT(C)                                    \
-			ReflectInfo::End()                                    \
+			ReflectInfo::End                                      \
 		};                                                      \
 		return info;                                            \
 	}

@@ -7,7 +7,7 @@ void Serialize(std::ofstream& out, void* reflectable, ReflectInfo* infos)
 	out << "{";
 
 	ReflectInfoIterator it(reflectable, infos);
-	ReflectInfoIterator::Reflectable_Info info(0,0);
+	ReflectInfoIterator::ReflectField info(0,0);
 	bool first_field = true;
 	while((info = it.Next()).reflectable)
 	{
@@ -97,14 +97,14 @@ char* NextToken(char* buffer, std::ifstream& in)
 	return ret;
 }
 
-void DeserializeValue(ReflectInfoIterator::Reflectable_Info& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos);
+void DeserializeValue(ReflectInfoIterator::ReflectField& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos);
 void Deserialize(std::ifstream& in, void* reflectable, ReflectInfo* infos)
 {
 	char buffer[255];
 	NextToken(buffer, in); // key
 	while(buffer[0] != '}')
 	{
-		ReflectInfoIterator::Reflectable_Info r_info = Reflectable::Get(buffer, reflectable, infos);
+		ReflectInfoIterator::ReflectField r_info = ReflectInfoIterator::ReflectField(reflectable, infos).Get(buffer);
 		NextToken(buffer, in); // :
 
 		DeserializeValue(r_info, buffer, in, reflectable, infos);
@@ -113,7 +113,7 @@ void Deserialize(std::ifstream& in, void* reflectable, ReflectInfo* infos)
 	}
 }
 
-void DeserializeValue(ReflectInfoIterator::Reflectable_Info& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos)
+void DeserializeValue(ReflectInfoIterator::ReflectField& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos)
 {
 	NextToken(buffer, in); // Value
 	if(buffer[0] == '{')

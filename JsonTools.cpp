@@ -59,7 +59,95 @@ void Serialize(std::ofstream& out, void* reflectable, ReflectInfo* infos)
 
 void Serialize(void* reflectable, char* path)
 {
-	std::ofstream fout(path, std::ios::out);
+	std::ofstream fout(path);
 	Serialize(fout, ((Reflectable*)reflectable)->ClassAddress(), ((Reflectable*)reflectable)->ReflectInfos());
 	fout.close();
+}
+
+
+bool IsWhiteSpace(const char& c)
+{
+	return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+}
+
+char* NextToken(char* buffer, std::ifstream& in) 
+{
+	char* ret = buffer;
+	char c;
+	do{ in >> c;} while(IsWhiteSpace(c));
+
+	if(c == '\"')
+	{
+		in >> c;
+		while(c != '\"')
+		{
+			*(buffer ++) = c;
+			in >> c;
+		}
+	}
+	else
+	{
+		while(!IsWhiteSpace(c))
+		{
+			*(buffer ++) = c;
+			in >> c;
+		}
+	}
+	(*buffer) = '\0';
+	return ret;
+}
+
+void DeserializeValue(ReflectInfoIterator::Reflectable_Info& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos);
+void Deserialize(std::ifstream& in, void* reflectable, ReflectInfo* infos)
+{
+	char buffer[255];
+	NextToken(buffer, in); // key
+	while(buffer[0] != '}')
+	{
+		ReflectInfoIterator::Reflectable_Info r_info = Reflectable::Get(buffer, reflectable, infos);
+		NextToken(buffer, in); // :
+
+		DeserializeValue(r_info, buffer, in, reflectable, infos);
+
+		NextToken(buffer, in);
+	}
+}
+
+void DeserializeValue(ReflectInfoIterator::Reflectable_Info& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos)
+{
+	NextToken(buffer, in); // Value
+	if(buffer[0] == '{')
+	{
+		Deserialize(in, r_info.ClassPtr(), r_info.ReflectInfos());
+	}
+	else if(buffer[0] == '[')
+	{
+		VectorHandler v = r_info.GetVectorHandler();
+		NextToken(buffer, in);
+		while(buffer[0] != ']')
+		{
+			v->Push();
+			void* new_elem = v->GetElem(v->GetNumElems() - 1);
+			DeserializeValue(r_info, buffer, in, new_elem, v->GetItemsReflectInfos());
+		}
+	}
+	else
+	{
+		switch (r_info.infos->reflect_type)
+		{
+			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:   r_info.Int()   = atoi(buffer); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT: r_info.Short() = (short)atoi(buffer); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT: r_info.Float() = (float)atof(buffer); break;
+			default: break;
+		}
+	}
+}
+
+void Deserialize(void* reflectable, char* path)
+{
+	std::ifstream fin(path);
+	char tmp[2];
+	NextToken(tmp, fin); //Skip the first '{'
+	Deserialize(fin, ((Reflectable*)reflectable)->ClassAddress(), ((Reflectable*)reflectable)->ReflectInfos());
+	fin.close();
 }

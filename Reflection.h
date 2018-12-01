@@ -75,7 +75,6 @@ public:
 	virtual void* GetElem(int idx) {return &v[idx];}
 	virtual ReflectInfo* GetItemsReflectInfos() {return T::ClassReflectInfos();}
 };
-
 typedef VectorHandler(*VectorHandlerFunc)(void*);
 
 class Reflectable;
@@ -93,6 +92,7 @@ public:
 		Reflectable* ClassPtr() {return REFLECT_PTR(Reflectable, reflectable, infos->ptr);}
 		ReflectInfo* ReflectInfos() {return ((ReflectInfosFunc)infos->extra)();}
 		VectorHandler GetVectorHandler() {return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));}
+		Reflectable_Info Get(const char* field);
 	};
 	std::vector< Reflectable_Info > l;
 
@@ -178,37 +178,36 @@ public:
 			n = strcmpidx(info.infos->id, field);
 			if(info.infos->id[n] == '\0')
 			{
-				switch (info.infos->reflect_type)
+				if(field[n] == '\0')
 				{
-					case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-					case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-					case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-						if(field[n] == '\0')
-							return info;
-
-					case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS:
-						if(field[n] == '.')
-						{
-							return Get(&field[n + 1], info.ClassPtr(), info.ReflectInfos());
-						}
-						break;
-
-					case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS:
-						if(field[n] == '[')
-						{
-							char* end;
-							int idx = strtol(field + n + 1, &end, 10);
-							VectorHandler vector_handler = info.GetVectorHandler();
+					if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
+						return ReflectInfoIterator::Reflectable_Info(info.ClassPtr(), info.ReflectInfos());
+					else
+						return info;
+				}
+				else if(field[n] == '.')
+				{
+					if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
+						return Get(&field[n + 1], info.ClassPtr(), info.ReflectInfos());
+				}
+				else if(field[n] == '[')
+				{
+					if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS)
+					{
+						char* end;
+						int idx = strtol(field + n + 1, &end, 10);
+						VectorHandler vector_handler = info.GetVectorHandler();
+						if(*(end + 1) == '\0')
+							return ReflectInfoIterator::Reflectable_Info(vector_handler->GetElem(idx), vector_handler->GetItemsReflectInfos());
+						else
 							return Get(end + 2, vector_handler->GetElem(idx), vector_handler->GetItemsReflectInfos());
-						}
-						break;
+					}
 				}
 			}
 		}
+		return ReflectInfoIterator::Reflectable_Info(0,0);
 	}
 };
-
-
 
 template< class T >
 class ReflectableInit

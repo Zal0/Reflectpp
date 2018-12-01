@@ -116,11 +116,19 @@ int main()
 	int& n = reflectables[0]->Get("v_test0[2].y").Int();
 	n = 12345;
 
-	ReflectInfoIterator::Reflectable_Info r = reflectables[0]->Get("v_test0[2]");
-	r.Get("x").Int() = 1010;
+	ReflectInfoIterator::Reflectable_Info r = reflectables[2]->Get("v_test0");
+	VectorHandler v_h = r.GetVectorHandler();
+	v_h->Push();
+	//Reflectable::Get("x", v_h->GetElem(0), v_h->GetItemsReflectInfos()).Int() = 1010;
+	r = ReflectInfoIterator::Reflectable_Info(v_h->GetElem(0), v_h->GetItemsReflectInfos());
+	r.Get("x").Int() = 786;
+
+	//TOOD: GetElem return ReflectInfoIterator::Reflectable_Info
+	//r.Get("x").Int() = 1010;
 	//Reflectable::Get("x", r.reflectable, r.infos).Int() = 1010;
 
 	ReflectInfoIterator::Reflectable_Info r_class = reflectables[2]->Get("test");
+	r_class.Get("As").Short() = 321;
 
 	Serialize(reflectables[2], "test.json");
 

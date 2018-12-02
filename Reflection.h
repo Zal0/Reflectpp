@@ -21,6 +21,13 @@
 //Returns a pointer casted to TYPE of the data stored in INSTANCE at OFFSET
 #define REFLECT_PTR(TYPE, INSTANCE, OFFSET) (TYPE*)(((char*)(INSTANCE)) + OFFSET)
 
+class ReflectInfo;
+class Reflectable;
+class VectorHandlerI;
+typedef ReflectInfo*(*ReflectInfosFunc)();
+typedef std::auto_ptr< VectorHandlerI > VectorHandler;
+typedef VectorHandler(*VectorHandlerFunc)(void*);
+
 class ReflectInfo 
 {
 public:
@@ -46,7 +53,21 @@ public:
 	ReflectInfo(ReflectType reflect_type, const char* id, PTR ptr, PTR extra = 0) : reflect_type(reflect_type), id(id), ptr(ptr), extra(extra) {}
 	static ReflectInfo End;
 };
-typedef ReflectInfo*(*ReflectInfosFunc)();
+
+class ReflectField {
+public:
+	void* reflectable;
+	ReflectInfo* infos;
+	ReflectField(Reflectable* reflectable);
+	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
+
+	int& Int() {return *REFLECT_PTR(int, reflectable, infos->ptr);}
+	short& Short() {return *REFLECT_PTR(short, reflectable, infos->ptr);}
+	float& Float() {return *REFLECT_PTR(float, reflectable, infos->ptr);}
+	ReflectField ClassPtr() {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
+	VectorHandler GetVectorHandler() {return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));}
+	ReflectField Get(const char* field);
+};
 
 class VectorHandlerI
 {
@@ -54,10 +75,12 @@ public:
 	virtual int GetNumElems() = 0;
 	virtual void Push() = 0;
 	virtual void Pop() = 0;
-	virtual void* GetElem(int idx) = 0;
+	ReflectField GetElem(int idx) {return ReflectField(GetElemPtr(idx), GetItemsReflectInfos());}
+
+protected:
+	virtual void* GetElemPtr(int idx) = 0;
 	virtual ReflectInfo* GetItemsReflectInfos() = 0;
 };
-typedef std::auto_ptr< VectorHandlerI > VectorHandler;
 
 template< class T >
 class VectorHandlerT : public VectorHandlerI
@@ -72,39 +95,22 @@ public:
 	virtual int GetNumElems() {return (int)v.size();}
 	virtual void Push() {v.push_back(T());}
 	virtual void Pop() {v.pop_back();}
-	virtual void* GetElem(int idx) {return &v[idx];}
+	virtual void* GetElemPtr(int idx) {return &v[idx];}
 	virtual ReflectInfo* GetItemsReflectInfos() {return T::ClassReflectInfos();}
 };
-typedef VectorHandler(*VectorHandlerFunc)(void*);
 
-class Reflectable;
 class ReflectInfoIterator {
 public:
-	class ReflectField {
-	public:
-		void* reflectable;
-		ReflectInfo* infos;
-		ReflectField(Reflectable* reflectable);
-		ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
-
-		int& Int() {return *REFLECT_PTR(int, reflectable, infos->ptr);}
-		short& Short() {return *REFLECT_PTR(short, reflectable, infos->ptr);}
-		float& Float() {return *REFLECT_PTR(float, reflectable, infos->ptr);}
-		Reflectable* ClassPtr() {return REFLECT_PTR(Reflectable, reflectable, infos->ptr);}
-		ReflectInfo* ReflectInfos() {return ((ReflectInfosFunc)infos->extra)();}
-		VectorHandler GetVectorHandler() {return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));}
-		ReflectField Get(const char* field);
-	};
 	std::vector< ReflectField > l;
 
 public:
-	ReflectInfoIterator(void* reflectable, ReflectInfo* infos);
+	ReflectInfoIterator(const ReflectField& reflectable);
 	ReflectField Next();
 };
 
 class Reflectable
 {
-public:
+private:
 	static ReflectInfo* ClassReflectInfos() {
 		static ReflectInfo info[] = {
 			ReflectInfo::End
@@ -112,10 +118,11 @@ public:
 		return info;
 	}
 
+public:
 	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 	virtual void* This() {return this;}
 
-	ReflectInfoIterator::ReflectField Get(const char* field);
+	ReflectField Get(const char* field);
 };
 
 template< class T >

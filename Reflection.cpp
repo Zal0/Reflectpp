@@ -1,5 +1,13 @@
 #include "Reflection.h"
 
+ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0); 
+
+ReflectField::ReflectField(Reflectable* reflectable)
+{
+	this->reflectable = reflectable->This();
+	this->infos = reflectable->ReflectInfos();
+}
+
 static int strcmpidx(const char* str0, const char* str1)
 {
 	int ret = 0;
@@ -12,10 +20,10 @@ static int strcmpidx(const char* str0, const char* str1)
 	return ret;
 }
 
-ReflectInfoIterator::ReflectField Get(const char* field, void* reflectable, ReflectInfo* infos)
+ReflectField ReflectField::Get(const char* field) 
 {
-	ReflectInfoIterator it(reflectable, infos);
-	ReflectInfoIterator::ReflectField info(0,0);
+	ReflectInfoIterator it(*this);
+	ReflectField info(0,0);
 	int n;
 	while((info = it.Next()).reflectable)
 	{
@@ -25,14 +33,14 @@ ReflectInfoIterator::ReflectField Get(const char* field, void* reflectable, Refl
 			if(field[n] == '\0')
 			{
 				if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
-					return ReflectInfoIterator::ReflectField(info.ClassPtr(), info.ReflectInfos());
+					return info.ClassPtr();
 				else
 					return info;
 			}
 			else if(field[n] == '.')
 			{
 				if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
-					return Get(&field[n + 1], info.ClassPtr(), info.ReflectInfos());
+					return info.ClassPtr().Get(&field[n + 1]);
 			}
 			else if(field[n] == '[')
 			{
@@ -42,36 +50,29 @@ ReflectInfoIterator::ReflectField Get(const char* field, void* reflectable, Refl
 					int idx = strtol(field + n + 1, &end, 10);
 					VectorHandler vector_handler = info.GetVectorHandler();
 					if(*(end + 1) == '\0')
-						return ReflectInfoIterator::ReflectField(vector_handler->GetElem(idx), vector_handler->GetItemsReflectInfos());
+						return vector_handler->GetElem(idx);
 					else
-						return Get(end + 2, vector_handler->GetElem(idx), vector_handler->GetItemsReflectInfos());
+						return vector_handler->GetElem(idx).Get(end + 2);
 				}
 			}
 		}
 	}
-	return ReflectInfoIterator::ReflectField(0,0);
+	return ReflectField(0,0);
 }
 
-ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0); 
-
-ReflectInfoIterator::ReflectField ReflectInfoIterator::ReflectField::Get(const char* field) 
+ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)
 {
-	return ::Get(field, reflectable, infos);
+	l.push_back(reflectable);
 }
 
-ReflectInfoIterator::ReflectInfoIterator(void* reflectable, ReflectInfo* infos)
+ReflectField ReflectInfoIterator::Next() 
 {
-	l.push_back(ReflectField(reflectable, infos));
-}
-
-ReflectInfoIterator::ReflectField ReflectInfoIterator::Next() 
-{
-	if(l.empty())
+	if(l.empty()) //Done
 		return ReflectField(0, 0);
 
 	void* reflectable  = l[l.size() -1].reflectable;
 	ReflectInfo* infos = (l[l.size() - 1].infos) ++;
-	if(infos->id == "")
+	if(infos->id == "") //table end
 	{
 		l.pop_back();
 		return Next();
@@ -89,16 +90,12 @@ ReflectInfoIterator::ReflectField ReflectInfoIterator::Next()
 			return Next();
 		}
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-		case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-		case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-		case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS:
 		default:
 			return ReflectField(reflectable, infos);
 	}
 }
 
-ReflectInfoIterator::ReflectField Reflectable::Get(const char* field)
+ReflectField Reflectable::Get(const char* field)
 {
-	return ::Get(field, This(), ReflectInfos());
+	return ReflectField(this).Get(field);
 }

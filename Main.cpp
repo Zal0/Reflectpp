@@ -41,21 +41,15 @@ public:
 	#include "ReflectDecl.h"
 };
 
-void PrintReflectable(void* reflectable, ReflectInfo* infos = 0, int depth = 0)
+void PrintReflectable(ReflectField reflectable, int depth = 0)
 {
-	if(infos == 0)
-	{
-		infos = ((Reflectable*)reflectable)->ReflectInfos();
-		reflectable = ((Reflectable*)reflectable)->This();//reflectable is pointing to Reflectable base (virtual) class, we need to make sure it points the this pointer
-	}
-
 	char* tabs = new char[depth + 1];
 	for(int i = 0; i < depth; ++i)
 		tabs[i] = ' ';
 	tabs[depth] = '\0';
 
-	ReflectInfoIterator it(reflectable, infos);
-	ReflectInfoIterator::ReflectField info(0,0);
+	ReflectInfoIterator it(reflectable);
+	ReflectField info(0,0);
 	while((info = it.Next()).reflectable)
 	{
 		switch (info.infos->reflect_type)
@@ -74,7 +68,7 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos = 0, int depth = 0)
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
 				printf("%s%s:\n", tabs, info.infos->id);
-				PrintReflectable(info.ClassPtr(), info.ReflectInfos(), depth + 1);
+				PrintReflectable(info.ClassPtr(), depth + 1);
 				break;
 			}
 
@@ -84,7 +78,7 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos = 0, int depth = 0)
 				for(int i = 0; i < vector_handler->GetNumElems(); ++i)
 				{
 					printf("%s [%d]\n", tabs, i);
-					PrintReflectable(vector_handler->GetElem(i), vector_handler->GetItemsReflectInfos(), depth + 2);
+					PrintReflectable(vector_handler->GetElem(i), depth + 2);
 				}
 				break;
 			}
@@ -116,18 +110,18 @@ int main()
 	int& n = reflectables[0]->Get("v_test0[2].y").Int();
 	n = 12345;
 
-	ReflectInfoIterator::ReflectField r = reflectables[2]->Get("v_test0");
+	ReflectField r = reflectables[2]->Get("v_test0");
 	VectorHandler v_h = r.GetVectorHandler();
 	v_h->Push();
 	//Reflectable::Get("x", v_h->GetElem(0), v_h->GetItemsReflectInfos()).Int() = 1010;
-	r = ReflectInfoIterator::ReflectField(v_h->GetElem(0), v_h->GetItemsReflectInfos());
+	r = ReflectField(v_h->GetElem(0));
 	r.Get("x").Int() = 786;
 
-	//TOOD: GetElem return ReflectInfoIterator::ReflectField
+	//TOOD: GetElem return ReflectField
 	//r.Get("x").Int() = 1010;
 	//Reflectable::Get("x", r.reflectable, r.infos).Int() = 1010;
 
-	ReflectInfoIterator::ReflectField r_class = reflectables[2]->Get("test");
+	ReflectField r_class = reflectables[2]->Get("test");
 	r_class.Get("As").Short() = 321;
 
 	Serialize(reflectables[2], "test.json");

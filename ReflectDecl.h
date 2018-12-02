@@ -1,15 +1,24 @@
+//Fields declaration
+#undef REFLECT_INT
+#undef REFLECT_SHORT
+#undef REFLECT_FLOAT
+#undef REFLECT_CLASS
+#undef REFLECT_VECTOR_CLASS
+
 #define REFLECT_INT(ACCESS, A, DEFAULT)    ACCESS: int A;	
 #define REFLECT_SHORT(ACCESS, A, DEFAULT)  ACCESS: short A;
 #define REFLECT_FLOAT(ACCESS, A, DEFAULT)  ACCESS: float A;
 #define REFLECT_CLASS(ACCESS, CLASS, name) ACCESS: CLASS name;
 #define REFLECT_VECTOR_CLASS(ACCESS, CLASS, name) ACCESS: std::vector< CLASS > name;
 REFLECTION_DATA
+
+//Class ReflectInfos array
 #undef REFLECT_INT
 #undef REFLECT_SHORT
 #undef REFLECT_FLOAT
 #undef REFLECT_CLASS
 #undef REFLECT_VECTOR_CLASS
-	
+
 #define REFLECT_INT(ACCESS, A, DEFAULT)        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INT,   #A, OFFSET(A)),
 #define REFLECT_SHORT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
 #define REFLECT_FLOAT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
@@ -30,6 +39,7 @@ virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 
 virtual void* ClassAddress() {return this;}
 
+//Fields initialization
 #undef REFLECT_INT
 #undef REFLECT_SHORT
 #undef REFLECT_FLOAT

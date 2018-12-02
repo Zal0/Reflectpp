@@ -60,7 +60,7 @@ void Serialize(std::ofstream& out, void* reflectable, ReflectInfo* infos)
 void Serialize(void* reflectable, char* path)
 {
 	std::ofstream fout(path);
-	Serialize(fout, ((Reflectable*)reflectable)->ClassAddress(), ((Reflectable*)reflectable)->ReflectInfos());
+	Serialize(fout, ((Reflectable*)reflectable)->This(), ((Reflectable*)reflectable)->ReflectInfos());
 	fout.close();
 }
 
@@ -148,6 +148,6 @@ void Deserialize(void* reflectable, char* path)
 	std::ifstream fin(path);
 	char tmp[2];
 	NextToken(tmp, fin); //Skip the first '{'
-	Deserialize(fin, ((Reflectable*)reflectable)->ClassAddress(), ((Reflectable*)reflectable)->ReflectInfos());
+	Deserialize(fin, ((Reflectable*)reflectable)->This(), ((Reflectable*)reflectable)->ReflectInfos());
 	fin.close();
 }

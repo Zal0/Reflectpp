@@ -84,6 +84,7 @@ public:
 	public:
 		void* reflectable;
 		ReflectInfo* infos;
+		ReflectField(Reflectable* reflectable);
 		ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
 
 		int& Int() {return *REFLECT_PTR(int, reflectable, infos->ptr);}
@@ -112,7 +113,7 @@ public:
 	}
 
 	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
-	virtual void* ClassAddress() {return this;}
+	virtual void* This() {return this;}
 
 	ReflectInfoIterator::ReflectField Get(const char* field);
 };

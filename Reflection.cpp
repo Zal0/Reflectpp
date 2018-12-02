@@ -100,5 +100,5 @@ ReflectInfoIterator::ReflectField ReflectInfoIterator::Next()
 
 ReflectInfoIterator::ReflectField Reflectable::Get(const char* field)
 {
-	return ::Get(field, ClassAddress(), ReflectInfos());
+	return ::Get(field, This(), ReflectInfos());
 }

@@ -46,7 +46,7 @@ void PrintReflectable(void* reflectable, ReflectInfo* infos = 0, int depth = 0)
 	if(infos == 0)
 	{
 		infos = ((Reflectable*)reflectable)->ReflectInfos();
-		reflectable = ((Reflectable*)reflectable)->ClassAddress();//reflectable is pointing to Reflectable base (virtual) class, we need to make sure it points the this pointer
+		reflectable = ((Reflectable*)reflectable)->This();//reflectable is pointing to Reflectable base (virtual) class, we need to make sure it points the this pointer
 	}
 
 	char* tabs = new char[depth + 1];

@@ -37,7 +37,7 @@ static ReflectInfo* ClassReflectInfos() {
 }
 virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 
-virtual void* ClassAddress() {return this;}
+virtual void* This() {return this;}
 
 //Fields initialization
 #undef REFLECT_INT

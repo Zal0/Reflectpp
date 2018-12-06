@@ -2,12 +2,12 @@
 
 #include <fstream>
 
-void Serialize(std::ofstream& out, void* reflectable, ReflectInfo* infos)
+void Serialize(std::ofstream& out, ReflectField reflectable)
 {
 	out << "{";
 
-	ReflectInfoIterator it(reflectable, infos);
-	ReflectInfoIterator::ReflectField info(0,0);
+	ReflectInfoIterator it(reflectable);
+	ReflectField info(0,0);
 	bool first_field = true;
 	while((info = it.Next()).reflectable)
 	{
@@ -36,7 +36,7 @@ void Serialize(std::ofstream& out, void* reflectable, ReflectInfo* infos)
 
 			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
 				out << "\"" << info.infos->id << "\": ";
-				Serialize(out, info.ClassPtr(), info.ReflectInfos());
+				Serialize(out, info.ClassPtr());
 				break;
 			}
 
@@ -46,7 +46,7 @@ void Serialize(std::ofstream& out, void* reflectable, ReflectInfo* infos)
 				for(int i = 0; i < vector_handler->GetNumElems(); ++i)
 				{
 					if(i != 0) out << ", ";
-					Serialize(out, vector_handler->GetElem(i), vector_handler->GetItemsReflectInfos());
+					Serialize(out, ReflectField(vector_handler->GetElem(i)));
 				}
 				out << "]";
 				break;
@@ -57,97 +57,133 @@ void Serialize(std::ofstream& out, void* reflectable, ReflectInfo* infos)
 	out << "}";
 }
 
-void Serialize(void* reflectable, char* path)
+void Serialize(Reflectable* reflectable, char* path)
 {
 	std::ofstream fout(path);
-	Serialize(fout, ((Reflectable*)reflectable)->This(), ((Reflectable*)reflectable)->ReflectInfos());
+	Serialize(fout, reflectable);
 	fout.close();
 }
 
-
-bool IsWhiteSpace(const char& c)
+class PeekStream 
 {
-	return c == ' ' || c == '\t' || c == '\r' || c == '\n';
-}
+private:
+	void Get() {c = stream.get();}
 
-char* NextToken(char* buffer, std::ifstream& in) 
-{
-	char* ret = buffer;
+public:
 	char c;
-	do{ in >> c;} while(IsWhiteSpace(c));
-
-	if(c == '\"')
-	{
-		in >> c;
-		while(c != '\"')
-		{
-			*(buffer ++) = c;
-			in >> c;
-		}
-	}
-	else
-	{
-		while(!IsWhiteSpace(c))
-		{
-			*(buffer ++) = c;
-			in >> c;
-		}
-	}
-	(*buffer) = '\0';
-	return ret;
-}
-
-void DeserializeValue(ReflectInfoIterator::ReflectField& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos);
-void Deserialize(std::ifstream& in, void* reflectable, ReflectInfo* infos)
-{
 	char buffer[255];
-	NextToken(buffer, in); // key
-	while(buffer[0] != '}')
+	std::ifstream& stream;
+
+	PeekStream(std::ifstream& stream) : stream(stream) {c = stream.get();}
+
+	bool IsWhiteSpace()
 	{
-		ReflectInfoIterator::ReflectField r_info = ReflectInfoIterator::ReflectField(reflectable, infos).Get(buffer);
-		NextToken(buffer, in); // :
+		return c == ' ' || c == '\t' || c == '\r' || c == '\n';
+	}
 
-		DeserializeValue(r_info, buffer, in, reflectable, infos);
+	bool IsSpecialChar() 
+	{
+		return c == '{' || c == '}' || c == ':' || c == ',' || c == '[' || c == ']';
+	}
 
-		NextToken(buffer, in);
+	char* NextToken() 
+	{
+		char* buf = buffer;
+		while(IsWhiteSpace()) {Get();}
+
+		if(IsSpecialChar())
+		{
+			*(buf ++) = c;
+			Get();
+		}
+		else if(c == '\"')
+		{
+			Get();
+			while(c != '\"')
+			{
+				*(buf ++) = c;
+				Get();
+			}
+			Get();
+		}
+		else
+		{
+			while(!IsWhiteSpace() && !IsSpecialChar())
+			{
+				*(buf ++) = c;
+				Get();
+			}
+		}
+		(*buf) = '\0';
+		return buffer;
+	}
+};
+
+void DeserializeValue(ReflectField r_info, PeekStream& in);
+void Deserialize(ReflectField reflectable, PeekStream& in)
+{
+	char* token = in.NextToken();
+	while(token[0] != '}')
+	{
+		ReflectField r_info = reflectable.Get(token);
+		in.NextToken(); // :
+
+		in.NextToken();
+		DeserializeValue(r_info, in);
+
+		token = in.NextToken(); //,
+		if(token[0] == ',')
+		{
+			token = in.NextToken();
+		}
 	}
 }
 
-void DeserializeValue(ReflectInfoIterator::ReflectField& r_info, char* buffer, std::ifstream& in, void* reflectable, ReflectInfo* infos)
+void DeserializeValue(ReflectField r_info, PeekStream& in)
 {
-	NextToken(buffer, in); // Value
-	if(buffer[0] == '{')
+	char* token = in.buffer; // Value
+	if(token[0] == '{')
 	{
-		Deserialize(in, r_info.ClassPtr(), r_info.ReflectInfos());
+		Deserialize(r_info, in);
 	}
-	else if(buffer[0] == '[')
+	else if(token[0] == '[')
 	{
 		VectorHandler v = r_info.GetVectorHandler();
-		NextToken(buffer, in);
-		while(buffer[0] != ']')
+		v->Clear();
+		token = in.NextToken();
+		while(token[0] != ']')
 		{
 			v->Push();
-			void* new_elem = v->GetElem(v->GetNumElems() - 1);
-			DeserializeValue(r_info, buffer, in, new_elem, v->GetItemsReflectInfos());
+			ReflectField new_elem = v->GetElem(v->GetNumElems() - 1);
+			DeserializeValue(new_elem, in);
+
+			token = in.NextToken();
+			if(token[0] == ',')
+			{
+				token = in.NextToken();
+			}
 		}
 	}
 	else
 	{
 		switch (r_info.infos->reflect_type)
 		{
-			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:   r_info.Int()   = atoi(buffer); break;
-			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT: r_info.Short() = (short)atoi(buffer); break;
-			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT: r_info.Float() = (float)atof(buffer); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:   r_info.Int()   = atoi(token); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT: r_info.Short() = (short)atoi(token); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT: r_info.Float() = (float)atof(token); break;
 			default: break;
 		}
 	}
 }
 
-void Deserialize(void* reflectable, char* path)
+void Deserialize(Reflectable* reflectable, char* path)
 {
-	std::ifstream fin(path);
-	char tmp[2];
-	NextToken(tmp, fin); //Skip the first '{'
-	Deserialize(fin, ((Reflectable*)reflectable)->This(), ((Reflectable*)reflectable)->ReflectInfos());
+	std::ifstream fin(path, std::ios::binary);
+	
+	//PeekStream test(fin);
+	//while(!fin.eof()) test.NextToken();
+	PeekStream in(fin);
+	in.NextToken();
+	DeserializeValue(reflectable, in);
 	fin.close();
 }

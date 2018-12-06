@@ -3,6 +3,6 @@
 
 #include "Reflection.h"
 
-void Serialize(void* reflectable, char* path);
-void Deserialize(void* reflectable, char* path);
+void Serialize(Reflectable* reflectable, char* path);
+void Deserialize(Reflectable* reflectable, char* path);
 #endif

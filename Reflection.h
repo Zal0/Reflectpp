@@ -75,6 +75,7 @@ public:
 	virtual int GetNumElems() = 0;
 	virtual void Push() = 0;
 	virtual void Pop() = 0;
+	virtual void Clear() = 0;
 	ReflectField GetElem(int idx) {return ReflectField(GetElemPtr(idx), GetItemsReflectInfos());}
 
 protected:
@@ -95,6 +96,7 @@ public:
 	virtual int GetNumElems() {return (int)v.size();}
 	virtual void Push() {v.push_back(T());}
 	virtual void Pop() {v.pop_back();}
+	virtual void Clear() {v.clear();}
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
 	virtual ReflectInfo* GetItemsReflectInfos() {return T::ClassReflectInfos();}
 };

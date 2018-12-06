@@ -164,7 +164,7 @@ void DeserializeValue(ReflectField r_info, PeekStream& in)
 			}
 		}
 	}
-	else
+	else if(r_info.reflectable)
 	{
 		switch (r_info.infos->reflect_type)
 		{

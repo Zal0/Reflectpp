@@ -65,7 +65,7 @@ public:
 	short& Short() {return *REFLECT_PTR(short, reflectable, infos->ptr);}
 	float& Float() {return *REFLECT_PTR(float, reflectable, infos->ptr);}
 	ReflectField ClassPtr() {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
-	VectorHandler GetVectorHandler() {return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));}
+	VectorHandler GetVectorHandler();
 	ReflectField Get(const char* field);
 };
 
@@ -97,6 +97,8 @@ public:
 	virtual void Push() {v.push_back(T());}
 	virtual void Pop() {v.pop_back();}
 	virtual void Clear() {v.clear();}
+
+protected:
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
 	virtual ReflectInfo* GetItemsReflectInfos() {return T::ClassReflectInfos();}
 };

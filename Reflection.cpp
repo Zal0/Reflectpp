@@ -22,8 +22,11 @@ static int strcmpidx(const char* str0, const char* str1)
 
 ReflectField ReflectField::Get(const char* field) 
 {
-	ReflectInfoIterator it(*this);
 	ReflectField info(0,0);
+	if(!reflectable)
+		return info;
+
+	ReflectInfoIterator it(*this);
 	int n;
 	while((info = it.Next()).reflectable)
 	{
@@ -58,6 +61,27 @@ ReflectField ReflectField::Get(const char* field)
 		}
 	}
 	return ReflectField(0,0);
+}
+
+class NullVectorHandler : public VectorHandlerI
+{
+public:
+	virtual int GetNumElems(){return 0;}
+	virtual void Push() {}
+	virtual void Pop() {}
+	virtual void Clear() {}
+
+protected:
+	virtual void* GetElemPtr(int idx) {return 0;}
+	virtual ReflectInfo* GetItemsReflectInfos() {return 0;}
+};
+
+VectorHandler ReflectField::GetVectorHandler() 
+{
+	if(reflectable)
+		return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));
+	else
+		return VectorHandler(new NullVectorHandler());
 }
 
 ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)

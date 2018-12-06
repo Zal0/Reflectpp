@@ -74,7 +74,7 @@ public:
 	char buffer[255];
 	std::ifstream& stream;
 
-	PeekStream(std::ifstream& stream) : stream(stream) {c = stream.get();}
+	PeekStream(std::ifstream& stream) : stream(stream) {c = stream.get(); NextToken();}
 
 	bool IsWhiteSpace()
 	{
@@ -180,10 +180,6 @@ void Deserialize(Reflectable* reflectable, char* path)
 {
 	std::ifstream fin(path, std::ios::binary);
 	
-	//PeekStream test(fin);
-	//while(!fin.eof()) test.NextToken();
-	PeekStream in(fin);
-	in.NextToken();
-	DeserializeValue(reflectable, in);
+	DeserializeValue(reflectable, PeekStream(fin));
 	fin.close();
 }

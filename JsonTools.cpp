@@ -68,9 +68,9 @@ class PeekStream
 {
 private:
 	void Get() {c = stream.get();}
+	char c; //The next token available (already read, is cached here)
 
 public:
-	char c;
 	char buffer[255];
 	std::ifstream& stream;
 

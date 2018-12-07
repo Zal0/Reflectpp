@@ -20,7 +20,7 @@ public:
 		REFLECT_INT(public, Ai, 1)  \
 		REFLECT_SHORT(public, As, 2)\
 		REFLECT_VECTOR_CLASS(public, Test0, v_test0)\
-		REFLECT_VECTOR_CLASS(public, float, v_int)
+		REFLECT_VECTOR_CLASS(public, int, v_int)
 	#include "ReflectDecl.h"
 };
 
@@ -103,16 +103,16 @@ int main()
 	reflectables[1] = new B();
 
 	C* c = new C();
-	/*c->v_test0.push_back(Test0());
+	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_int.push_back(1);
 	c->v_int.push_back(2);
 	c->v_int.push_back(3);
-	c->v_int.push_back(4);*/
+	c->v_int.push_back(4);
 	reflectables[2] = c;
 	
-	//Serialize(reflectables[2], "test.json");
+	Serialize(reflectables[2], "test.json");
 	Deserialize(reflectables[2], "test.json");
 
 	for(int i = 0; i < 3; ++i)

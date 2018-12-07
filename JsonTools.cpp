@@ -119,43 +119,37 @@ public:
 	}
 };
 
-void DeserializeValue(ReflectField r_info, PeekStream& in);
 void Deserialize(ReflectField reflectable, PeekStream& in)
-{
-	char* token = in.NextToken();
-	while(token[0] != '}')
-	{
-		ReflectField r_info = reflectable.Get(token);
-		in.NextToken(); // :
-
-		in.NextToken();
-		DeserializeValue(r_info, in);
-
-		token = in.NextToken(); //,
-		if(token[0] == ',')
-		{
-			token = in.NextToken();
-		}
-	}
-}
-
-void DeserializeValue(ReflectField r_info, PeekStream& in)
 {
 	char* token = in.buffer; // Value
 	if(token[0] == '{')
 	{
-		Deserialize(r_info, in);
+		char* token = in.NextToken();
+		while(token[0] != '}')
+		{
+			ReflectField r_info = reflectable.Get(token);
+			in.NextToken(); // :
+
+			in.NextToken();
+			Deserialize(r_info, in);
+
+			token = in.NextToken(); //,
+			if(token[0] == ',')
+			{
+				token = in.NextToken();
+			}
+		}
 	}
 	else if(token[0] == '[')
 	{
-		VectorHandler v = r_info.GetVectorHandler();
+		VectorHandler v = reflectable.GetVectorHandler();
 		v->Clear();
 		token = in.NextToken();
 		while(token[0] != ']')
 		{
 			v->Push();
 			ReflectField new_elem = v->GetElem(v->GetNumElems() - 1);
-			DeserializeValue(new_elem, in);
+			Deserialize(new_elem, in);
 
 			token = in.NextToken();
 			if(token[0] == ',')
@@ -164,13 +158,13 @@ void DeserializeValue(ReflectField r_info, PeekStream& in)
 			}
 		}
 	}
-	else if(r_info.reflectable)
+	else if(reflectable.reflectable)
 	{
-		switch (r_info.infos->reflect_type)
+		switch (reflectable.infos->reflect_type)
 		{
-			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:   r_info.Int()   = atoi(token); break;
-			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT: r_info.Short() = (short)atoi(token); break;
-			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT: r_info.Float() = (float)atof(token); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:   reflectable.Int()   = atoi(token); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT: reflectable.Short() = (short)atoi(token); break;
+			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT: reflectable.Float() = (float)atof(token); break;
 			default: break;
 		}
 	}
@@ -180,6 +174,6 @@ void Deserialize(Reflectable* reflectable, char* path)
 {
 	std::ifstream fin(path, std::ios::binary);
 	
-	DeserializeValue(reflectable, PeekStream(fin));
+	Deserialize(reflectable, PeekStream(fin));
 	fin.close();
 }

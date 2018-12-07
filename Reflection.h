@@ -55,18 +55,21 @@ public:
 };
 
 class ReflectField {
+private:
+	ReflectInfo classDummyInfos[2];
+
 public:
 	void* reflectable;
 	ReflectInfo* infos;
 	ReflectField(Reflectable* reflectable);
-	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
+	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos), classDummyInfos{ReflectInfo::End, ReflectInfo::End} {}
 
-	int& Int() {return *REFLECT_PTR(int, reflectable, infos->ptr);}
-	short& Short() {return *REFLECT_PTR(short, reflectable, infos->ptr);}
-	float& Float() {return *REFLECT_PTR(float, reflectable, infos->ptr);}
-	ReflectField ClassPtr() {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
-	VectorHandler GetVectorHandler();
-	ReflectField Get(const char* field);
+	int& Int() const {return *REFLECT_PTR(int, reflectable, infos->ptr);}
+	short& Short() const {return *REFLECT_PTR(short, reflectable, infos->ptr);}
+	float& Float() const {return *REFLECT_PTR(float, reflectable, infos->ptr);}
+	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
+	VectorHandler GetVectorHandler() const;
+	ReflectField Get(const char* field) const;
 };
 
 class VectorHandlerI

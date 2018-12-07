@@ -2,10 +2,15 @@
 
 ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0); 
 
-ReflectField::ReflectField(Reflectable* reflectable)
+ReflectField::ReflectField(Reflectable* reflectable) :
+	classDummyInfos
+	{
+		ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF())), 
+		ReflectInfo::End
+	}
 {
 	this->reflectable = reflectable->This();
-	this->infos = reflectable->ReflectInfosF()();
+	this->infos = classDummyInfos;
 }
 
 static int strcmpidx(const char* str0, const char* str1)
@@ -20,7 +25,7 @@ static int strcmpidx(const char* str0, const char* str1)
 	return ret;
 }
 
-ReflectField ReflectField::Get(const char* field) 
+ReflectField ReflectField::Get(const char* field) const 
 {
 	ReflectField info(0,0);
 	if(!reflectable)
@@ -76,7 +81,7 @@ protected:
 	virtual ReflectInfo* GetItemsReflectInfos() {return 0;}
 };
 
-VectorHandler ReflectField::GetVectorHandler() 
+VectorHandler ReflectField::GetVectorHandler() const
 {
 	if(reflectable)
 		return ((VectorHandlerFunc)infos->extra)(REFLECT_PTR(void, reflectable, infos->ptr));

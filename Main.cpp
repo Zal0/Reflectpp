@@ -42,7 +42,7 @@ public:
 	#include "ReflectDecl.h"
 };
 
-void PrintReflectable(ReflectField reflectable, int depth)
+void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 {
 	char* tabs = new char[depth + 1];
 	for(int i = 0; i < depth; ++i)
@@ -87,12 +87,6 @@ void PrintReflectable(ReflectField reflectable, int depth)
 			break;
 	}
 	delete[] tabs;
-}
-
-void PrintReflectable(Reflectable* reflectable)
-{
-	ReflectField r(reflectable->This(), &ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF())));
-	PrintReflectable(r, 0);
 }
 
 int main()

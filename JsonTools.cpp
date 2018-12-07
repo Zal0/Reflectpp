@@ -2,7 +2,7 @@
 
 #include <fstream>
 
-void Serialize(std::ofstream& out, ReflectField reflectable)
+void Serialize(std::ofstream& out, const ReflectField& reflectable)
 {
 	switch(reflectable.infos->reflect_type)
 	{
@@ -57,10 +57,8 @@ void Serialize(std::ofstream& out, ReflectField reflectable)
 
 void Serialize(Reflectable* reflectable, char* path)
 {
-	ReflectField r(reflectable->This(), &ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF())));
-
 	std::ofstream fout(path);
-	Serialize(fout, r);
+	Serialize(fout, reflectable);
 	fout.close();
 }
 
@@ -119,7 +117,7 @@ public:
 	}
 };
 
-void Deserialize(ReflectField reflectable, PeekStream& in)
+void Deserialize(const ReflectField& reflectable, PeekStream& in)
 {
 	char* token = in.buffer; // Value
 	if(token[0] == '{')
@@ -173,7 +171,6 @@ void Deserialize(ReflectField reflectable, PeekStream& in)
 void Deserialize(Reflectable* reflectable, char* path)
 {
 	std::ifstream fin(path, std::ios::binary);
-	
 	Deserialize(reflectable, PeekStream(fin));
 	fin.close();
 }

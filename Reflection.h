@@ -56,7 +56,7 @@ public:
 
 class ReflectField {
 private:
-	ReflectInfo classDummyInfos[2];
+	ReflectInfo classDummyInfos[2]; //When casting directly from Reflectable* to Reflectfield I need to store a tmp ReflectTable pointing to the class
 
 public:
 	void* reflectable;

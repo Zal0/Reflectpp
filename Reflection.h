@@ -151,7 +151,6 @@ private:
 	}
 
 public:
-	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
 	virtual ReflectInfosFunc ReflectInfosF(){return ClassReflectInfos;}
 	virtual void* This() {return this;}
 

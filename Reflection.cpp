@@ -5,7 +5,7 @@ ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0);
 ReflectField::ReflectField(Reflectable* reflectable)
 {
 	this->reflectable = reflectable->This();
-	this->infos = reflectable->ReflectInfos();
+	this->infos = reflectable->ReflectInfosF()();
 }
 
 static int strcmpidx(const char* str0, const char* str1)

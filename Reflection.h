@@ -100,7 +100,35 @@ public:
 
 protected:
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
-	virtual ReflectInfo* GetItemsReflectInfos() {return T::ClassReflectInfos();}
+	virtual ReflectInfo* GetItemsReflectInfos() {return ReflectInfoByClass< T >();}
+
+	template< class R >
+	ReflectInfo* ReflectInfoByClass()
+	{
+		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)R::ClassReflectInfos);
+		return &ret;
+	}
+
+	template<>
+	ReflectInfo* ReflectInfoByClass< int >()
+	{
+		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_INT, "", 0);
+		return &ret;
+	}
+
+	template<>
+	ReflectInfo* ReflectInfoByClass< short >()
+	{
+		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_SHORT, "", 0);
+		return &ret;
+	}
+
+	template<>
+	ReflectInfo* ReflectInfoByClass< float >()
+	{
+		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_FLOAT, "", 0);
+		return &ret;
+	}
 };
 
 class ReflectInfoIterator {
@@ -124,6 +152,7 @@ private:
 
 public:
 	virtual ReflectInfo* ReflectInfos() {return ClassReflectInfos();}
+	virtual ReflectInfosFunc ReflectInfosF(){return ClassReflectInfos;}
 	virtual void* This() {return this;}
 
 	ReflectField Get(const char* field);

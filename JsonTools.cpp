@@ -4,63 +4,63 @@
 
 void Serialize(std::ofstream& out, ReflectField reflectable)
 {
-	out << "{";
-
-	ReflectInfoIterator it(reflectable);
-	ReflectField info(0,0);
-	bool first_field = true;
-	while((info = it.Next()).reflectable)
+	switch(reflectable.infos->reflect_type)
 	{
-		if(first_field) 
-		{
-			first_field = false;
-		}
-		else
-		{
-			out << ", ";
-		}
-
-		switch (info.infos->reflect_type)
-		{
-			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-				out << "\"" << info.infos->id << "\": " << info.Int();
-				break;
-
-			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-				out << "\"" << info.infos->id << "\": " << info.Short();
-				break;
-
-			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-				out << "\"" << info.infos->id << "\": " << info.Float();
-				break;
-
-			case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
-				out << "\"" << info.infos->id << "\": ";
-				Serialize(out, info.ClassPtr());
-				break;
-			}
-
-			case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS: {
-				VectorHandler vector_handler = info.GetVectorHandler();
-				out << "\"" << info.infos->id << "\": [";
-				for(int i = 0; i < vector_handler->GetNumElems(); ++i)
+		case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
+			out << "{";
+			ReflectInfoIterator it(reflectable.ClassPtr());
+			ReflectField info(0,0);
+			bool first_field = true;
+			while((info = it.Next()).reflectable)
+			{
+				if(first_field) 
 				{
-					if(i != 0) out << ", ";
-					Serialize(out, ReflectField(vector_handler->GetElem(i)));
+					first_field = false;
 				}
-				out << "]";
-				break;
-			}
-		}
-	}
+				else
+				{
+					out << ", ";
+				}
 
-	out << "}";
+				out << "\"" << info.infos->id << "\"" << ":";
+				Serialize(out, info);
+			}
+			out << "}";
+			break;
+		}
+			
+		case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS: {
+			out << "[";
+			VectorHandler vector_handler = reflectable.GetVectorHandler();
+			for(int i = 0; i < vector_handler->GetNumElems(); ++i)
+			{
+				if(i != 0) out << ", ";
+				Serialize(out, ReflectField(vector_handler->GetElem(i)));
+			}
+			out << "]";
+			break;
+		}
+
+		case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
+			out << reflectable.Int();
+			break;
+
+		case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
+			out << reflectable.Short();
+			break;
+
+		case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
+			out << reflectable.Float();
+			break;
+	}
 }
 
 void Serialize(Reflectable* reflectable, char* path)
 {
+	ReflectField r(reflectable->This(), &ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF())));
+
 	std::ofstream fout(path);
-	Serialize(fout, reflectable);
+	Serialize(fout, r);
 	fout.close();
 }
 

@@ -1,14 +1,13 @@
 #include "Reflection.h"
+#include <stdlib.h>
 
 ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0); 
 
-ReflectField::ReflectField(Reflectable* reflectable) :
-	classDummyInfos
-	{
-		ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF())), 
-		ReflectInfo::End
-	}
+ReflectField::ReflectField(Reflectable* reflectable)
 {
+	classDummyInfos[0] = ReflectInfo(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF()));
+	classDummyInfos[1] = ReflectInfo::End;
+
 	this->reflectable = reflectable->This();
 	this->infos = classDummyInfos;
 }
@@ -40,19 +39,19 @@ ReflectField ReflectField::Get(const char* field) const
 		{
 			if(field[n] == '\0')
 			{
-				if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
+				if(info.infos->reflect_type == ReflectInfo::REFLECT_TYPE_CLASS)
 					return info.ClassPtr();
 				else
 					return info;
 			}
 			else if(field[n] == '.')
 			{
-				if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_CLASS)
+				if(info.infos->reflect_type == ReflectInfo::REFLECT_TYPE_CLASS)
 					return info.ClassPtr().Get(&field[n + 1]);
 			}
 			else if(field[n] == '[')
 			{
-				if(info.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS)
+				if(info.infos->reflect_type == ReflectInfo::REFLECT_TYPE_VECTOR_CLASS)
 				{
 					char* end;
 					int idx = strtol(field + n + 1, &end, 10);
@@ -101,7 +100,7 @@ ReflectField ReflectInfoIterator::Next()
 
 	void* reflectable  = l[l.size() -1].reflectable;
 	ReflectInfo* infos = (l[l.size() - 1].infos) ++;
-	if(infos->id == "") //table end
+	if(infos->id[0] == '\0') //table end
 	{
 		l.pop_back();
 		return Next();
@@ -109,11 +108,11 @@ ReflectField ReflectInfoIterator::Next()
 
 	switch(infos->reflect_type)
 	{
-		case ReflectInfo::ReflectType::REFLECT_TYPE_INHERITANCE_TABLE:
+		case ReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE:
 			l.push_back(ReflectField(reflectable, ((ReflectInfosFunc)(infos->ptr))()));
 			return Next();
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS: {
+		case ReflectInfo::REFLECT_TYPE_PARENT_CLASS: {
 			Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
 			l.push_back(ReflectField(classObj, ((ReflectInfosFunc)(infos->extra))()));
 			return Next();
@@ -127,4 +126,25 @@ ReflectField ReflectInfoIterator::Next()
 ReflectField Reflectable::Get(const char* field)
 {
 	return ReflectField(this).Get(field);
+}
+
+template<>
+ReflectInfo* ReflectInfoByClass< int >()
+{
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_INT, "", 0);
+	return &ret;
+}
+
+template<>
+ReflectInfo* ReflectInfoByClass< short >()
+{
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_SHORT, "", 0);
+	return &ret;
+}
+
+template<>
+ReflectInfo* ReflectInfoByClass< float >()
+{
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_FLOAT, "", 0);
+	return &ret;
 }

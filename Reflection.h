@@ -4,6 +4,9 @@
 #include <vector>
 #include <string.h>
 
+#include <iostream>
+#include <memory>
+
 #ifdef _WIN64
 	typedef long long PTR;
 #else
@@ -50,6 +53,7 @@ public:
 	PTR extra;
 
 public:
+	ReflectInfo() {};
 	ReflectInfo(ReflectType reflect_type, const char* id, PTR ptr, PTR extra = 0) : reflect_type(reflect_type), id(id), ptr(ptr), extra(extra) {}
 	static ReflectInfo End;
 };
@@ -62,7 +66,7 @@ public:
 	void* reflectable;
 	ReflectInfo* infos;
 	ReflectField(Reflectable* reflectable);
-	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos), classDummyInfos{ReflectInfo::End, ReflectInfo::End} {}
+	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
 
 	int& Int() const {return *REFLECT_PTR(int, reflectable, infos->ptr);}
 	short& Short() const {return *REFLECT_PTR(short, reflectable, infos->ptr);}
@@ -86,6 +90,22 @@ protected:
 	virtual ReflectInfo* GetItemsReflectInfos() = 0;
 };
 
+template< class R >
+ReflectInfo* ReflectInfoByClass()
+{
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)R::ClassReflectInfos);
+	return &ret;
+}
+
+template<>
+ReflectInfo* ReflectInfoByClass< int >();
+
+template<>
+ReflectInfo* ReflectInfoByClass< short >();
+
+template<>
+ReflectInfo* ReflectInfoByClass< float >();
+
 template< class T >
 class VectorHandlerT : public VectorHandlerI
 {
@@ -104,34 +124,6 @@ public:
 protected:
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
 	virtual ReflectInfo* GetItemsReflectInfos() {return ReflectInfoByClass< T >();}
-
-	template< class R >
-	ReflectInfo* ReflectInfoByClass()
-	{
-		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)R::ClassReflectInfos);
-		return &ret;
-	}
-
-	template<>
-	ReflectInfo* ReflectInfoByClass< int >()
-	{
-		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_INT, "", 0);
-		return &ret;
-	}
-
-	template<>
-	ReflectInfo* ReflectInfoByClass< short >()
-	{
-		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_SHORT, "", 0);
-		return &ret;
-	}
-
-	template<>
-	ReflectInfo* ReflectInfoByClass< float >()
-	{
-		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_FLOAT, "", 0);
-		return &ret;
-	}
 };
 
 class ReflectInfoIterator {
@@ -174,7 +166,7 @@ public:
 //The pointer to the ReflectInfos function is not enough because the first inherited class shares its address with the class
 //and the compiler cast it to the latter (so in "class A : public B, public C"  A and B share the same offset (0) and calling
 //ReflectInfos to a Reflectable in that address will always return A:::ReflectInfos)
-#define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::ClassReflectInfos),
+#define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::ClassReflectInfos),
 
 #define REFLECTABLE_CLASS(A)                                        \
 class A : public ReflectableInit< A >, public virtual Reflectable { \

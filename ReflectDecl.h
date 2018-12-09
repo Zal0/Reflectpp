@@ -19,17 +19,17 @@ REFLECTION_DATA
 #undef REFLECT_CLASS
 #undef REFLECT_VECTOR_CLASS
 
-#define REFLECT_INT(ACCESS, A, DEFAULT)        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INT,   #A, OFFSET(A)),
-#define REFLECT_SHORT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
-#define REFLECT_FLOAT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
-#define REFLECT_CLASS(ACCESS, CLASS, A)        ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
-#define REFLECT_VECTOR_CLASS(ACCESS, CLASS, A) ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS, #A, OFFSET(A), (PTR)VectorHandlerT< CLASS >::GetVectorHandler),
+#define REFLECT_INT(ACCESS, A, DEFAULT)        ReflectInfo(ReflectInfo::REFLECT_TYPE_INT,   #A, OFFSET(A)),
+#define REFLECT_SHORT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
+#define REFLECT_FLOAT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
+#define REFLECT_CLASS(ACCESS, CLASS, A)        ReflectInfo(ReflectInfo::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
+#define REFLECT_VECTOR_CLASS(ACCESS, CLASS, A) ReflectInfo(ReflectInfo::REFLECT_TYPE_VECTOR_CLASS, #A, OFFSET(A), (PTR)VectorHandlerT< CLASS >::GetVectorHandler),
 
 public:
 
 static ReflectInfo* ClassReflectInfos() {
 	static ReflectInfo info[] = {
-		ReflectInfo(ReflectInfo::ReflectType::REFLECT_TYPE_INHERITANCE_TABLE, "rht", (PTR)InheritanceTable),
+		ReflectInfo(ReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE, "rht", (PTR)InheritanceTable),
 		REFLECTION_DATA
 		ReflectInfo::End
 	};

@@ -1,12 +1,13 @@
 #include "JsonTools.h"
 
 #include <fstream>
+#include <stdlib.h>
 
 void Serialize(std::ofstream& out, const ReflectField& reflectable)
 {
 	switch(reflectable.infos->reflect_type)
 	{
-		case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
+		case ReflectInfo::REFLECT_TYPE_CLASS: {
 			out << "{";
 			ReflectInfoIterator it(reflectable.ClassPtr());
 			ReflectField info(0,0);
@@ -29,7 +30,7 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 			break;
 		}
 			
-		case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS: {
+		case ReflectInfo::REFLECT_TYPE_VECTOR_CLASS: {
 			out << "[";
 			VectorHandler vector_handler = reflectable.GetVectorHandler();
 			for(int i = 0; i < vector_handler->GetNumElems(); ++i)
@@ -41,16 +42,19 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 			break;
 		}
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
+		case ReflectInfo::REFLECT_TYPE_INT:
 			out << reflectable.Int();
 			break;
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
+		case ReflectInfo::REFLECT_TYPE_SHORT:
 			out << reflectable.Short();
 			break;
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
+		case ReflectInfo::REFLECT_TYPE_FLOAT:
 			out << reflectable.Float();
+			break;
+
+		default:
 			break;
 	}
 }
@@ -160,9 +164,9 @@ void Deserialize(const ReflectField& reflectable, PeekStream& in)
 	{
 		switch (reflectable.infos->reflect_type)
 		{
-			case ReflectInfo::ReflectType::REFLECT_TYPE_INT:   reflectable.Int()   = atoi(token); break;
-			case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT: reflectable.Short() = (short)atoi(token); break;
-			case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT: reflectable.Float() = (float)atof(token); break;
+			case ReflectInfo::REFLECT_TYPE_INT:   reflectable.Int()   = atoi(token); break;
+			case ReflectInfo::REFLECT_TYPE_SHORT: reflectable.Short() = (short)atoi(token); break;
+			case ReflectInfo::REFLECT_TYPE_FLOAT: reflectable.Float() = (float)atof(token); break;
 			default: break;
 		}
 	}
@@ -171,6 +175,7 @@ void Deserialize(const ReflectField& reflectable, PeekStream& in)
 void Deserialize(Reflectable* reflectable, char* path)
 {
 	std::ifstream fin(path, std::ios::binary);
-	Deserialize(reflectable, PeekStream(fin));
+	PeekStream p(fin);
+	Deserialize(reflectable, p);
 	fin.close();
 }

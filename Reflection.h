@@ -60,7 +60,7 @@ public:
 
 class ReflectField {
 private:
-	ReflectInfo classDummyInfos[2]; //When casting directly from Reflectable* to Reflectfield I need to store a tmp ReflectTable pointing to the class
+	ReflectInfo classDummyInfos[2]; //When casting directly from Reflectable* to Reflectfield I need to store a tmp ReflectInfo table pointing to the class
 
 public:
 	void* reflectable;
@@ -97,14 +97,9 @@ ReflectInfo* ReflectInfoByClass()
 	return &ret;
 }
 
-template<>
-ReflectInfo* ReflectInfoByClass< int >();
-
-template<>
-ReflectInfo* ReflectInfoByClass< short >();
-
-template<>
-ReflectInfo* ReflectInfoByClass< float >();
+template<> ReflectInfo* ReflectInfoByClass< int >();
+template<> ReflectInfo* ReflectInfoByClass< short >();
+template<> ReflectInfo* ReflectInfoByClass< float >();
 
 template< class T >
 class VectorHandlerT : public VectorHandlerI

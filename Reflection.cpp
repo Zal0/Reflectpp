@@ -5,6 +5,7 @@ ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0);
 
 ReflectField::ReflectField(Reflectable* reflectable)
 {
+	//Instead of directly point to reflectable infos, create a dummy table (simplifies things, see PrintReflectable or Serialize)
 	classDummyInfos[0] = ReflectInfo(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF()));
 	classDummyInfos[1] = ReflectInfo::End;
 
@@ -90,7 +91,15 @@ VectorHandler ReflectField::GetVectorHandler() const
 
 ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)
 {
-	l.push_back(reflectable);
+	//Ignore the reflectable ReflectInfo::REFLECT_TYPE_CLASS that was added during casting
+	if(reflectable.infos->id[0] == '\0' && reflectable.infos->reflect_type == ReflectInfo::REFLECT_TYPE_CLASS)
+	{
+		l.push_back(reflectable.ClassPtr());
+	}
+	else
+	{
+		l.push_back(reflectable);
+	}
 }
 
 ReflectField ReflectInfoIterator::Next() 

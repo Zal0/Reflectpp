@@ -1,27 +1,19 @@
 //Fields declaration
-#undef REFLECT_INT
-#undef REFLECT_SHORT
-#undef REFLECT_FLOAT
+#undef SERIALIZED_FIELD
 #undef REFLECT_CLASS
 #undef REFLECT_VECTOR_CLASS
 
-#define REFLECT_INT(ACCESS, A, DEFAULT)    ACCESS: int A;	
-#define REFLECT_SHORT(ACCESS, A, DEFAULT)  ACCESS: short A;
-#define REFLECT_FLOAT(ACCESS, A, DEFAULT)  ACCESS: float A;
+#define SERIALIZED_FIELD(ACCESS, TYPE, NAME, DEFAULT) ACCESS: TYPE NAME;
 #define REFLECT_CLASS(ACCESS, CLASS, name) ACCESS: CLASS name;
 #define REFLECT_VECTOR_CLASS(ACCESS, CLASS, name) ACCESS: std::vector< CLASS > name;
 REFLECTION_DATA
 
 //Class ReflectInfos array
-#undef REFLECT_INT
-#undef REFLECT_SHORT
-#undef REFLECT_FLOAT
+#undef SERIALIZED_FIELD
 #undef REFLECT_CLASS
 #undef REFLECT_VECTOR_CLASS
 
-#define REFLECT_INT(ACCESS, A, DEFAULT)        ReflectInfo(ReflectInfo::REFLECT_TYPE_INT,   #A, OFFSET(A)),
-#define REFLECT_SHORT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::REFLECT_TYPE_SHORT, #A, OFFSET(A)),
-#define REFLECT_FLOAT(ACCESS, A, DEFAULT)      ReflectInfo(ReflectInfo::REFLECT_TYPE_FLOAT, #A, OFFSET(A)),
+#define SERIALIZED_FIELD(ACCESS, TYPE, NAME, DEFAULT) ReflectInfo(DefaultReflectInfo< TYPE >()->reflect_type, #NAME, OFFSET(NAME)),
 #define REFLECT_CLASS(ACCESS, CLASS, A)        ReflectInfo(ReflectInfo::REFLECT_TYPE_CLASS, #A, OFFSET(A), (PTR)CLASS::ClassReflectInfos),
 #define REFLECT_VECTOR_CLASS(ACCESS, CLASS, A) ReflectInfo(ReflectInfo::REFLECT_TYPE_VECTOR_CLASS, #A, OFFSET(A), (PTR)VectorHandlerT< CLASS >::GetVectorHandler),
 
@@ -40,15 +32,11 @@ virtual ReflectInfosFunc ReflectInfosF(){return ClassReflectInfos;}
 virtual void* This() {return this;}
 
 //Fields initialization
-#undef REFLECT_INT
-#undef REFLECT_SHORT
-#undef REFLECT_FLOAT
+#undef SERIALIZED_FIELD
 #undef REFLECT_CLASS
 #undef REFLECT_VECTOR_CLASS
-	
-#define REFLECT_INT(ACCESS, A, DEFAULT)	  A = DEFAULT;
-#define REFLECT_SHORT(ACCESS, A, DEFAULT) A = DEFAULT;
-#define REFLECT_FLOAT(ACCESS, A, DEFAULT) A = DEFAULT;
+
+#define SERIALIZED_FIELD(ACCESS, TYPE, NAME, DEFAULT) NAME = DEFAULT;
 #define REFLECT_CLASS(ACCESS, CLASS, A)
 #define REFLECT_VECTOR_CLASS(ACCESS, CLASS, A)
 void ReflectInit()
@@ -58,8 +46,6 @@ void ReflectInit()
 
 #undef REFLECTION_DATA
 #undef REFLECTION_INHERITANCE_DATA
-#undef REFLECT_INT
-#undef REFLECT_SHORT
-#undef REFLECT_FLOAT
+#undef SERIALIZED_FIELD
 #undef REFLECT_CLASS
 #undef REFLECT_VECTOR_CLASS

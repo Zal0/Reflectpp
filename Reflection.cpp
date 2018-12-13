@@ -137,23 +137,16 @@ ReflectField Reflectable::Get(const char* field)
 	return ReflectField(this).Get(field);
 }
 
-template<>
-ReflectInfo* ReflectInfoByClass< int >()
-{
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_INT, "", 0);
-	return &ret;
-}
-
-template<>
-ReflectInfo* ReflectInfoByClass< short >()
-{
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_SHORT, "", 0);
-	return &ret;
-}
-
-template<>
-ReflectInfo* ReflectInfoByClass< float >()
-{
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_FLOAT, "", 0);
-	return &ret;
-}
+template<> ReflectInfo* DefaultReflectInfo< bool >()               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_BOOL,       "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< char >()               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CHAR,       "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< unsigned char >()      {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_UCHAR,      "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< short >()              {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_SHORT,      "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< unsigned short >()     {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_USHORT,     "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< int >()                {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_INT,        "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< unsigned int >()       {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_UINT,       "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< long >()               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_LONG,       "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< unsigned long >()      {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_ULONG,      "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< long long >()          {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_LONGLONG,   "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< unsigned long long >() {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_ULONGLONG,  "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< float >()              {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_FLOAT,      "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< double >()             {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_DOUBLE,     "", 0); return &ret;}

@@ -8,17 +8,17 @@
 #include "JsonTools.h"
 
 REFLECTABLE_CLASS(Test0)
-#define REFLECTION_DATA       \
-	REFLECT_INT(public, x, 10)  \
-	REFLECT_INT(public, y, 10)  
+#define REFLECTION_DATA \
+	SERIALIZED_FIELD(public, int, x, 10) \
+	SERIALIZED_FIELD(public, int, y, 10)  
 #include "ReflectDecl.h"
 };
 
 REFLECTABLE_CLASS(A)
 public:
 	#define REFLECTION_DATA       \
-		REFLECT_INT(public, Ai, 1)  \
-		REFLECT_SHORT(public, As, 2)\
+		SERIALIZED_FIELD(public, int, Ai, 1)  \
+		SERIALIZED_FIELD(public, short, As, 2)\
 		REFLECT_VECTOR_CLASS(public, Test0, v_test0)\
 		REFLECT_VECTOR_CLASS(public, int, v_int)
 	#include "ReflectDecl.h"
@@ -27,8 +27,8 @@ public:
 REFLECTABLE_CLASS(B)
 public:
 	#define REFLECTION_DATA \
-		REFLECT_SHORT(public, Bi, 3)  \
-		REFLECT_FLOAT(public, Bf, 4)  \
+		SERIALIZED_FIELD(public, short, Bi, 3)  \
+		SERIALIZED_FIELD(public, float, Bf, 4)  \
 		REFLECT_CLASS(public, A, test)
 	#include "ReflectDecl.h"
 };
@@ -36,8 +36,8 @@ public:
 REFLECTABLE_CLASS_INHERITS_2(C, A, B)
 public:
 	#define REFLECTION_DATA   \
-		REFLECT_SHORT(public, Ci, 5)    \
-		REFLECT_FLOAT(public, Cf, 6.0f) \
+		SERIALIZED_FIELD(public, short, Ci, 5)    \
+		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
 		REFLECT_CLASS(private, A, testC)
 	#include "ReflectDecl.h"
 };

@@ -39,9 +39,20 @@ public:
 		REFLECT_TYPE_INHERITANCE_TABLE,
 		REFLECT_TYPE_PARENT_CLASS,
 
-		REFLECT_TYPE_INT,
+		REFLECT_TYPE_BOOL,
+		REFLECT_TYPE_CHAR,
+		REFLECT_TYPE_UCHAR,
 		REFLECT_TYPE_SHORT,
+		REFLECT_TYPE_USHORT,
+		REFLECT_TYPE_INT,
+		REFLECT_TYPE_UINT,
+		REFLECT_TYPE_LONG,
+		REFLECT_TYPE_ULONG,
+		REFLECT_TYPE_LONGLONG,
+		REFLECT_TYPE_ULONGLONG,
 		REFLECT_TYPE_FLOAT,
+		REFLECT_TYPE_DOUBLE,
+
 		REFLECT_TYPE_CLASS,
 
 		REFLECT_TYPE_VECTOR_CLASS
@@ -91,15 +102,24 @@ protected:
 };
 
 template< class R >
-ReflectInfo* ReflectInfoByClass()
+ReflectInfo* DefaultReflectInfo()
 {
 	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)R::ClassReflectInfos);
 	return &ret;
 }
-
-template<> ReflectInfo* ReflectInfoByClass< int >();
-template<> ReflectInfo* ReflectInfoByClass< short >();
-template<> ReflectInfo* ReflectInfoByClass< float >();
+template<> ReflectInfo* DefaultReflectInfo< bool >();
+template<> ReflectInfo* DefaultReflectInfo< char >();
+template<> ReflectInfo* DefaultReflectInfo< unsigned char >();
+template<> ReflectInfo* DefaultReflectInfo< short >();
+template<> ReflectInfo* DefaultReflectInfo< unsigned short >();
+template<> ReflectInfo* DefaultReflectInfo< int >();
+template<> ReflectInfo* DefaultReflectInfo< unsigned int >();
+template<> ReflectInfo* DefaultReflectInfo< long >();
+template<> ReflectInfo* DefaultReflectInfo< unsigned long >();
+template<> ReflectInfo* DefaultReflectInfo< long long >();
+template<> ReflectInfo* DefaultReflectInfo< unsigned long long >();
+template<> ReflectInfo* DefaultReflectInfo< float >();
+template<> ReflectInfo* DefaultReflectInfo< double >();
 
 template< class T >
 class VectorHandlerT : public VectorHandlerI
@@ -118,7 +138,7 @@ public:
 
 protected:
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
-	virtual ReflectInfo* GetItemsReflectInfos() {return ReflectInfoByClass< T >();}
+	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T >();}
 };
 
 class ReflectInfoIterator {

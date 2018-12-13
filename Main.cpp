@@ -19,8 +19,8 @@ public:
 	#define REFLECTION_DATA       \
 		SERIALIZED_FIELD(public, int, Ai, 1)  \
 		SERIALIZED_FIELD(public, short, As, 2)\
-		REFLECT_VECTOR_CLASS(public, Test0, v_test0)\
-		REFLECT_VECTOR_CLASS(public, int, v_int)
+		SERIALIZED_FIELD_VECTOR(public, Test0, v_test0)\
+		SERIALIZED_FIELD_VECTOR(public, int, v_int)
 	#include "ReflectDecl.h"
 };
 
@@ -29,7 +29,7 @@ public:
 	#define REFLECTION_DATA \
 		SERIALIZED_FIELD(public, short, Bi, 3)  \
 		SERIALIZED_FIELD(public, float, Bf, 4)  \
-		REFLECT_CLASS(public, A, test)
+		SERIALIZED_FIELD_CLASS(public, A, test)
 	#include "ReflectDecl.h"
 };
 
@@ -38,7 +38,7 @@ public:
 	#define REFLECTION_DATA   \
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
-		REFLECT_CLASS(private, A, testC)
+		SERIALIZED_FIELD_CLASS(private, A, testC)
 	#include "ReflectDecl.h"
 };
 

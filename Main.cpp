@@ -105,35 +105,30 @@ int main()
 	c->v_int.push_back(3);
 	c->v_int.push_back(4);
 	reflectables[2] = c;
-	
-	Serialize(reflectables[2], "test.json");
-	Deserialize(reflectables[2], "test.json");
 
-	for(int i = 0; i < 3; ++i)
-	{
-		PrintReflectable(reflectables[i]);
-	}
-
-	//int& n = reflectables[0]->Get("v_test0[2].y").Int();
+	//int& n = reflectables[2]->Get("v_test0[2].y").Int();
 	//n = 12345;
 
 	//ReflectField r = reflectables[2]->Get("v_test0");
 	//VectorHandler v_h = r.GetVectorHandler();
 	//v_h->Push();
-	//Reflectable::Get("x", v_h->GetElem(0), v_h->GetItemsReflectInfos()).Int() = 1010;
-	//r = ReflectField(v_h->GetElem(0));
-	//r.Get("x").Int() = 786;
-
-	//TOOD: GetElem return ReflectField
-	//r.Get("x").Int() = 1010;
-	//Reflectable::Get("x", r.reflectable, r.infos).Int() = 1010;
+	//v_h->GetElem(0).Get("x").Int() = 33;
+	
+	//ReflectField r2 = reflectables[2]->Get("v_test0");
+	//VectorHandler v_h2 = r2.GetVectorHandler();
+	//r2 = ReflectField(v_h2->GetElem(0));
+	//r2.Get("x").Int() = 786;
 
 	//ReflectField r_class = reflectables[2]->Get("test");
 	//r_class.Get("As").Short() = 321;
 
-	//Serialize(reflectables[2], "test.json");
-
+	Serialize(reflectables[2], "test.json");
 	//Deserialize(reflectables[2], "test.json");
+	
+	for(int i = 0; i < 3; ++i)
+	{
+		PrintReflectable(reflectables[i]);
+	}
 
 	scanf_s("");
 	return 0;

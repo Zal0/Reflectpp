@@ -52,6 +52,7 @@ public:
 		REFLECT_TYPE_ULONGLONG,
 		REFLECT_TYPE_FLOAT,
 		REFLECT_TYPE_DOUBLE,
+		REFLECT_TYPE_STRING,
 
 		REFLECT_TYPE_CLASS,
 
@@ -79,12 +80,17 @@ public:
 	ReflectField(Reflectable* reflectable);
 	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
 
-	int& Int() const {return *REFLECT_PTR(int, reflectable, infos->ptr);}
-	short& Short() const {return *REFLECT_PTR(short, reflectable, infos->ptr);}
-	float& Float() const {return *REFLECT_PTR(float, reflectable, infos->ptr);}
+	template< class T > T& As() const
+	{
+		//if(infos->reflect_type == DefaultReflectInfo(T)->reflect_type)
+		return *REFLECT_PTR(T, reflectable, infos->ptr);
+	}
 	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
 	VectorHandler GetVectorHandler() const;
 	ReflectField Get(const char* field) const;
+
+	ReflectField& operator=(const char* str);
+	std::string ToString()const;
 };
 
 class VectorHandlerI
@@ -120,6 +126,7 @@ template<> ReflectInfo* DefaultReflectInfo< long long >();
 template<> ReflectInfo* DefaultReflectInfo< unsigned long long >();
 template<> ReflectInfo* DefaultReflectInfo< float >();
 template<> ReflectInfo* DefaultReflectInfo< double >();
+template<> ReflectInfo* DefaultReflectInfo< std::string >();
 
 template< class T >
 class VectorHandlerT : public VectorHandlerI

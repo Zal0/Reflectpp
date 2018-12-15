@@ -36,6 +36,7 @@ public:
 REFLECTABLE_CLASS_INHERITS_2(C, A, B)
 public:
 	#define REFLECTION_DATA   \
+		SERIALIZED_FIELD(public, std::string, name, "pepe") \
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
 		SERIALIZED_FIELD_CLASS(private, A, testC)
@@ -74,16 +75,8 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 			break;
 		}
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_INT:
-			printf("%d\n", reflectable.Int());
-			break;
-
-		case ReflectInfo::ReflectType::REFLECT_TYPE_SHORT:
-			printf("%d\n", reflectable.Short());
-			break;
-
-		case ReflectInfo::ReflectType::REFLECT_TYPE_FLOAT:
-			printf("%f\n", reflectable.Float());
+		default:
+			printf("%s\n", reflectable.ToString().c_str());
 			break;
 	}
 	delete[] tabs;

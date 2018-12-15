@@ -1,5 +1,6 @@
 #include "Reflection.h"
 #include <stdlib.h>
+#include <sstream>
 
 ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0); 
 
@@ -66,6 +67,54 @@ ReflectField ReflectField::Get(const char* field) const
 		}
 	}
 	return ReflectField(0,0);
+}
+
+ReflectField& ReflectField::operator=(const char* str)
+{
+	switch(infos->reflect_type)
+	{
+		case ReflectInfo::REFLECT_TYPE_BOOL:      As< bool >()                = str[0] == '0' ? false : true;   break;
+		case ReflectInfo::REFLECT_TYPE_CHAR:      As< char >()                = (char)atoi(str);                break;
+		case ReflectInfo::REFLECT_TYPE_UCHAR:     As< unsigned char >()       = (unsigned char)atoi(str);       break;
+		case ReflectInfo::REFLECT_TYPE_SHORT:     As< short >()               = (short)atoi(str);               break;
+		case ReflectInfo::REFLECT_TYPE_USHORT:    As< unsigned short >()      = (unsigned short)atoi(str);      break;
+		case ReflectInfo::REFLECT_TYPE_INT:       As< int >()                 = (int)atoi(str);                 break;
+		case ReflectInfo::REFLECT_TYPE_UINT:      As< unsigned int >()        = (unsigned int)atoi(str);        break;
+		case ReflectInfo::REFLECT_TYPE_LONG:      As< long >()                = (long)atol(str);                break;
+		case ReflectInfo::REFLECT_TYPE_ULONG:     As< unsigned long >()       = (unsigned long)atol(str);       break;
+		case ReflectInfo::REFLECT_TYPE_LONGLONG:  As< long long >()           = (long long)atoll(str);          break;
+		case ReflectInfo::REFLECT_TYPE_ULONGLONG: As< unsigned long long >()  = (unsigned long long)atoll(str); break;
+		case ReflectInfo::REFLECT_TYPE_FLOAT:     As< float >()               = (float)atof(str);               break;
+		case ReflectInfo::REFLECT_TYPE_DOUBLE:    As< double >()              = (double)atof(str);              break;
+		case ReflectInfo::REFLECT_TYPE_STRING:    As< std::string >()         = str;                            break;
+	}
+
+	return *this;
+}
+
+std::string ReflectField::ToString()const
+{
+	std::stringstream ss;
+
+	switch(infos->reflect_type)
+	{
+		case ReflectInfo::REFLECT_TYPE_BOOL:      ss << As< bool >();               break;
+		case ReflectInfo::REFLECT_TYPE_CHAR:      ss << As< char >();               break;
+		case ReflectInfo::REFLECT_TYPE_UCHAR:     ss << As< unsigned char >();      break;
+		case ReflectInfo::REFLECT_TYPE_SHORT:     ss << As< short >();              break;
+		case ReflectInfo::REFLECT_TYPE_USHORT:    ss << As< unsigned short >();     break;
+		case ReflectInfo::REFLECT_TYPE_INT:       ss << As< int >();                break;
+		case ReflectInfo::REFLECT_TYPE_UINT:      ss << As< unsigned int >();       break;
+		case ReflectInfo::REFLECT_TYPE_LONG:      ss << As< long >();               break;
+		case ReflectInfo::REFLECT_TYPE_ULONG:     ss << As< unsigned long >();      break;
+		case ReflectInfo::REFLECT_TYPE_LONGLONG:  ss << As< long long >();          break;
+		case ReflectInfo::REFLECT_TYPE_ULONGLONG: ss << As< unsigned long long >(); break;
+		case ReflectInfo::REFLECT_TYPE_FLOAT:     ss << As< float >();              break;
+		case ReflectInfo::REFLECT_TYPE_DOUBLE:    ss << As< double >();             break;
+		case ReflectInfo::REFLECT_TYPE_STRING:    ss << As< std::string >();        break;
+	}
+
+	return ss.str();
 }
 
 class NullVectorHandler : public VectorHandlerI
@@ -150,3 +199,4 @@ template<> ReflectInfo* DefaultReflectInfo< long long >()          {static Refle
 template<> ReflectInfo* DefaultReflectInfo< unsigned long long >() {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_ULONGLONG,  "", 0); return &ret;}
 template<> ReflectInfo* DefaultReflectInfo< float >()              {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_FLOAT,      "", 0); return &ret;}
 template<> ReflectInfo* DefaultReflectInfo< double >()             {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_DOUBLE,     "", 0); return &ret;}
+template<> ReflectInfo* DefaultReflectInfo< std::string >()        {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_STRING,     "", 0); return &ret;}

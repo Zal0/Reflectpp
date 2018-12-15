@@ -41,20 +41,13 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 			out << "]";
 			break;
 		}
-
-		case ReflectInfo::REFLECT_TYPE_INT:
-			out << reflectable.Int();
-			break;
-
-		case ReflectInfo::REFLECT_TYPE_SHORT:
-			out << reflectable.Short();
-			break;
-
-		case ReflectInfo::REFLECT_TYPE_FLOAT:
-			out << reflectable.Float();
+		
+		case ReflectInfo::REFLECT_TYPE_STRING:
+			out << '\"' << reflectable.ToString().c_str() << '\"';
 			break;
 
 		default:
+			out << reflectable.ToString().c_str();
 			break;
 	}
 }
@@ -121,7 +114,7 @@ public:
 	}
 };
 
-void Deserialize(const ReflectField& reflectable, PeekStream& in)
+void Deserialize(ReflectField& reflectable, PeekStream& in)
 {
 	char* token = in.buffer; // Value
 	if(token[0] == '{')
@@ -162,13 +155,7 @@ void Deserialize(const ReflectField& reflectable, PeekStream& in)
 	}
 	else if(reflectable.reflectable)
 	{
-		switch (reflectable.infos->reflect_type)
-		{
-			case ReflectInfo::REFLECT_TYPE_INT:   reflectable.Int()   = atoi(token); break;
-			case ReflectInfo::REFLECT_TYPE_SHORT: reflectable.Short() = (short)atoi(token); break;
-			case ReflectInfo::REFLECT_TYPE_FLOAT: reflectable.Float() = (float)atof(token); break;
-			default: break;
-		}
+		reflectable = token;
 	}
 }
 
@@ -176,6 +163,6 @@ void Deserialize(Reflectable* reflectable, char* path)
 {
 	std::ifstream fin(path, std::ios::binary);
 	PeekStream p(fin);
-	Deserialize(reflectable, p);
+	Deserialize(ReflectField(reflectable), p);
 	fin.close();
 }

@@ -196,6 +196,25 @@ ReflectInfo::ReflectType ReflectTypeBySize(int size) {
 	}
 }
 
+int EnumIndex(int value, const EnumReflectData* reflectDatas)
+{
+	int idx = 0;
+	do
+	{
+		if(reflectDatas->value == value)
+		{
+			return idx;
+		}
+		idx ++;
+	} while((reflectDatas ++)->value != value);
+
+	return 0; //Not found
+}
+
+const char* EnumStrValue(int value, const EnumReflectData* reflectDatas)
+{
+	return reflectDatas[EnumIndex(value, reflectDatas)].str;
+}
 
 template<> ReflectInfo* DefaultReflectInfo< bool >()               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_BOOL,       "", 0); return &ret;}
 template<> ReflectInfo* DefaultReflectInfo< char >()               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CHAR,       "", 0); return &ret;}

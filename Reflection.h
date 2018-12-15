@@ -24,6 +24,9 @@
 //Returns a pointer casted to TYPE of the data stored in INSTANCE at OFFSET
 #define REFLECT_PTR(TYPE, INSTANCE, OFFSET) (TYPE*)(((char*)(INSTANCE)) + OFFSET)
 
+#define CONCAT2(A, B)  A##B
+#define CONCAT(A, B) CONCAT2(A, B)
+
 class ReflectInfo;
 class Reflectable;
 class VectorHandlerI;
@@ -70,6 +73,7 @@ public:
 	static ReflectInfo End;
 };
 
+class EnumReflectData;
 class ReflectField {
 private:
 	ReflectInfo classDummyInfos[2]; //When casting directly from Reflectable* to Reflectfield I need to store a tmp ReflectInfo table pointing to the class
@@ -88,6 +92,8 @@ public:
 	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
 	VectorHandler GetVectorHandler() const;
 	ReflectField Get(const char* field) const;
+
+	EnumReflectData* EnumData() const {return infos->extra ? (EnumReflectData*)infos->extra : 0;}
 
 	ReflectField& operator=(const char* str);
 	std::string ToString()const;
@@ -158,6 +164,15 @@ public:
 };
 
 ReflectInfo::ReflectType ReflectTypeBySize(int size);
+class EnumReflectData {
+public:
+	const char* str;
+	const int value;
+	EnumReflectData(const char* str, const int value) : str(str), value(value) {};
+};
+int EnumIndex(int value, const EnumReflectData* reflectDatas);
+const char* EnumStrValue(int value, const EnumReflectData* reflectDatas);
+
 
 class Reflectable
 {

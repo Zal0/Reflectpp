@@ -7,8 +7,16 @@
 #include "Reflection.h"
 #include "JsonTools.h"
 
+#define ENUM_NAME testEnum
+#define ENUM_ENTRIES \
+	ENUM_ENTRY(enum0) \
+	ENUM_ENTRY_VALUE(enum1, 10) \
+	ENUM_ENTRY(enum500)
+#include "EnumDecl.h"
+
 REFLECTABLE_CLASS(Test0)
 #define REFLECTION_DATA \
+	SERIALIZED_ENUM(public, testEnum, en, enum0) \
 	SERIALIZED_FIELD(public, int, x, 10) \
 	SERIALIZED_FIELD(public, int, y, 10)  
 #include "ReflectDecl.h"
@@ -76,7 +84,14 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 		}
 
 		default:
-			printf("%s\n", reflectable.ToString().c_str());
+			if(reflectable.EnumData() == 0)
+			{
+				printf("%s\n", reflectable.ToString().c_str());
+			}
+			else
+			{
+				printf("%s\n", EnumStrValue(reflectable.As< int >(), reflectable.EnumData()));
+			}
 			break;
 	}
 	delete[] tabs;
@@ -93,12 +108,15 @@ int main()
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
+	c->v_test0[0].en = testEnum::enum0;
+	c->v_test0[1].en = testEnum::enum1;
+	c->v_test0[2].en = testEnum::enum500;
 	c->v_int.push_back(1);
 	c->v_int.push_back(2);
 	c->v_int.push_back(3);
 	c->v_int.push_back(4);
 	reflectables[2] = c;
-
+	
 	//int& n = reflectables[2]->Get("v_test0[2].y").Int();
 	//n = 12345;
 

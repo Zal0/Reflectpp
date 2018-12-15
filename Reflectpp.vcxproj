@@ -142,6 +142,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="EnumDecl.h" />
     <ClInclude Include="JsonTools.h" />
     <ClInclude Include="ReflectDecl.h" />
     <ClInclude Include="Reflection.h" />

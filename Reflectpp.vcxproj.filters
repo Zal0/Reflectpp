@@ -24,6 +24,9 @@
     <ClInclude Include="JsonTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnumDecl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JsonTools.cpp">

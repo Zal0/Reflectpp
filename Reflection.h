@@ -157,6 +157,8 @@ public:
 	ReflectField Next();
 };
 
+ReflectInfo::ReflectType ReflectTypeBySize(int size);
+
 class Reflectable
 {
 private:

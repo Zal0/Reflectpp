@@ -186,6 +186,17 @@ ReflectField Reflectable::Get(const char* field)
 	return ReflectField(this).Get(field);
 }
 
+ReflectInfo::ReflectType ReflectTypeBySize(int size) {
+	switch (size)
+	{
+		case 1:  return ReflectInfo::REFLECT_TYPE_CHAR;
+		case 2:  return ReflectInfo::REFLECT_TYPE_SHORT;
+		case 8:  return ReflectInfo::REFLECT_TYPE_LONGLONG; 
+		default: return ReflectInfo::REFLECT_TYPE_INT;
+	}
+}
+
+
 template<> ReflectInfo* DefaultReflectInfo< bool >()               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_BOOL,       "", 0); return &ret;}
 template<> ReflectInfo* DefaultReflectInfo< char >()               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CHAR,       "", 0); return &ret;}
 template<> ReflectInfo* DefaultReflectInfo< unsigned char >()      {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_UCHAR,      "", 0); return &ret;}

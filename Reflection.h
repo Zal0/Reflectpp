@@ -86,8 +86,11 @@ public:
 
 	template< class T > T& As() const
 	{
-		//if(infos->reflect_type == DefaultReflectInfo(T)->reflect_type)
-		return *REFLECT_PTR(T, reflectable, infos->ptr);
+		static T default_t;
+		if(infos->reflect_type == DefaultReflectInfo< T >()->reflect_type)
+			return *REFLECT_PTR(T, reflectable, infos->ptr);
+		else
+			return default_t; //This way we avoid memory issues
 	}
 	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
 	VectorHandler GetVectorHandler() const;

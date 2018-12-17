@@ -37,7 +37,7 @@ public:
 	#define REFLECTION_DATA \
 		SERIALIZED_FIELD(public, short, Bi, 3)  \
 		SERIALIZED_FIELD(public, float, Bf, 4)  \
-		SERIALIZED_FIELD_CLASS(public, A, test)
+		SERIALIZED_FIELD(public, A, test)
 	#include "ReflectDecl.h"
 };
 
@@ -47,7 +47,7 @@ public:
 		SERIALIZED_FIELD(public, std::string, name, "pepe") \
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
-		SERIALIZED_FIELD_CLASS(private, A, testC)
+		SERIALIZED_FIELD(private, A, testC)
 	#include "ReflectDecl.h"
 };
 

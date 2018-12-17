@@ -27,6 +27,11 @@
 #define CONCAT2(A, B)  A##B
 #define CONCAT(A, B) CONCAT2(A, B)
 
+//from https://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
+#define EXPAND( x ) x //VS workaround
+#define GET_MACRO(_1,_2,_3,_4,NAME,...) NAME
+#define SERIALIZED_FIELD(...) EXPAND(GET_MACRO(__VA_ARGS__, SERIALIZED_FIELD4, SERIALIZED_FIELD3, SERIALIZED_FIELD2)(__VA_ARGS__))
+
 class ReflectInfo;
 class Reflectable;
 class VectorHandlerI;

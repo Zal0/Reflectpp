@@ -10,7 +10,7 @@
 #define ENUM_NAME testEnum
 #define ENUM_ENTRIES \
 	ENUM_ENTRY(enum0) \
-	ENUM_ENTRY_VALUE(enum1, 10) \
+	ENUM_ENTRY(enum1, 10) \
 	ENUM_ENTRY(enum500)
 #include "EnumDecl.h"
 

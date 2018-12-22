@@ -8,7 +8,17 @@ enum ENUM_NAME {
 
 #define ENUM_ENTRY1(A) EnumReflectData(#A, (int)A),
 #define ENUM_ENTRY2(A, B) EnumReflectData(#A, B),
-static const EnumReflectData CONCAT(ENUM_NAME, ReflectDatas)[] = {ENUM_ENTRIES EnumReflectData("", 0)};
+
+class CONCAT(ENUM_NAME, ReflectInfo)
+{
+public:
+	static const EnumReflectData* ReflectDatas()
+	{
+		static const EnumReflectData reflect_datas[] = {ENUM_ENTRIES EnumReflectData("", 0)};
+		return reflect_datas;
+	}
+};
+
 #undef ENUM_ENTRY1
 #undef ENUM_ENTRY2
 

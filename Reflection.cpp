@@ -7,7 +7,7 @@ ReflectInfo ReflectInfo::End(REFLECT_TYPE_INT, "", 0);
 ReflectField::ReflectField(Reflectable* reflectable)
 {
 	//Instead of directly point to reflectable infos, create a dummy table (simplifies things, see PrintReflectable or Serialize)
-	classDummyInfos[0] = ReflectInfo(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF()));
+	classDummyInfos[0] = ReflectInfo(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)(reflectable->ReflectInfosF()()));
 	classDummyInfos[1] = ReflectInfo::End;
 
 	this->reflectable = reflectable->This();

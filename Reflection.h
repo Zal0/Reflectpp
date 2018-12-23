@@ -37,9 +37,7 @@
 class ReflectInfo;
 class Reflectable;
 class VectorHandlerI;
-class EnumReflectData;
 typedef ReflectInfo*(*ReflectInfosFunc)();
-typedef EnumReflectData*(*EnumReflectDataFunc)();
 typedef std::auto_ptr< VectorHandlerI > VectorHandler;
 typedef VectorHandler(*VectorHandlerFunc)(void*);
 
@@ -101,11 +99,11 @@ public:
 		else
 			return default_t; //This way we avoid memory issues
 	}
-	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfosFunc)infos->extra)());}
+	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfo*)infos->extra));}
 	VectorHandler GetVectorHandler() const;
 	ReflectField Get(const char* field) const;
 
-	EnumReflectData* EnumData() const {return infos->extra ? ((EnumReflectDataFunc)infos->extra)() : 0;}
+	EnumReflectData* EnumData() const {return infos->extra ? ((EnumReflectData*)infos->extra) : 0;}
 
 	ReflectField& operator=(const char* str);
 	std::string ToString()const;

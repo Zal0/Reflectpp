@@ -20,7 +20,7 @@ public:
 
 	static ReflectInfo* DefaultReflectInfo() 
 	{
-		static ReflectInfo ret(ReflectTypeBySize(sizeof(ENUM_NAME)), "", 0, (PTR)ReflectDatas);
+		static ReflectInfo ret(ReflectTypeBySize(sizeof(ENUM_NAME)), "", 0, (PTR)(ReflectDatas()));
 		return &ret;
 	}
 };

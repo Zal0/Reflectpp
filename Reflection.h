@@ -37,7 +37,9 @@
 class ReflectInfo;
 class Reflectable;
 class VectorHandlerI;
+class EnumReflectData;
 typedef ReflectInfo*(*ReflectInfosFunc)();
+typedef EnumReflectData*(*EnumReflectDataFunc)();
 typedef std::auto_ptr< VectorHandlerI > VectorHandler;
 typedef VectorHandler(*VectorHandlerFunc)(void*);
 
@@ -103,7 +105,7 @@ public:
 	VectorHandler GetVectorHandler() const;
 	ReflectField Get(const char* field) const;
 
-	EnumReflectData* EnumData() const {return infos->extra ? (EnumReflectData*)infos->extra : 0;}
+	EnumReflectData* EnumData() const {return infos->extra ? ((EnumReflectDataFunc)infos->extra)() : 0;}
 
 	ReflectField& operator=(const char* str);
 	std::string ToString()const;
@@ -126,8 +128,7 @@ protected:
 template< class R >
 ReflectInfo* DefaultReflectInfo()
 {
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)R::ClassReflectInfos);
-	return &ret;
+	return R::DefaultReflectInfo();
 }
 template<> ReflectInfo* DefaultReflectInfo< bool >();
 template<> ReflectInfo* DefaultReflectInfo< char >();
@@ -144,7 +145,7 @@ template<> ReflectInfo* DefaultReflectInfo< float >();
 template<> ReflectInfo* DefaultReflectInfo< double >();
 template<> ReflectInfo* DefaultReflectInfo< std::string >();
 
-template< class T >
+template< class T, class T2 >
 class VectorHandlerT : public VectorHandlerI
 {
 private:
@@ -152,7 +153,7 @@ private:
 	VectorHandlerT(void* ptr) : v(*((std::vector< T >*)ptr)){}
 
 public:
-	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT<T>(ptr));}
+	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT<T, T2>(ptr));}
 	
 	virtual int GetNumElems() {return (int)v.size();}
 	virtual void Push() {v.push_back(T());}
@@ -161,7 +162,7 @@ public:
 
 protected:
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
-	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T >();}
+	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T2 >();}
 };
 
 class ReflectInfoIterator {

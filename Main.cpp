@@ -17,6 +17,7 @@
 REFLECTABLE_CLASS(Test0)
 #define REFLECTION_DATA \
 	SERIALIZED_ENUM(public, testEnum, en, enum0) \
+	SERIALIZED_ENUM_VECTOR(public, testEnum, enVector) \
 	SERIALIZED_FIELD(public, int, x, 10) \
 	SERIALIZED_FIELD(public, int, y, 10)  
 #include "ReflectDecl.h"
@@ -111,6 +112,10 @@ int main()
 	c->v_test0[0].en = testEnum::enum0;
 	c->v_test0[1].en = testEnum::enum1;
 	c->v_test0[2].en = testEnum::enum500;
+	c->v_test0[0].enVector.push_back(testEnum::enum500);
+	c->v_test0[0].enVector.push_back(testEnum::enum500);
+	c->v_test0[0].enVector.push_back(testEnum::enum1);
+	c->v_test0[0].enVector.push_back(testEnum::enum0);
 	c->v_int.push_back(1);
 	c->v_int.push_back(2);
 	c->v_int.push_back(3);

@@ -17,6 +17,12 @@ public:
 		static const EnumReflectData reflect_datas[] = {ENUM_ENTRIES EnumReflectData("", 0)};
 		return reflect_datas;
 	}
+
+	static ReflectInfo* DefaultReflectInfo() 
+	{
+		static ReflectInfo ret(ReflectTypeBySize(sizeof(ENUM_NAME)), "", 0, (PTR)ReflectDatas);
+		return &ret;
+	}
 };
 
 #undef ENUM_ENTRY1

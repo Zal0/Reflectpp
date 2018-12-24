@@ -28,8 +28,8 @@ public:
 	#define REFLECTION_DATA       \
 		SERIALIZED_FIELD(public, int, Ai, 1)  \
 		SERIALIZED_FIELD(public, short, As, 2)\
-		SERIALIZED_FIELD_VECTOR(public, Test0, v_test0)\
-		SERIALIZED_FIELD_VECTOR(public, int, v_int)
+		SERIALIZED_FIELD(public, std::vector< Test0 >, v_test0)\
+		SERIALIZED_FIELD(public, std::vector< int >, v_int)
 	#include "ReflectDecl.h"
 };
 
@@ -48,7 +48,8 @@ public:
 		SERIALIZED_FIELD(public, std::string, name, "pepe") \
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
-		SERIALIZED_FIELD(private, A, testC)
+		SERIALIZED_FIELD(private, A, testC) \
+		SERIALIZED_FIELD(public, std::vector< std::vector< A > >, v_table)
 	#include "ReflectDecl.h"
 };
 
@@ -120,6 +121,14 @@ int main()
 	c->v_int.push_back(2);
 	c->v_int.push_back(3);
 	c->v_int.push_back(4);
+	c->v_table.push_back(std::vector<A>());
+	c->v_table[0].push_back(A());
+	c->v_table[0].push_back(A());
+	c->v_table[0].push_back(A());
+	c->v_table.push_back(std::vector<A>());
+	c->v_table[1].push_back(A());
+	c->v_table[1].push_back(A());
+	c->v_table[1].push_back(A());
 	reflectables[2] = c;
 	
 	//int& n = reflectables[2]->Get("v_test0[2].y").Int();

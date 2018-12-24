@@ -126,22 +126,31 @@ protected:
 template< class R >
 ReflectInfo* DefaultReflectInfo()
 {
+	return DefaultReflectInfo((R*)0);
+}
+template< class R >
+ReflectInfo* DefaultReflectInfo(R*)
+{
 	return R::DefaultReflectInfo();
 }
-template<> ReflectInfo* DefaultReflectInfo< bool >();
-template<> ReflectInfo* DefaultReflectInfo< char >();
-template<> ReflectInfo* DefaultReflectInfo< unsigned char >();
-template<> ReflectInfo* DefaultReflectInfo< short >();
-template<> ReflectInfo* DefaultReflectInfo< unsigned short >();
-template<> ReflectInfo* DefaultReflectInfo< int >();
-template<> ReflectInfo* DefaultReflectInfo< unsigned int >();
-template<> ReflectInfo* DefaultReflectInfo< long >();
-template<> ReflectInfo* DefaultReflectInfo< unsigned long >();
-template<> ReflectInfo* DefaultReflectInfo< long long >();
-template<> ReflectInfo* DefaultReflectInfo< unsigned long long >();
-template<> ReflectInfo* DefaultReflectInfo< float >();
-template<> ReflectInfo* DefaultReflectInfo< double >();
-template<> ReflectInfo* DefaultReflectInfo< std::string >();
+ReflectInfo* DefaultReflectInfo(bool*);
+ReflectInfo* DefaultReflectInfo(char*);
+ReflectInfo* DefaultReflectInfo(unsigned char*);
+ReflectInfo* DefaultReflectInfo(short*);
+ReflectInfo* DefaultReflectInfo(unsigned short*);
+ReflectInfo* DefaultReflectInfo(int*);
+ReflectInfo* DefaultReflectInfo(unsigned int*);
+ReflectInfo* DefaultReflectInfo(long*);
+ReflectInfo* DefaultReflectInfo(unsigned long*);
+ReflectInfo* DefaultReflectInfo(long long*);
+ReflectInfo* DefaultReflectInfo(long long*);
+ReflectInfo* DefaultReflectInfo(float*);
+ReflectInfo* DefaultReflectInfo(double*);
+ReflectInfo* DefaultReflectInfo(std::string*);
+template< class T > ReflectInfo* DefaultReflectInfo(std::vector< T >*) {
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_VECTOR_CLASS, "", 0, (PTR)VectorHandlerT< T, T >::GetVectorHandler); 
+	return &ret;
+}
 
 template< class T, class T2 >
 class VectorHandlerT : public VectorHandlerI

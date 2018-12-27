@@ -1,17 +1,20 @@
+class ENUM_NAME
+{
+public:
 #define ENUM_ENTRY1(A) A,
 #define ENUM_ENTRY2(A, B) A = B,
-enum ENUM_NAME {
-	ENUM_ENTRIES
-};
+	enum enum_values {
+		ENUM_ENTRIES
+	} value;
+
+	ENUM_NAME() {}
+	ENUM_NAME(enum_values val) : value(val) {}
+
 #undef ENUM_ENTRY1
 #undef ENUM_ENTRY2
 
 #define ENUM_ENTRY1(A) EnumReflectData(#A, (int)A),
 #define ENUM_ENTRY2(A, B) EnumReflectData(#A, B),
-
-class CONCAT(ENUM_NAME, ReflectInfo)
-{
-public:
 	static const EnumReflectData* ReflectDatas()
 	{
 		static const EnumReflectData reflect_datas[] = {ENUM_ENTRIES EnumReflectData("", 0)};

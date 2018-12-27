@@ -16,8 +16,8 @@
 
 REFLECTABLE_CLASS(Test0)
 #define REFLECTION_DATA \
-	SERIALIZED_ENUM(public, testEnum, en, enum0) \
-	SERIALIZED_ENUM_VECTOR(public, testEnum, enVector) \
+	SERIALIZED_FIELD(public, testEnum, en, testEnum::enum0) \
+	SERIALIZED_FIELD(public, std::vector< testEnum >, enVector) \
 	SERIALIZED_FIELD(public, int, x, 10) \
 	SERIALIZED_FIELD(public, int, y, 10)  
 #include "ReflectDecl.h"
@@ -49,7 +49,7 @@ public:
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
 		SERIALIZED_FIELD(private, A, testC) \
-		SERIALIZED_FIELD(public, std::vector< std::vector< A > >, v_table)
+		SERIALIZED_FIELD(public, std::vector< std::vector< testEnum > >, v_table)
 	#include "ReflectDecl.h"
 };
 
@@ -107,7 +107,7 @@ int main()
 	reflectables[1] = new B();
 
 	C* c = new C();
-	c->v_test0.push_back(Test0());
+	/*c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_test0[0].en = testEnum::enum0;
@@ -121,14 +121,14 @@ int main()
 	c->v_int.push_back(2);
 	c->v_int.push_back(3);
 	c->v_int.push_back(4);
-	c->v_table.push_back(std::vector<A>());
-	c->v_table[0].push_back(A());
-	c->v_table[0].push_back(A());
-	c->v_table[0].push_back(A());
-	c->v_table.push_back(std::vector<A>());
-	c->v_table[1].push_back(A());
-	c->v_table[1].push_back(A());
-	c->v_table[1].push_back(A());
+	c->v_table.push_back(std::vector<testEnum>());
+	c->v_table[0].push_back(testEnum::enum500);
+	c->v_table[0].push_back(testEnum::enum1);
+	c->v_table[0].push_back(testEnum::enum0);
+	c->v_table.push_back(std::vector<testEnum>());
+	c->v_table[1].push_back(testEnum::enum0);
+	c->v_table[1].push_back(testEnum::enum1);
+	c->v_table[1].push_back(testEnum::enum500);*/
 	reflectables[2] = c;
 	
 	//int& n = reflectables[2]->Get("v_test0[2].y").Int();
@@ -147,8 +147,8 @@ int main()
 	//ReflectField r_class = reflectables[2]->Get("test");
 	//r_class.Get("As").Short() = 321;
 
-	Serialize(reflectables[2], "test.json");
-	//Deserialize(reflectables[2], "test.json");
+	//Serialize(reflectables[2], "test.json");
+	Deserialize(reflectables[2], "test.json");
 	
 	for(int i = 0; i < 3; ++i)
 	{

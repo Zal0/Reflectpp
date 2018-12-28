@@ -45,7 +45,7 @@ public:
 REFLECTABLE_CLASS_INHERITS_2(C, A, B)
 public:
 	#define REFLECTION_DATA   \
-		SERIALIZED_FIELD(public, std::string, name, "pepe") \
+		SERIALIZED_FIELD(public, std::string, name) \
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
 		SERIALIZED_FIELD(private, A, testC) \

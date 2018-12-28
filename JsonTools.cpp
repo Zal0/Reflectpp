@@ -30,7 +30,7 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 			break;
 		}
 			
-		case ReflectInfo::REFLECT_TYPE_VECTOR_CLASS: {
+		case ReflectInfo::REFLECT_TYPE_VECTOR: {
 			out << "[";
 			VectorHandler vector_handler = reflectable.GetVectorHandler();
 			for(int i = 0; i < vector_handler->GetNumElems(); ++i)

@@ -53,7 +53,7 @@ ReflectField ReflectField::Get(const char* field) const
 			}
 			else if(field[n] == '[')
 			{
-				if(info.infos->reflect_type == ReflectInfo::REFLECT_TYPE_VECTOR_CLASS)
+				if(info.infos->reflect_type == ReflectInfo::REFLECT_TYPE_VECTOR)
 				{
 					char* end;
 					int idx = strtol(field + n + 1, &end, 10);

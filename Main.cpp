@@ -74,7 +74,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 			break;
 		}
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR_CLASS: {
+		case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR: {
 			VectorHandler vector_handler = reflectable.GetVectorHandler();
 			printf("[%d]\n", vector_handler->GetNumElems());
 			for(int i = 0; i < vector_handler->GetNumElems(); ++i)

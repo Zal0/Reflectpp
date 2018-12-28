@@ -66,7 +66,7 @@ public:
 
 		REFLECT_TYPE_CLASS,
 
-		REFLECT_TYPE_VECTOR_CLASS
+		REFLECT_TYPE_VECTOR
 	};
 
 	ReflectType reflect_type;
@@ -148,7 +148,7 @@ ReflectInfo* DefaultReflectInfo(float*);
 ReflectInfo* DefaultReflectInfo(double*);
 ReflectInfo* DefaultReflectInfo(std::string*);
 template< class T > ReflectInfo* DefaultReflectInfo(std::vector< T >*) {
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_VECTOR_CLASS, "", 0, (PTR)VectorHandlerT< T, T >::GetVectorHandler); 
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_VECTOR, "", 0, (PTR)VectorHandlerT< T >::GetVectorHandler); 
 	return &ret;
 }
 

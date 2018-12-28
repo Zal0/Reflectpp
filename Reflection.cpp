@@ -87,6 +87,7 @@ ReflectField& ReflectField::operator=(const char* str)
 		case ReflectInfo::REFLECT_TYPE_FLOAT:     As< float >()               = (float)atof(str);               break;
 		case ReflectInfo::REFLECT_TYPE_DOUBLE:    As< double >()              = (double)atof(str);              break;
 		case ReflectInfo::REFLECT_TYPE_STRING:    As< std::string >()         = str;                            break;
+		default: break;
 	}
 
 	return *this;
@@ -112,6 +113,7 @@ std::string ReflectField::ToString()const
 		case ReflectInfo::REFLECT_TYPE_FLOAT:     ss << As< float >();              break;
 		case ReflectInfo::REFLECT_TYPE_DOUBLE:    ss << As< double >();             break;
 		case ReflectInfo::REFLECT_TYPE_STRING:    ss << As< std::string >();        break;
+		default: break;
 	}
 
 	return ss.str();

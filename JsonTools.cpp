@@ -163,6 +163,7 @@ void Deserialize(Reflectable* reflectable, char* path)
 {
 	std::ifstream fin(path, std::ios::binary);
 	PeekStream p(fin);
-	Deserialize(ReflectField(reflectable), p);
+	ReflectField rf(reflectable);
+	Deserialize(rf, p);
 	fin.close();
 }

@@ -80,6 +80,8 @@ public:
 	static ReflectInfo End;
 };
 
+template< class R > ReflectInfo* DefaultReflectInfo();
+
 class EnumReflectData;
 class ReflectField {
 private:
@@ -123,16 +125,26 @@ protected:
 	virtual ReflectInfo* GetItemsReflectInfos() = 0;
 };
 
-template< class R >
-ReflectInfo* DefaultReflectInfo()
+template< class T, class T2 >
+class VectorHandlerT : public VectorHandlerI
 {
-	return DefaultReflectInfo((R*)0);
-}
-template< class R >
-ReflectInfo* DefaultReflectInfo(R*)
-{
-	return R::DefaultReflectInfo();
-}
+private:
+	std::vector< T >& v;
+	VectorHandlerT(void* ptr) : v(*((std::vector< T >*)ptr)){}
+
+public:
+	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT<T, T2>(ptr));}
+	
+	virtual int GetNumElems() {return (int)v.size();}
+	virtual void Push() {v.push_back(T());}
+	virtual void Pop() {v.pop_back();}
+	virtual void Clear() {v.clear();}
+
+protected:
+	virtual void* GetElemPtr(int idx) {return &v[idx];}
+	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T2 >();}
+};
+
 ReflectInfo* DefaultReflectInfo(bool*);
 ReflectInfo* DefaultReflectInfo(char*);
 ReflectInfo* DefaultReflectInfo(unsigned char*);
@@ -143,34 +155,24 @@ ReflectInfo* DefaultReflectInfo(unsigned int*);
 ReflectInfo* DefaultReflectInfo(long*);
 ReflectInfo* DefaultReflectInfo(unsigned long*);
 ReflectInfo* DefaultReflectInfo(long long*);
-ReflectInfo* DefaultReflectInfo(long long*);
+ReflectInfo* DefaultReflectInfo(unsigned long long*);
 ReflectInfo* DefaultReflectInfo(float*);
 ReflectInfo* DefaultReflectInfo(double*);
 ReflectInfo* DefaultReflectInfo(std::string*);
 template< class T > ReflectInfo* DefaultReflectInfo(std::vector< T >*) {
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_VECTOR, "", 0, (PTR)VectorHandlerT< T >::GetVectorHandler); 
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_VECTOR, "", 0, (PTR)VectorHandlerT< T, T >::GetVectorHandler); 
 	return &ret;
 }
-
-template< class T >
-class VectorHandlerT : public VectorHandlerI
+template< class R >
+ReflectInfo* DefaultReflectInfo(R*)
 {
-private:
-	std::vector< T >& v;
-	VectorHandlerT(void* ptr) : v(*((std::vector< T >*)ptr)){}
-
-public:
-	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT< T >(ptr));}
-	
-	virtual int GetNumElems() {return (int)v.size();}
-	virtual void Push() {v.push_back(T());}
-	virtual void Pop() {v.pop_back();}
-	virtual void Clear() {v.clear();}
-
-protected:
-	virtual void* GetElemPtr(int idx) {return &v[idx];}
-	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T >();}
-};
+	return R::DefaultReflectInfo();
+}
+template< class R >
+ReflectInfo* DefaultReflectInfo()
+{
+	return DefaultReflectInfo((R*)0);
+}
 
 class ReflectInfoIterator {
 public:

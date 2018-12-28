@@ -100,8 +100,8 @@ std::string ReflectField::ToString()const
 	switch(infos->reflect_type)
 	{
 		case ReflectInfo::REFLECT_TYPE_BOOL:      ss << As< bool >();               break;
-		case ReflectInfo::REFLECT_TYPE_CHAR:      ss << As< char >();               break;
-		case ReflectInfo::REFLECT_TYPE_UCHAR:     ss << As< unsigned char >();      break;
+		case ReflectInfo::REFLECT_TYPE_CHAR:      ss << (int)As< char >();               break;
+		case ReflectInfo::REFLECT_TYPE_UCHAR:     ss << (int)As< unsigned char >();      break;
 		case ReflectInfo::REFLECT_TYPE_SHORT:     ss << As< short >();              break;
 		case ReflectInfo::REFLECT_TYPE_USHORT:    ss << As< unsigned short >();     break;
 		case ReflectInfo::REFLECT_TYPE_INT:       ss << As< int >();                break;

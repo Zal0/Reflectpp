@@ -213,9 +213,18 @@ int EnumIndex(int value, const EnumReflectData* reflectDatas)
 	return 0; //Not found
 }
 
-const char* EnumStrValue(int value, const EnumReflectData* reflectDatas)
+const char* EnumStrValue(const ReflectField& reflectable)
 {
-	return reflectDatas[EnumIndex(value, reflectDatas)].str;
+	const EnumReflectData* reflectDatas = reflectable.EnumData();
+	int index;
+	switch(reflectable.infos->reflect_type) 
+	{
+		case ReflectInfo::REFLECT_TYPE_CHAR:  index = (int)reflectable.As< char >(); break;
+		case ReflectInfo::REFLECT_TYPE_SHORT: index = (int)reflectable.As< short >(); break;
+		default: index = reflectable.As< int >(); break;
+	}
+
+	return reflectDatas[EnumIndex(index, reflectDatas)].str;
 }
 
 ReflectInfo* DefaultReflectInfo(bool*)               {static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_BOOL,       "", 0); return &ret;}

@@ -92,7 +92,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 			}
 			else
 			{
-				printf("%s\n", EnumStrValue(reflectable.As< int >(), reflectable.EnumData()));
+				printf("%s\n", EnumStrValue(reflectable));
 			}
 			break;
 	}
@@ -107,7 +107,7 @@ int main()
 	reflectables[1] = new B();
 
 	C* c = new C();
-	/*c->v_test0.push_back(Test0());
+	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_test0[0].en = testEnum::enum0;
@@ -128,7 +128,7 @@ int main()
 	c->v_table.push_back(std::vector<testEnum>());
 	c->v_table[1].push_back(testEnum::enum0);
 	c->v_table[1].push_back(testEnum::enum1);
-	c->v_table[1].push_back(testEnum::enum500);*/
+	c->v_table[1].push_back(testEnum::enum500);
 	reflectables[2] = c;
 	
 	//int& n = reflectables[2]->Get("v_test0[2].y").Int();
@@ -147,8 +147,8 @@ int main()
 	//ReflectField r_class = reflectables[2]->Get("test");
 	//r_class.Get("As").Short() = 321;
 
-	//Serialize(reflectables[2], "test.json");
-	Deserialize(reflectables[2], "test.json");
+	Serialize(reflectables[2], "test.json");
+	//Deserialize(reflectables[2], "test.json");
 	
 	for(int i = 0; i < 3; ++i)
 	{

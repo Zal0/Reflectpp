@@ -152,7 +152,7 @@ template< class T > ReflectInfo* DefaultReflectInfo(std::vector< T >*) {
 	return &ret;
 }
 
-template< class T, class T2 >
+template< class T >
 class VectorHandlerT : public VectorHandlerI
 {
 private:
@@ -160,7 +160,7 @@ private:
 	VectorHandlerT(void* ptr) : v(*((std::vector< T >*)ptr)){}
 
 public:
-	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT<T, T2>(ptr));}
+	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT< T >(ptr));}
 	
 	virtual int GetNumElems() {return (int)v.size();}
 	virtual void Push() {v.push_back(T());}
@@ -169,7 +169,7 @@ public:
 
 protected:
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
-	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T2 >();}
+	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T >();}
 };
 
 class ReflectInfoIterator {

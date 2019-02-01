@@ -5,14 +5,14 @@
 #include <stdio.h>
 
 #include "Reflection.h"
-#include "JsonTools.h"
+#include "ReflectionJsonTools.h"
 
 #define ENUM_NAME testEnum
 #define ENUM_ENTRIES \
 	ENUM_ENTRY(enum0) \
 	ENUM_ENTRY(enum1, 10) \
 	ENUM_ENTRY(enum500)
-#include "EnumDecl.h"
+#include "ReflectEnumDecl.h"
 
 REFLECTABLE_CLASS(Test0)
 #define REFLECTION_DATA \

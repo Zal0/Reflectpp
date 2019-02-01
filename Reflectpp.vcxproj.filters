@@ -21,21 +21,21 @@
     <ClInclude Include="ReflectDecl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="JsonTools.h">
+    <ClInclude Include="ReflectionJsonTools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EnumDecl.h">
+    <ClInclude Include="ReflectEnumDecl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="JsonTools.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Reflection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectionJsonTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

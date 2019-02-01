@@ -251,8 +251,10 @@ public:
 //ReflectInfos to a Reflectable in that address will always return A:::ReflectInfos)
 #define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::ClassReflectInfos),
 
-#define REFLECTABLE_CLASS(A)                                        \
-class A : public ReflectableInit< A >, public virtual Reflectable { \
+#define REFLECTABLE_CLASS_DECL(A)                                   \
+class A : public ReflectableInit< A >, public virtual Reflectable { 
+
+#define REFLECTABLE_CLASS_PROPS(A)                                  \
 private:                                                            \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}             \
                                                                     \
@@ -263,8 +265,15 @@ private:                                                            \
 			return info;                                                  \
 		}
 
-#define REFLECTABLE_CLASS_INHERITS_1(A, B)              \
-class A : public ReflectableInit< A >, public B {       \
+#define REFLECTABLE_CLASS(A) \
+REFLECTABLE_CLASS_DECL(A)    \
+REFLECTABLE_CLASS_PROPS(A)
+
+
+#define REFLECTABLE_CLASS_INHERITS_1_DECL(A, B)         \
+class A : public ReflectableInit< A >, public B {       
+
+#define REFLECTABLE_CLASS_INHERITS_1_PROPS(A, B)        \
 private:                                                \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;} \
                                                         \
@@ -276,8 +285,14 @@ private:                                                \
 		return info;                                        \
 	}
 
-#define REFLECTABLE_CLASS_INHERITS_2(A, B, C)               \
-class A : public ReflectableInit< A >, public B, public C { \
+#define REFLECTABLE_CLASS_INHERITS_1(A, B) \
+REFLECTABLE_CLASS_INHERITS_1_DECL(A, B)    \
+REFLECTABLE_CLASS_INHERITS_1_PROPS(A, B)
+
+#define REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C)          \
+class A : public ReflectableInit< A >, public B, public C { 
+
+#define REFLECTABLE_CLASS_INHERITS_2_PROPS(A, B, C)         \
 private:                                                    \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}     \
                                                             \
@@ -289,5 +304,10 @@ private:                                                    \
 		};                                                      \
 		return info;                                            \
 	}
+
+
+#define REFLECTABLE_CLASS_INHERITS_2(A, B, C) \
+REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C)    \
+REFLECTABLE_CLASS_INHERITS_2_PROPS(A, B, C)
 
 #endif

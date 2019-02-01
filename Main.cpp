@@ -40,6 +40,10 @@ public:
 		SERIALIZED_FIELD(public, float, Bf, 4)  \
 		SERIALIZED_FIELD(public, A, test)
 	#include "ReflectDecl.h"
+
+	virtual const char* ToString() {
+		return "I am a B ptr";
+	}
 };
 
 REFLECTABLE_CLASS_INHERITS_2(C, A, B)
@@ -49,7 +53,8 @@ public:
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
 		SERIALIZED_FIELD(private, A, testC) \
-		SERIALIZED_FIELD(public, std::vector< std::vector< testEnum > >, v_table)
+		SERIALIZED_FIELD(public, std::vector< std::vector< testEnum > >, v_table) \
+		SERIALIZED_FIELD(public, B*, bPtr)
 	#include "ReflectDecl.h"
 };
 
@@ -86,7 +91,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 		}
 
 		default:
-			if(reflectable.EnumData() == 0)
+			if(reflectable.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_POINTER || reflectable.EnumData() == 0)
 			{
 				printf("%s\n", reflectable.ToString().c_str());
 			}
@@ -104,7 +109,10 @@ int main()
 	Reflectable* reflectables[3];
 
 	reflectables[0] = new A();
-	reflectables[1] = new B();
+	B* b = new B();
+	reflectables[1] = b;
+
+	ReflectInfo* r = DefaultReflectInfo< A* >();
 
 	C* c = new C();
 	c->v_test0.push_back(Test0());
@@ -129,6 +137,7 @@ int main()
 	c->v_table[1].push_back(testEnum::enum0);
 	c->v_table[1].push_back(testEnum::enum1);
 	c->v_table[1].push_back(testEnum::enum500);
+	c->bPtr = b;
 	reflectables[2] = c;
 	
 	//int& n = reflectables[2]->Get("v_test0[2].y").Int();
@@ -148,7 +157,7 @@ int main()
 	//r_class.Get("As").Short() = 321;
 
 	Serialize(reflectables[2], "test.json");
-	//Deserialize(reflectables[2], "test.json");
+	Deserialize(reflectables[2], "test.json");
 	
 	for(int i = 0; i < 3; ++i)
 	{

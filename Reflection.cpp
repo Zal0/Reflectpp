@@ -87,6 +87,7 @@ ReflectField& ReflectField::operator=(const char* str)
 		case ReflectInfo::REFLECT_TYPE_FLOAT:     As< float >()               = (float)atof(str);               break;
 		case ReflectInfo::REFLECT_TYPE_DOUBLE:    As< double >()              = (double)atof(str);              break;
 		case ReflectInfo::REFLECT_TYPE_STRING:    As< std::string >()         = str;                            break;
+		case ReflectInfo::REFLECT_TYPE_POINTER:   ReflectablePtr()->FromReflectString(str);                     break;
 		default: break;
 	}
 
@@ -100,8 +101,8 @@ std::string ReflectField::ToString()const
 	switch(infos->reflect_type)
 	{
 		case ReflectInfo::REFLECT_TYPE_BOOL:      ss << As< bool >();               break;
-		case ReflectInfo::REFLECT_TYPE_CHAR:      ss << (int)As< char >();               break;
-		case ReflectInfo::REFLECT_TYPE_UCHAR:     ss << (int)As< unsigned char >();      break;
+		case ReflectInfo::REFLECT_TYPE_CHAR:      ss << (int)As< char >();          break;
+		case ReflectInfo::REFLECT_TYPE_UCHAR:     ss << (int)As< unsigned char >(); break;
 		case ReflectInfo::REFLECT_TYPE_SHORT:     ss << As< short >();              break;
 		case ReflectInfo::REFLECT_TYPE_USHORT:    ss << As< unsigned short >();     break;
 		case ReflectInfo::REFLECT_TYPE_INT:       ss << As< int >();                break;
@@ -113,6 +114,7 @@ std::string ReflectField::ToString()const
 		case ReflectInfo::REFLECT_TYPE_FLOAT:     ss << As< float >();              break;
 		case ReflectInfo::REFLECT_TYPE_DOUBLE:    ss << As< double >();             break;
 		case ReflectInfo::REFLECT_TYPE_STRING:    ss << As< std::string >();        break;
+		case ReflectInfo::REFLECT_TYPE_POINTER:   ss << '\"' << ReflectablePtr()->ToReflectString() << '\"'; break;
 		default: break;
 	}
 

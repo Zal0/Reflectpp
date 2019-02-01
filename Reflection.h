@@ -40,6 +40,7 @@ class VectorHandlerI;
 typedef ReflectInfo*(*ReflectInfosFunc)();
 typedef std::auto_ptr< VectorHandlerI > VectorHandler;
 typedef VectorHandler(*VectorHandlerFunc)(void*);
+typedef Reflectable*(*ReflectablePtrFunc)(void*);
 
 class ReflectInfo 
 {
@@ -66,7 +67,8 @@ public:
 
 		REFLECT_TYPE_CLASS,
 
-		REFLECT_TYPE_VECTOR
+		REFLECT_TYPE_VECTOR,
+		REFLECT_TYPE_POINTER
 	};
 
 	ReflectType reflect_type;
@@ -101,11 +103,13 @@ public:
 		else
 			return default_t; //This way we avoid memory issues
 	}
+
 	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfo*)infos->extra));}
 	VectorHandler GetVectorHandler() const;
 	ReflectField Get(const char* field) const;
 
 	EnumReflectData* EnumData() const {return infos->extra ? ((EnumReflectData*)infos->extra) : 0;}
+	Reflectable* ReflectablePtr() const {return ((ReflectablePtrFunc)infos->extra)(As< void* >());}
 
 	ReflectField& operator=(const char* str);
 	std::string ToString()const;
@@ -145,6 +149,13 @@ protected:
 	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T >();}
 };
 
+//Given a void* this returns the pointer to Reflectable* (void* must be pointing to a T* inheriting Reflectable)
+template< class T >
+Reflectable* ReflectablePtr(void* ptr) {
+	T* t_ptr = (T*)ptr;
+	return (Reflectable*)t_ptr;
+}
+
 ReflectInfo* DefaultReflectInfo(bool*);
 ReflectInfo* DefaultReflectInfo(char*);
 ReflectInfo* DefaultReflectInfo(unsigned char*);
@@ -159,15 +170,25 @@ ReflectInfo* DefaultReflectInfo(unsigned long long*);
 ReflectInfo* DefaultReflectInfo(float*);
 ReflectInfo* DefaultReflectInfo(double*);
 ReflectInfo* DefaultReflectInfo(std::string*);
+
 template< class T > ReflectInfo* DefaultReflectInfo(std::vector< T >*) {
 	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_VECTOR, "", 0, (PTR)VectorHandlerT< T >::GetVectorHandler); 
 	return &ret;
 }
+
 template< class R >
 ReflectInfo* DefaultReflectInfo(R*)
 {
 	return R::DefaultReflectInfo();
 }
+
+template< class R >
+ReflectInfo* DefaultReflectInfo(R**)
+{
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_POINTER, "", 0, (PTR)(ReflectablePtrFunc)ReflectablePtr< R >); 
+	return &ret;
+}
+
 template< class R >
 ReflectInfo* DefaultReflectInfo()
 {
@@ -206,9 +227,12 @@ private:
 
 public:
 	virtual ReflectInfosFunc ReflectInfosF(){return ClassReflectInfos;}
-	virtual void* This() {return this;}
+	virtual void* This() = 0;
 
 	ReflectField Get(const char* field);
+
+	virtual const char* ToReflectString() {return "Ptr";}
+	virtual void FromReflectString(const char* str) {}
 };
 
 template< class T >

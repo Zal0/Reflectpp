@@ -58,6 +58,19 @@ public:
 	#include "ReflectDecl.h"
 };
 
+REFLECTABLE_CLASS(D)
+	#define REFLECTION_DATA   \
+		SERIALIZED_FIELD(public, short, Fi, -5)
+	#include "ReflectDecl.h"
+};
+
+REFLECTABLE_CLASS_INHERITS_1(G, A)
+};
+
+REFLECTABLE_CLASS_INHERITS_3(F, A, B, D)
+	#include "ReflectDecl.h"
+};
+
 void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 {
 	char* tabs = new char[depth + 1];
@@ -106,7 +119,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 
 int main()
 {
-	Reflectable* reflectables[3];
+	Reflectable* reflectables[4];
 
 	reflectables[0] = new A();
 	B* b = new B();
@@ -139,6 +152,8 @@ int main()
 	c->v_table[1].push_back(testEnum::enum500);
 	c->bPtr = b;
 	reflectables[2] = c;
+
+	reflectables[3] = new F();
 	
 	//int& n = reflectables[2]->Get("v_test0[2].y").Int();
 	//n = 12345;
@@ -157,9 +172,9 @@ int main()
 	//r_class.Get("As").Short() = 321;
 
 	Serialize(reflectables[2], "test.json");
-	Deserialize(reflectables[2], "test.json");
+	//Deserialize(reflectables[2], "test.json");
 	
-	for(int i = 0; i < 3; ++i)
+	for(int i = 0; i < 4; ++i)
 	{
 		PrintReflectable(reflectables[i]);
 	}

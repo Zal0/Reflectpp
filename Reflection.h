@@ -217,7 +217,7 @@ const char* EnumStrValue(const ReflectField& reflectable);
 
 class Reflectable
 {
-private:
+public:
 	static ReflectInfo* ClassReflectInfos() {
 		static ReflectInfo info[] = {
 			ReflectInfo::End
@@ -227,12 +227,14 @@ private:
 
 public:
 	virtual ReflectInfosFunc ReflectInfosF(){return ClassReflectInfos;}
-	virtual void* This() = 0;
+	virtual void* This() {return this;}
 
 	ReflectField Get(const char* field);
 
 	virtual const char* ToReflectString() {return "Ptr";}
 	virtual void FromReflectString(const char* str) {}
+
+	void ReflectInit() {}
 };
 
 template< class T >
@@ -309,5 +311,27 @@ private:                                                    \
 #define REFLECTABLE_CLASS_INHERITS_2(A, B, C) \
 REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C)    \
 REFLECTABLE_CLASS_INHERITS_2_PROPS(A, B, C)
+
+#define REFLECTABLE_CLASS_INHERITS_3_DECL(A, B, C, D)                 \
+class A : public ReflectableInit< A >, public B, public C, public D { 
+
+#define REFLECTABLE_CLASS_INHERITS_3_PROPS(A, B, C, D)      \
+private:                                                    \
+	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}     \
+                                                            \
+	static ReflectInfo* InheritanceTable() {                  \
+		static ReflectInfo info[] = {                           \
+			REFLECT_INHERIT(B)                                    \
+			REFLECT_INHERIT(C)                                    \
+			REFLECT_INHERIT(D)                                    \
+			ReflectInfo::End                                      \
+		};                                                      \
+		return info;                                            \
+	}
+
+
+#define REFLECTABLE_CLASS_INHERITS_3(A, B, C, D) \
+REFLECTABLE_CLASS_INHERITS_3_DECL(A, B, C, D)    \
+REFLECTABLE_CLASS_INHERITS_3_PROPS(A, B, C, D)
 
 #endif

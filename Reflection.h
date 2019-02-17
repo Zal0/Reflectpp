@@ -233,14 +233,14 @@ public:
 
 	virtual const char* ToReflectString() {return "Ptr";}
 	virtual void FromReflectString(const char* str) {}
-
-	void ReflectInit() {}
 };
 
 template< class T >
 class ReflectableInit
 {
 public:
+	void ReflectInit() {}
+
 	ReflectableInit() {
 		void (T::*init)() = &T::ReflectInit;
 		((*(T*)(this)).*init)();
@@ -254,11 +254,17 @@ public:
 #define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::ClassReflectInfos),
 
 #define REFLECTABLE_CLASS_DECL(A)                                   \
-class A : public ReflectableInit< A >, public virtual Reflectable { 
+class A : private ReflectableInit< A >, public virtual Reflectable { 
+
+#define REFLECTABLE_CLASS_COMMON_PROPS(A)               \
+	using ReflectableInit< A >::ReflectInit;              \
+	friend class ReflectableInit< A >;                    \
+	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}
+
 
 #define REFLECTABLE_CLASS_PROPS(A)                                  \
 private:                                                            \
-	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}             \
+	REFLECTABLE_CLASS_COMMON_PROPS(A)                                 \
                                                                     \
 	static ReflectInfo* InheritanceTable() {                          \
 			static ReflectInfo info[] = {                                 \
@@ -273,11 +279,11 @@ REFLECTABLE_CLASS_PROPS(A)
 
 
 #define REFLECTABLE_CLASS_INHERITS_1_DECL(A, B)         \
-class A : public ReflectableInit< A >, public B {       
+class A : private ReflectableInit< A >, public B {       
 
 #define REFLECTABLE_CLASS_INHERITS_1_PROPS(A, B)        \
 private:                                                \
-	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;} \
+	REFLECTABLE_CLASS_COMMON_PROPS(A)                     \
                                                         \
 	static ReflectInfo* InheritanceTable() {              \
 		static ReflectInfo info[] = {                       \
@@ -292,11 +298,11 @@ REFLECTABLE_CLASS_INHERITS_1_DECL(A, B)    \
 REFLECTABLE_CLASS_INHERITS_1_PROPS(A, B)
 
 #define REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C)          \
-class A : public ReflectableInit< A >, public B, public C { 
+class A : private ReflectableInit< A >, public B, public C { 
 
 #define REFLECTABLE_CLASS_INHERITS_2_PROPS(A, B, C)         \
 private:                                                    \
-	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}     \
+	REFLECTABLE_CLASS_COMMON_PROPS(A)                         \
                                                             \
 	static ReflectInfo* InheritanceTable() {                  \
 		static ReflectInfo info[] = {                           \
@@ -313,11 +319,11 @@ REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C)    \
 REFLECTABLE_CLASS_INHERITS_2_PROPS(A, B, C)
 
 #define REFLECTABLE_CLASS_INHERITS_3_DECL(A, B, C, D)                 \
-class A : public ReflectableInit< A >, public B, public C, public D { 
+class A : private ReflectableInit< A >, public B, public C, public D { 
 
 #define REFLECTABLE_CLASS_INHERITS_3_PROPS(A, B, C, D)      \
 private:                                                    \
-	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}     \
+	REFLECTABLE_CLASS_COMMON_PROPS(A)                         \
                                                             \
 	static ReflectInfo* InheritanceTable() {                  \
 		static ReflectInfo info[] = {                           \

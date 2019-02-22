@@ -1,11 +1,16 @@
 #ifndef REFLECTION_H
 #define REFLECTION_H
 
+#define cached_new new
+#undef new
+
 #include <vector>
 #include <string.h>
 
 #include <iostream>
 #include <memory>
+
+#define new cached_new
 
 #ifdef _WIN64
 	typedef long long PTR;

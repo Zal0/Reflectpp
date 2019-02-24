@@ -68,7 +68,6 @@ REFLECTABLE_CLASS_INHERITS_1(G, A)
 };
 
 REFLECTABLE_CLASS_INHERITS_3(F, A, B, D)
-	#include "ReflectDecl.h"
 };
 
 void PrintReflectable(const ReflectField& reflectable, int depth = 0)

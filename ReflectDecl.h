@@ -27,9 +27,6 @@ static ReflectInfo* ClassReflectInfos() {
 	};
 	return info;
 }
-virtual ReflectInfosFunc ReflectInfosF(){return ClassReflectInfos;}
-
-virtual void* This() {return this;}
 
 static ReflectInfo* DefaultReflectInfo()
 {

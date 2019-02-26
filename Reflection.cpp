@@ -14,6 +14,18 @@ ReflectField::ReflectField(Reflectable* reflectable)
 	this->infos = classDummyInfos;
 }
 
+ReflectField::ReflectField(const ReflectField& r) :
+	reflectable(r.reflectable)
+,	infos(r.infos) 
+{
+	if(r.infos == r.classDummyInfos)
+	{
+		classDummyInfos[0] = r.classDummyInfos[0];
+		classDummyInfos[1] = r.classDummyInfos[1];
+		infos = classDummyInfos;
+	}
+}
+
 static int strcmpidx(const char* str0, const char* str1)
 {
 	int ret = 0;

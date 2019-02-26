@@ -103,6 +103,7 @@ public:
 	ReflectInfo* infos;
 	ReflectField(Reflectable* reflectable);
 	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
+	ReflectField(const ReflectField& r);
 
 	template< class T > T& As() const
 	{

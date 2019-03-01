@@ -1,14 +1,20 @@
-class ENUM_NAME
-{
-public:
 #define ENUM_ENTRY1(A) A,
 #define ENUM_ENTRY2(A, B) A = B,
-	enum enum_values {
-		ENUM_ENTRIES
-	} value;
+#define ENUM_NAME_ CONCAT(ENUM_NAME,_)
 
-	ENUM_NAME() {}
-	ENUM_NAME(enum_values val) : value(val) {}
+enum ENUM_NAME_ {
+	ENUM_ENTRIES
+};
+
+class ENUM_NAME
+{
+private:
+	ENUM_NAME_ value;
+
+public:
+	ENUM_NAME()  {}
+	ENUM_NAME(ENUM_NAME_ val) : value(val) {}
+	operator ENUM_NAME_() {return value;}
 
 #undef ENUM_ENTRY1
 #undef ENUM_ENTRY2
@@ -31,5 +37,6 @@ public:
 #undef ENUM_ENTRY1
 #undef ENUM_ENTRY2
 
+#undef _ENUM
 #undef ENUM_NAME
 #undef ENUM_ENTRIES

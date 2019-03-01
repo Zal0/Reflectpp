@@ -16,7 +16,7 @@
 
 REFLECTABLE_CLASS(Test0)
 #define REFLECTION_DATA \
-	SERIALIZED_FIELD(public, testEnum, en, testEnum::enum0) \
+	SERIALIZED_FIELD(public, testEnum, en, enum0) \
 	SERIALIZED_FIELD(public, std::vector< testEnum >, enVector) \
 	SERIALIZED_FIELD(public, int, x, 10) \
 	SERIALIZED_FIELD(public, int, y, 10)  
@@ -130,25 +130,25 @@ int main()
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());
-	c->v_test0[0].en = testEnum::enum0;
-	c->v_test0[1].en = testEnum::enum1;
-	c->v_test0[2].en = testEnum::enum500;
-	c->v_test0[0].enVector.push_back(testEnum::enum500);
-	c->v_test0[0].enVector.push_back(testEnum::enum500);
-	c->v_test0[0].enVector.push_back(testEnum::enum1);
-	c->v_test0[0].enVector.push_back(testEnum::enum0);
+	c->v_test0[0].en = enum0;
+	c->v_test0[1].en = enum1;
+	c->v_test0[2].en = enum500;
+	c->v_test0[0].enVector.push_back(enum500);
+	c->v_test0[0].enVector.push_back(enum500);
+	c->v_test0[0].enVector.push_back(enum1);
+	c->v_test0[0].enVector.push_back(enum0);
 	c->v_int.push_back(1);
 	c->v_int.push_back(2);
 	c->v_int.push_back(3);
 	c->v_int.push_back(4);
 	c->v_table.push_back(std::vector<testEnum>());
-	c->v_table[0].push_back(testEnum::enum500);
-	c->v_table[0].push_back(testEnum::enum1);
-	c->v_table[0].push_back(testEnum::enum0);
+	c->v_table[0].push_back(enum500);
+	c->v_table[0].push_back(enum1);
+	c->v_table[0].push_back(enum0);
 	c->v_table.push_back(std::vector<testEnum>());
-	c->v_table[1].push_back(testEnum::enum0);
-	c->v_table[1].push_back(testEnum::enum1);
-	c->v_table[1].push_back(testEnum::enum500);
+	c->v_table[1].push_back(enum0);
+	c->v_table[1].push_back(enum1);
+	c->v_table[1].push_back(enum500);
 	c->bPtr = b;
 	reflectables[2] = c;
 

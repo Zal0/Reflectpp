@@ -14,7 +14,7 @@ private:
 public:
 	ENUM_NAME()  {}
 	ENUM_NAME(ENUM_NAME_ val) : value(val) {}
-	operator ENUM_NAME_() {return value;}
+	operator ENUM_NAME_() const {return value;}
 
 #undef ENUM_ENTRY1
 #undef ENUM_ENTRY2

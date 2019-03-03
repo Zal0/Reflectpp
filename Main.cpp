@@ -19,17 +19,19 @@ REFLECTABLE_CLASS(Test0)
 	SERIALIZED_FIELD(public, testEnum, en, enum0) \
 	SERIALIZED_FIELD(public, std::vector< testEnum >, enVector) \
 	SERIALIZED_FIELD(public, int, x, 10) \
-	SERIALIZED_FIELD(public, int, y, 10)  
+	SERIALIZED_FIELD(public, int, y, 10)
 #include "ReflectDecl.h"
 };
 
 REFLECTABLE_CLASS(A)
 public:
+	int exposed_int;
 	#define REFLECTION_DATA       \
 		SERIALIZED_FIELD(public, int, Ai, 1)  \
 		SERIALIZED_FIELD(public, short, As, 2)\
 		SERIALIZED_FIELD(public, std::vector< Test0 >, v_test0)\
-		SERIALIZED_FIELD(public, std::vector< int >, v_int)
+		SERIALIZED_FIELD(public, std::vector< int >, v_int)\
+		EXPOSED_FIELD(int, exposed_int)
 	#include "ReflectDecl.h"
 };
 

@@ -80,6 +80,8 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 	switch(reflectable.infos->reflect_type)
 	{
 		case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
+			if(depth == 0)
+				printf("\nclass %s", reflectable.infos->id);
 			printf("\n");
 			ReflectInfoIterator it(reflectable.ClassPtr());
 			ReflectField info(0,0);

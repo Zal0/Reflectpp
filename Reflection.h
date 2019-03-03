@@ -228,15 +228,17 @@ const char* EnumStrValue(const ReflectField& reflectable);
 class Reflectable
 {
 public:
-	static ReflectInfo* ClassReflectInfos() {
+	static ReflectInfo* DefaultReflectInfo()
+	{
 		static ReflectInfo info[] = {
 			ReflectInfo::End
 		};
-		return info;
+		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, "Reflectable", 0, (PTR)info);
+		return &ret;
 	}
 
 public:
-	virtual ReflectInfosFunc ReflectInfosF(){return ClassReflectInfos;}
+	virtual ReflectInfosFunc DefaultReflectInfoF() {return DefaultReflectInfo;}
 	virtual void* This() {return this;}
 
 	ReflectField Get(const char* field);
@@ -256,8 +258,9 @@ public:
 		((*(T*)(this)).*init)();
 	}
 
-	static ReflectInfo* ClassReflectInfos() {
-		return T::InheritanceTable();
+	static ReflectInfo* DefaultReflectInfo() {
+		static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, T::ReflectableClassName(), 0, (PTR)T::InheritanceTable());
+		return &ret;
 	}
 };
 
@@ -265,19 +268,20 @@ public:
 //The pointer to the ReflectInfos function is not enough because the first inherited class shares its address with the class
 //and the compiler cast it to the latter (so in "class A : public B, public C"  A and B share the same offset (0) and calling
 //ReflectInfos to a Reflectable in that address will always return A:::ReflectInfos)
-#define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::ClassReflectInfos),
+#define REFLECT_INHERIT(A) ReflectInfo(ReflectInfo::REFLECT_TYPE_PARENT_CLASS, #A, CLASS_OFFSET(A), (PTR)A::DefaultReflectInfo),
 
 #define REFLECTABLE_CLASS_DECL(A)                                   \
 class A : private ReflectableInit< A >, public virtual Reflectable { 
 
-#define REFLECTABLE_CLASS_COMMON_PROPS(A)                             \
-public:                                                               \
-	using ReflectableInit< A >::ClassReflectInfos;                      \
-	using ReflectableInit< A >::ReflectInit;                            \
-	virtual ReflectInfosFunc ReflectInfosF(){return &ClassReflectInfos;}\
-	virtual void* This() {return this;}                                 \
-private:                                                              \
-	friend class ReflectableInit< A >;                                  \
+#define REFLECTABLE_CLASS_COMMON_PROPS(A)                                      \
+public:                                                                        \
+	using ReflectableInit< A >::DefaultReflectInfo;                              \
+	using ReflectableInit< A >::ReflectInit;                                     \
+	virtual ReflectInfosFunc DefaultReflectInfoF() {return &DefaultReflectInfo;} \
+	virtual void* This() {return this;}                                          \
+	static const char* ReflectableClassName() {return #A;}                       \
+private:                                                                       \
+	friend class ReflectableInit< A >;                                           \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}
 
 

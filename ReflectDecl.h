@@ -17,18 +17,14 @@ REFLECTION_DATA
 
 public:
 
-static ReflectInfo* ClassReflectInfos() {
+static ReflectInfo* DefaultReflectInfo()
+{
 	static ReflectInfo info[] = {
 		ReflectInfo(ReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE, "rht", (PTR)InheritanceTable),
 		REFLECTION_DATA
 		ReflectInfo::End
 	};
-	return info;
-}
-
-static ReflectInfo* DefaultReflectInfo()
-{
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, "", 0, (PTR)(ClassReflectInfos()));
+	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, ReflectableClassName(), 0, (PTR)info);
 	return &ret;
 }
 

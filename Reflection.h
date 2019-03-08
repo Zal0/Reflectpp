@@ -91,8 +91,6 @@ public:
 	static ReflectInfo End;
 };
 
-template< class R > ReflectInfo* DefaultReflectInfo();
-
 class EnumReflectData;
 class ReflectField {
 private:
@@ -108,7 +106,7 @@ public:
 	template< class T > T& As() const
 	{
 		static T default_t;
-		if(infos->reflect_type == DefaultReflectInfo< T >()->reflect_type)
+		if(infos->reflect_type == DefaultReflectInfo((T*)0)->reflect_type)
 			return *REFLECT_PTR(T, reflectable, infos->ptr);
 		else
 			return default_t; //This way we avoid memory issues
@@ -156,7 +154,7 @@ public:
 
 protected:
 	virtual void* GetElemPtr(int idx) {return &v[idx];}
-	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo< T >();}
+	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo((T*)0);}
 };
 
 //Given a void* this returns the pointer to Reflectable* (void* must be pointing to a T* inheriting Reflectable)
@@ -197,12 +195,6 @@ ReflectInfo* DefaultReflectInfo(R**)
 {
 	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_POINTER, "", 0, (PTR)(ReflectablePtrFunc)ReflectablePtr< R >); 
 	return &ret;
-}
-
-template< class R >
-ReflectInfo* DefaultReflectInfo()
-{
-	return DefaultReflectInfo((R*)0);
 }
 
 class ReflectInfoIterator {

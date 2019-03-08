@@ -128,8 +128,6 @@ int main()
 	B* b = new B();
 	reflectables[1] = b;
 
-	ReflectInfo* r = DefaultReflectInfo< A* >();
-
 	C* c = new C();
 	c->v_test0.push_back(Test0());
 	c->v_test0.push_back(Test0());

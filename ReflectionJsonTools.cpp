@@ -5,9 +5,9 @@
 
 void Serialize(std::ofstream& out, const ReflectField& reflectable)
 {
-	switch(reflectable.infos->reflect_type)
+	switch(reflectable.infos->info->reflect_type)
 	{
-		case ReflectInfo::REFLECT_TYPE_CLASS: {
+		case TypeReflectInfo::REFLECT_TYPE_CLASS: {
 			out << "{";
 			ReflectInfoIterator it(reflectable.ClassPtr());
 			ReflectField info(0,0);
@@ -30,7 +30,7 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 			break;
 		}
 			
-		case ReflectInfo::REFLECT_TYPE_VECTOR: {
+		case TypeReflectInfo::REFLECT_TYPE_VECTOR: {
 			out << "[";
 			VectorHandler vector_handler = reflectable.GetVectorHandler();
 			for(int i = 0; i < vector_handler->GetNumElems(); ++i)
@@ -42,7 +42,7 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 			break;
 		}
 		
-		case ReflectInfo::REFLECT_TYPE_STRING:
+		case TypeReflectInfo::REFLECT_TYPE_STRING:
 			out << '\"' << reflectable.ToString().c_str() << '\"';
 			break;
 

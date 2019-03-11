@@ -79,9 +79,19 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 		tabs[i] = ' ';
 	tabs[depth] = '\0';
 
-	switch(reflectable.infos->reflect_type)
+	/*int array_size = 1;
+	if(const char* idx = strchr(reflectable.infos->id, '['))
 	{
-		case ReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
+		array_size = atoi(++ idx);
+		printf("%s[%d] ", tabs, array_size);
+		ReflectField field(reflectable.reflectable, &ReflectInfo(reflectable.infos->info->reflect_type, "ptr", 8, reflectable.infos->info->extra));
+		PrintReflectable(field, depth + 1);
+		return;
+	}*/
+
+	switch(reflectable.infos->info->reflect_type)
+	{
+		case TypeReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
 			if(depth == 0)
 				printf("\nclass %s", reflectable.infos->id);
 			printf("\n");
@@ -95,7 +105,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 			break;
 		}
 
-		case ReflectInfo::ReflectType::REFLECT_TYPE_VECTOR: {
+		case TypeReflectInfo::ReflectType::REFLECT_TYPE_VECTOR: {
 			VectorHandler vector_handler = reflectable.GetVectorHandler();
 			printf("[%d]\n", vector_handler->GetNumElems());
 			for(int i = 0; i < vector_handler->GetNumElems(); ++i)
@@ -107,7 +117,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 		}
 
 		default:
-			if(reflectable.infos->reflect_type == ReflectInfo::ReflectType::REFLECT_TYPE_POINTER || reflectable.EnumData() == 0)
+			if(reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_POINTER || reflectable.EnumData() == 0)
 			{
 				printf("%s\n", reflectable.ToString().c_str());
 			}
@@ -127,6 +137,9 @@ int main()
 	reflectables[0] = new A();
 	B* b = new B();
 	reflectables[1] = b;
+
+	int tmp0 = sizeof(B);
+	int tmp1 = sizeof(*b);
 
 	C* c = new C();
 	c->v_test0.push_back(Test0());

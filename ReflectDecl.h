@@ -15,19 +15,20 @@ REFLECTION_DATA
 
 //Class ReflectInfos array
 #define EXPOSED_FIELD(TYPE, NAME) SERIALIZED_FIELD(0, TYPE, NAME, 0)
-#define SERIALIZED_FIELD4(ACCESS, TYPE, NAME, DEFAULT) ReflectInfo(::DefaultReflectInfo((TYPE*)0)->reflect_type, #NAME, OFFSET(NAME), ::DefaultReflectInfo((TYPE*)0)->extra),
-#define SERIALIZED_FIELD3(ACCESS, TYPE, NAME)          ReflectInfo(::DefaultReflectInfo((TYPE*)0)->reflect_type, #NAME, OFFSET(NAME), ::DefaultReflectInfo((TYPE*)0)->extra),
+#define SERIALIZED_FIELD4(ACCESS, TYPE, NAME, DEFAULT) ReflectInfo(::DefaultReflectInfo((TYPE*)0)->info, #NAME, OFFSET(NAME)),
+#define SERIALIZED_FIELD3(ACCESS, TYPE, NAME)          ReflectInfo(::DefaultReflectInfo((TYPE*)0)->info, #NAME, OFFSET(NAME)),
 
 public:
 
 static ReflectInfo* DefaultReflectInfo()
 {
 	static ReflectInfo info[] = {
-		ReflectInfo(ReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE, "rht", (PTR)InheritanceTable),
+		ReflectInfo(&TypeReflectInfo::InheritanceTable, "rht", (PTR)InheritanceTable),
 		REFLECTION_DATA
 		ReflectInfo::End
 	};
-	static ReflectInfo ret(ReflectInfo::REFLECT_TYPE_CLASS, ReflectableClassName(), 0, (PTR)info);
+	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_CLASS, sizeof(*ReflectClass()), (PTR)info);
+	static ReflectInfo ret(&t_info, ReflectableClassName(), 0);
 	return &ret;
 }
 

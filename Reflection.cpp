@@ -269,9 +269,10 @@ int EnumIndex(int value, const EnumReflectData* reflectDatas)
 			return idx;
 		}
 		idx ++;
-	} while((reflectDatas ++)->value != value);
+		reflectDatas ++;
+	} while(reflectDatas->str[0] != '?' && (reflectDatas)->value != value);
 
-	return 0; //Not found
+	return idx; //Not found
 }
 
 const char* EnumStrValue(const ReflectField& reflectable)

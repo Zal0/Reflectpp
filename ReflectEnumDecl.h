@@ -23,7 +23,7 @@ public:
 #define ENUM_ENTRY2(A, B) EnumReflectData(#A, B),
 	static const EnumReflectData* ReflectDatas()
 	{
-		static const EnumReflectData reflect_datas[] = {ENUM_ENTRIES EnumReflectData("", 0)};
+		static const EnumReflectData reflect_datas[] = {ENUM_ENTRIES EnumReflectData("?", 0)};
 		return reflect_datas;
 	}
 

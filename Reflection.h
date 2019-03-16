@@ -99,7 +99,7 @@ public:
 
 public:
 	ReflectInfo() {};
-	ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(info), id(id), ptr(ptr) {}
+	ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr);
 	static ReflectInfo End;
 };
 
@@ -124,12 +124,21 @@ public:
 			return default_t; //This way we avoid memory issues
 	}
 
+	//Content REFLECT_TYPE_CLASS
 	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfo*)infos->info->extra));}
-	VectorHandler GetVectorHandler() const;
 	ReflectField Get(const char* field) const;
 
+	//Content REFLECT_TYPE_VECTOR
+	VectorHandler GetVectorHandler() const;
+
 	EnumReflectData* EnumData() const {return infos->info->extra ? ((EnumReflectData*)infos->info->extra) : 0;}
+
+	//Content REFLECT_TYPE_POINTER
 	Reflectable* ReflectablePtr() const {return ((ReflectablePtrFunc)infos->info->extra)(As< void* >());}
+
+	bool IsArray() const;
+	int GetNumElems() const;
+	ReflectField GetElem(int idx) const;
 
 	ReflectField& operator=(const char* str);
 	std::string ToString()const;

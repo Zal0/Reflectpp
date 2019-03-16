@@ -31,6 +31,7 @@ public:
 		SERIALIZED_FIELD(public, short, As, 2)\
 		SERIALIZED_FIELD(public, std::vector< Test0 >, v_test0)\
 		SERIALIZED_FIELD(public, std::vector< int >, v_int)\
+		SERIALIZED_FIELD(public, Test0, array_test[3]) \
 		EXPOSED_FIELD(int, exposed_int)
 	#include "ReflectDecl.h"
 };
@@ -79,53 +80,46 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 		tabs[i] = ' ';
 	tabs[depth] = '\0';
 
-	/*int array_size = 1;
-	if(const char* idx = strchr(reflectable.infos->id, '['))
+	
+	if(reflectable.IsArray()) //either a REFLECT_TYPE_VECTOR or an array
 	{
-		array_size = atoi(++ idx);
-		printf("%s[%d] ", tabs, array_size);
-		ReflectField field(reflectable.reflectable, &ReflectInfo(reflectable.infos->info->reflect_type, "ptr", 8, reflectable.infos->info->extra));
-		PrintReflectable(field, depth + 1);
-		return;
-	}*/
-
-	switch(reflectable.infos->info->reflect_type)
+		int num_elems = reflectable.GetNumElems();
+		printf("[%d]\n", num_elems);
+		for(int i = 0; i < num_elems; ++i)
+		{
+			printf("%s[%d] ", tabs, i);
+			PrintReflectable(reflectable.GetElem(i), depth + 2);
+		}
+	} 
+	else 
 	{
-		case TypeReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
-			if(depth == 0)
-				printf("\nclass %s", reflectable.infos->id);
-			printf("\n");
-			ReflectInfoIterator it(reflectable.ClassPtr());
-			ReflectField info(0,0);
-			while((info = it.Next()).reflectable)
-			{
-				printf("%s%s: ", tabs, info.infos->id);
-				PrintReflectable(info, depth + 1);
+		switch(reflectable.infos->info->reflect_type)
+		{
+			case TypeReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
+				if(depth == 0)
+					printf("\nclass %s", reflectable.infos->id);
+				printf("\n");
+				ReflectInfoIterator it(reflectable.ClassPtr());
+				ReflectField info(0,0);
+				while((info = it.Next()).reflectable)
+				{
+					printf("%s%s: ", tabs, info.infos->id);
+					PrintReflectable(info, depth + 1);
+				}
+				break;
 			}
-			break;
-		}
 
-		case TypeReflectInfo::ReflectType::REFLECT_TYPE_VECTOR: {
-			VectorHandler vector_handler = reflectable.GetVectorHandler();
-			printf("[%d]\n", vector_handler->GetNumElems());
-			for(int i = 0; i < vector_handler->GetNumElems(); ++i)
-			{
-				printf("%s[%d] ", tabs, i);
-				PrintReflectable(vector_handler->GetElem(i), depth + 2);
-			}
-			break;
+			default:
+				if(reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_POINTER || reflectable.EnumData() == 0)
+				{
+					printf("%s\n", reflectable.ToString().c_str());
+				}
+				else
+				{
+					printf("%s\n", EnumStrValue(reflectable));
+				}
+				break;
 		}
-
-		default:
-			if(reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_POINTER || reflectable.EnumData() == 0)
-			{
-				printf("%s\n", reflectable.ToString().c_str());
-			}
-			else
-			{
-				printf("%s\n", EnumStrValue(reflectable));
-			}
-			break;
 	}
 	delete[] tabs;
 }

@@ -5,6 +5,15 @@
 TypeReflectInfo TypeReflectInfo::InheritanceTable(TypeReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE, 0, 0);
 ReflectInfo ReflectInfo::End(0, "", 0); 
 
+ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(info), id(id), ptr(ptr) {
+	//Offset address in arrays have been calculated based on the last element, fix it
+	if(const char* idx = strchr(id, '['))
+	{
+		int array_size = atoi(++ idx);
+		this->ptr = ptr - array_size * info->size;
+	}
+}
+
 ReflectField::ReflectField(Reflectable* reflectable)
 {
 	//Instead of directly point to reflectable infos, create a dummy table (simplifies things, see PrintReflectable or Serialize)
@@ -153,6 +162,43 @@ VectorHandler ReflectField::GetVectorHandler() const
 		return ((VectorHandlerFunc)infos->info->extra)(REFLECT_PTR(void, reflectable, infos->ptr));
 	else
 		return VectorHandler(new NullVectorHandler());
+}
+
+bool ReflectField::IsArray() const
+{
+	return infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR || strchr(infos->id, '[');
+}
+
+int ReflectField::GetNumElems() const
+{
+	if(const char* idx = strchr(infos->id, '['))
+	{
+		return atoi(++ idx);
+	}
+	else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR) 
+	{
+		VectorHandler vector_handler = GetVectorHandler();
+		return vector_handler->GetNumElems();
+	}
+	return 1;
+}
+
+ReflectField ReflectField::GetElem(int idx) const
+{
+	if(strchr(infos->id, '['))
+	{
+		ReflectField ret(reflectable, infos);
+		ret.infos = &ret.classDummyInfos[0];
+		*ret.infos = *infos;
+		ret.infos->id = "";
+		ret.infos->ptr += idx * ret.infos->info->size;
+		return ret;
+	}
+	else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR) 
+	{
+		VectorHandler vector_handler = GetVectorHandler();
+		return vector_handler->GetElem(idx);
+	}
 }
 
 ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)

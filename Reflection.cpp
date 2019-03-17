@@ -199,6 +199,7 @@ ReflectField ReflectField::GetElem(int idx) const
 		VectorHandler vector_handler = GetVectorHandler();
 		return vector_handler->GetElem(idx);
 	}
+	return ReflectField(0, 0);
 }
 
 ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)

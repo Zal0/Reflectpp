@@ -53,7 +53,7 @@ ReflectField::ReflectField(const ReflectField& r) :
 static int strcmpidx(const char* str0, const char* str1)
 {
 	int ret = 0;
-	while(*str0 != '\0' && *str1 != '\0' && *str0 == *str1)
+	while(*str0 != '\0' && *str0 != '[' && *str1 != '\0' && *str0 == *str1)
 	{
 		str0 ++;
 		str1 ++;
@@ -64,45 +64,38 @@ static int strcmpidx(const char* str0, const char* str1)
 
 ReflectField ReflectField::Get(const char* field) const 
 {
-	ReflectField info(0,0);
-	if(!reflectable)
-		return info;
-
-	ReflectInfoIterator it(*this);
-	int n;
-	while((info = it.Next()).reflectable)
+	if(field[0] == '\0')
 	{
-		n = strcmpidx(info.infos->id, field);
-		if(info.infos->id[n] == '\0')
+		return *this;
+	}
+	else if(field[0] == '.') 
+	{
+		if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_CLASS)
+			return ClassPtr().Get(field + 1);
+	}
+	else if(field[0] == '[')
+	{
+		if(IsArray())
 		{
-			if(field[n] == '\0')
+			char* end;
+			int idx = strtol(field + 1, &end, 10);
+			return GetElem(idx).Get(end + 1);
+		}
+	}
+	else
+	{
+		ReflectField info(0,0);
+		ReflectInfoIterator it(*this);
+		int n;
+		while((info = it.Next()).reflectable)
+		{
+			n = strcmpidx(info.infos->id, field);
+			if(info.infos->id[n] == '\0' || info.infos->id[n] == '[')
 			{
-				if(info.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_CLASS)
-					return info.ClassPtr();
-				else
-					return info;
-			}
-			else if(field[n] == '.')
-			{
-				if(info.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_CLASS)
-					return info.ClassPtr().Get(&field[n + 1]);
-			}
-			else if(field[n] == '[')
-			{
-				if(info.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR)
-				{
-					char* end;
-					int idx = strtol(field + n + 1, &end, 10);
-					VectorHandler vector_handler = info.GetVectorHandler();
-					if(*(end + 1) == '\0')
-						return vector_handler->GetElem(idx);
-					else
-						return vector_handler->GetElem(idx).Get(end + 2);
-				}
+				return info.Get(&field[n]);
 			}
 		}
 	}
-	return ReflectField(0,0);
 }
 
 ReflectField& ReflectField::operator=(const char* str)
@@ -275,7 +268,7 @@ ReflectField ReflectInfoIterator::Next()
 
 ReflectField Reflectable::Get(const char* field)
 {
-	return ReflectField(this).Get(field);
+	return ReflectField(This(), (ReflectInfo*)DefaultReflectInfoF()()->info->extra).Get(field);
 }
 
 TypeReflectInfo::ReflectType ReflectTypeBySize(int size) {

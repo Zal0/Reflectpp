@@ -7,7 +7,11 @@ ReflectInfo ReflectInfo::End(0, "", 0);
 
 int ArrayOffset(const char* id, int accum = 0) 
 {
-	if(const char* idx = strchr(id, '['))
+	//offset in [2][3][4] is calculated as
+	//2
+	//2 * 3 + 3 = (2 + 1) * 3 = 9
+	//9 * 4 + 4 = (9 + 1) * 4 = 20
+ 	if(const char* idx = strchr(id, '['))
 	{
 		int offset = (accum + 1) * atoi(idx + 1);
 		return ArrayOffset(strchr(idx, ']') + 1, offset);

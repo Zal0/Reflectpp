@@ -5,12 +5,22 @@
 TypeReflectInfo TypeReflectInfo::InheritanceTable(TypeReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE, 0, 0);
 ReflectInfo ReflectInfo::End(0, "", 0); 
 
-ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(info), id(id), ptr(ptr) {
-	//Offset address in arrays have been calculated based on the last element, fix it
+int ArrayOffset(const char* id, int accum = 0) 
+{
 	if(const char* idx = strchr(id, '['))
 	{
-		int array_size = atoi(++ idx);
-		this->ptr = ptr - array_size * info->size;
+		int offset = (accum + 1) * atoi(idx + 1);
+		return ArrayOffset(strchr(idx, ']') + 1, offset);
+	}
+	return accum;
+}
+
+ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(info), id(id), ptr(ptr) {
+	//Offset address in arrays have been calculated based on the last element, fix it
+	//In case of bidimensional arrays is a bit more complex: [2][3][4] offste is 2*3*4 + 3*4 + 4
+	if(const char* idx = strchr(id, '['))
+	{
+		this->ptr -= ArrayOffset(id) * info->size;
 	}
 }
 
@@ -183,15 +193,29 @@ int ReflectField::GetNumElems() const
 	return 1;
 }
 
+int ReflectField::GetArrayElemSize() const
+{
+	int ret = infos->info->size;
+	const char* i = strchr(infos->id, ']');
+	while(i = strchr(i, '['))
+	{
+		ret *= atoi(i + 1);
+		i = strchr(i, ']') + 1;
+	}
+	return ret;
+}
+
 ReflectField ReflectField::GetElem(int idx) const
 {
-	if(strchr(infos->id, '['))
+	if(const char* array_start = strchr(infos->id, '['))
 	{
-		ReflectField ret(reflectable, infos);
+		const char* array_end = strchr(infos->id, ']');
+
+		ReflectField ret(((unsigned char*)reflectable) + infos->ptr + idx * GetArrayElemSize(), infos);
 		ret.infos = &ret.classDummyInfos[0];
 		*ret.infos = *infos;
-		ret.infos->id = "";
-		ret.infos->ptr += idx * ret.infos->info->size;
+		ret.infos->id = array_end + 1;
+		ret.infos->ptr = 0;
 		return ret;
 	}
 	else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR) 

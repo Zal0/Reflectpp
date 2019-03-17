@@ -31,7 +31,7 @@ public:
 		SERIALIZED_FIELD(public, short, As, 2)\
 		SERIALIZED_FIELD(public, std::vector< Test0 >, v_test0)\
 		SERIALIZED_FIELD(public, std::vector< int >, v_int)\
-		SERIALIZED_FIELD(public, Test0, array_test[3]) \
+		SERIALIZED_FIELD(public, Test0, array_test[2][3][2]) \
 		EXPOSED_FIELD(int, exposed_int)
 	#include "ReflectDecl.h"
 };
@@ -84,7 +84,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 	if(reflectable.IsArray()) //either a REFLECT_TYPE_VECTOR or an array
 	{
 		int num_elems = reflectable.GetNumElems();
-		printf("[%d]\n", num_elems);
+		printf("size %d\n", num_elems);
 		for(int i = 0; i < num_elems; ++i)
 		{
 			printf("%s[%d] ", tabs, i);

@@ -5,50 +5,56 @@
 
 void Serialize(std::ofstream& out, const ReflectField& reflectable)
 {
-	switch(reflectable.infos->info->reflect_type)
+	if(reflectable.IsArray())
 	{
-		case TypeReflectInfo::REFLECT_TYPE_CLASS: {
-			out << "{";
-			ReflectInfoIterator it(reflectable.ClassPtr());
-			ReflectField info(0,0);
-			bool first_field = true;
-			while((info = it.Next()).reflectable)
-			{
-				if(first_field) 
+		out << "[";
+		for(int i = 0; i < reflectable.GetNumElems(); ++i)
+		{
+			if(i != 0) out << ", ";
+			Serialize(out, ReflectField(reflectable.GetElem(i)));
+		}
+		out << "]";
+	}
+	else
+	{
+		switch(reflectable.infos->info->reflect_type)
+		{
+			case TypeReflectInfo::REFLECT_TYPE_CLASS: {
+				out << "{";
+				ReflectInfoIterator it(reflectable.ClassPtr());
+				ReflectField info(0,0);
+				bool first_field = true;
+				while((info = it.Next()).reflectable)
 				{
-					first_field = false;
-				}
-				else
-				{
-					out << ", ";
-				}
+					if(first_field) 
+					{
+						first_field = false;
+					}
+					else
+					{
+						out << ", ";
+					}
 
-				out << "\"" << info.infos->id << "\"" << ":";
-				Serialize(out, info);
+					out << "\"";
+					for(const char* c = info.infos->id; *c != '[' && *c != '\0'; ++c)
+					{
+						out << *c;
+					}
+					out << "\"" << ":";
+					Serialize(out, info);
+				}
+				out << "}";
+				break;
 			}
-			out << "}";
-			break;
-		}
-			
-		case TypeReflectInfo::REFLECT_TYPE_VECTOR: {
-			out << "[";
-			VectorHandler vector_handler = reflectable.GetVectorHandler();
-			for(int i = 0; i < vector_handler->GetNumElems(); ++i)
-			{
-				if(i != 0) out << ", ";
-				Serialize(out, ReflectField(vector_handler->GetElem(i)));
-			}
-			out << "]";
-			break;
-		}
 		
-		case TypeReflectInfo::REFLECT_TYPE_STRING:
-			out << '\"' << reflectable.ToString().c_str() << '\"';
-			break;
+			case TypeReflectInfo::REFLECT_TYPE_STRING:
+				out << '\"' << reflectable.ToString().c_str() << '\"';
+				break;
 
-		default:
-			out << reflectable.ToString().c_str();
-			break;
+			default:
+				out << reflectable.ToString().c_str();
+				break;
+		}
 	}
 }
 
@@ -137,13 +143,21 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 	}
 	else if(token[0] == '[')
 	{
-		VectorHandler v = reflectable.GetVectorHandler();
-		v->Clear();
+		VectorHandler v;
+		if(reflectable.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR)
+		{
+			VectorHandler v = reflectable.GetVectorHandler();
+			v->Clear();
+		}
+		
 		token = in.NextToken();
+		int elem_idx = 0;
 		while(token[0] != ']')
 		{
-			v->Push();
-			ReflectField new_elem = v->GetElem(v->GetNumElems() - 1);
+			if(reflectable.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR)
+				v->Push();
+
+			ReflectField new_elem = reflectable.GetElem(elem_idx);
 			Deserialize(new_elem, in);
 
 			token = in.NextToken();
@@ -151,6 +165,8 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 			{
 				token = in.NextToken();
 			}
+
+			elem_idx ++;
 		}
 	}
 	else if(reflectable.reflectable)

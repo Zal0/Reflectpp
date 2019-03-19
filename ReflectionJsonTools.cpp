@@ -146,7 +146,7 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 		VectorHandler v;
 		if(reflectable.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR)
 		{
-			VectorHandler v = reflectable.GetVectorHandler();
+			v = reflectable.GetVectorHandler();
 			v->Clear();
 		}
 		

@@ -70,8 +70,7 @@ ReflectField ReflectField::Get(const char* field) const
 	}
 	else if(field[0] == '.') 
 	{
-		if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_CLASS)
-			return ClassPtr().Get(field + 1);
+		return Get(field + 1);
 	}
 	else if(field[0] == '[')
 	{
@@ -85,12 +84,12 @@ ReflectField ReflectField::Get(const char* field) const
 	else
 	{
 		ReflectField info(0,0);
-		ReflectInfoIterator it(*this);
+		ReflectInfoIterator it(ClassPtr());
 		int n;
 		while((info = it.Next()).reflectable)
 		{
 			n = strcmpidx(info.infos->id, field);
-			if(info.infos->id[n] == '\0' || info.infos->id[n] == '[')
+			if((info.infos->id[n] == '\0' || info.infos->id[n] == '[') && (field[n] == '\0' || field[n] == '[' || field[n] == '.'))
 			{
 				return info.Get(&field[n]);
 			}
@@ -268,7 +267,7 @@ ReflectField ReflectInfoIterator::Next()
 
 ReflectField Reflectable::Get(const char* field)
 {
-	return ReflectField(This(), (ReflectInfo*)DefaultReflectInfoF()()->info->extra).Get(field);
+	return ReflectField(this).Get(field);
 }
 
 TypeReflectInfo::ReflectType ReflectTypeBySize(int size) {

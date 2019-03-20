@@ -22,7 +22,7 @@ int ArrayOffset(const char* id, int accum = 0)
 ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(info), id(id), ptr(ptr) {
 	//Offset address in arrays have been calculated based on the last element, fix it
 	//In case of bidimensional arrays is a bit more complex: [2][3][4] offste is 2*3*4 + 3*4 + 4
-	if(const char* idx = strchr(id, '['))
+	if(strchr(id, '['))
 	{
 		this->ptr -= ArrayOffset(id) * info->size;
 	}
@@ -36,6 +36,14 @@ ReflectField::ReflectField(Reflectable* reflectable)
 
 	this->reflectable = reflectable->This();
 	this->infos = classDummyInfos;
+}
+
+ReflectField::ReflectField(void* reflectable, ReflectInfo* infos) : 
+	reflectable(reflectable), 
+	infos(infos) 
+{
+	classDummyInfos[0] = ReflectInfo::End;
+	classDummyInfos[1] = ReflectInfo::End;
 }
 
 ReflectField::ReflectField(const ReflectField& r) :
@@ -72,14 +80,11 @@ ReflectField ReflectField::Get(const char* field) const
 	{
 		return Get(field + 1);
 	}
-	else if(field[0] == '[')
+	else if(field[0] == '[' && IsArray())
 	{
-		if(IsArray())
-		{
-			char* end;
-			int idx = strtol(field + 1, &end, 10);
-			return GetElem(idx).Get(end + 1);
-		}
+		char* end;
+		int idx = strtol(field + 1, &end, 10);
+		return GetElem(idx).Get(end + 1);
 	}
 	else
 	{
@@ -94,6 +99,7 @@ ReflectField ReflectField::Get(const char* field) const
 				return info.Get(&field[n]);
 			}
 		}
+		return info;
 	}
 }
 
@@ -193,7 +199,7 @@ int ReflectField::GetArrayElemSize() const
 {
 	int ret = infos->info->size;
 	const char* i = strchr(infos->id, ']');
-	while(i = strchr(i, '['))
+	while((i = strchr(i, '[')))
 	{
 		ret *= atoi(i + 1);
 		i = strchr(i, ']') + 1;
@@ -203,7 +209,7 @@ int ReflectField::GetArrayElemSize() const
 
 ReflectField ReflectField::GetElem(int idx) const
 {
-	if(const char* array_start = strchr(infos->id, '['))
+	if(strchr(infos->id, '['))
 	{
 		const char* array_end = strchr(infos->id, ']');
 

@@ -103,6 +103,8 @@ public:
 	static ReflectInfo End;
 };
 
+template< class R > ReflectInfo* DefaultReflectInfo();
+
 class EnumReflectData;
 class ReflectField {
 private:
@@ -113,13 +115,13 @@ public:
 	void* reflectable;
 	ReflectInfo* infos;
 	ReflectField(Reflectable* reflectable);
-	ReflectField(void* reflectable, ReflectInfo* infos) : reflectable(reflectable), infos(infos) {}
+	ReflectField(void* reflectable, ReflectInfo* infos);
 	ReflectField(const ReflectField& r);
 
 	template< class T > T& As() const
 	{
 		static T default_t;
-		if(infos->info->reflect_type == DefaultReflectInfo((T*)0)->info->reflect_type)
+		if(infos->info->reflect_type == DefaultReflectInfo< T >()->info->reflect_type)
 			return *REFLECT_PTR(T, reflectable, infos->ptr);
 		else
 			return default_t; //This way we avoid memory issues
@@ -219,6 +221,12 @@ ReflectInfo* DefaultReflectInfo(R**)
 	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_POINTER, sizeof(R*), (PTR)(ReflectablePtrFunc)ReflectablePtr< R >);
 	static ReflectInfo ret(&t_info, "", 0); 
 	return &ret;
+}
+
+template< class R >
+ReflectInfo* DefaultReflectInfo()
+{
+	return DefaultReflectInfo((R*)0);
 }
 
 class ReflectInfoIterator {

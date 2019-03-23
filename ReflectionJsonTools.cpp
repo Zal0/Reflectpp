@@ -48,11 +48,11 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 			}
 		
 			case TypeReflectInfo::REFLECT_TYPE_STRING:
-				out << '\"' << reflectable.ToString().c_str() << '\"';
+				out << '\"' << STRING_TO_CHAR_PTR(reflectable.ToString()) << '\"';
 				break;
 
 			default:
-				out << reflectable.ToString().c_str();
+				out << STRING_TO_CHAR_PTR(reflectable.ToString());
 				break;
 		}
 	}

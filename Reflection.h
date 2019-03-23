@@ -113,7 +113,7 @@ public:
 	void* reflectable;
 	ReflectInfo* infos;
 	ReflectField(Reflectable* reflectable);
-	ReflectField(void* reflectable, ReflectInfo* infos);
+	ReflectField(void* reflectable = 0, ReflectInfo* infos = 0);
 	ReflectField(const ReflectField& r);
 
 	template< class T > T& As() const
@@ -142,7 +142,7 @@ public:
 	ReflectField GetElem(int idx) const;
 
 	ReflectField& operator=(const char* str);
-	std::string ToString()const;
+	STRING ToString()const;
 };
 
 class VectorHandlerI

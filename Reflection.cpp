@@ -128,31 +128,33 @@ ReflectField& ReflectField::operator=(const char* str)
 	return *this;
 }
 
-std::string ReflectField::ToString()const
+#define TO_STRING(STR, TYPE) snprintf(buff, BUFF_SIZE, STR, As< TYPE >());
+STRING ReflectField::ToString()const
 {
-	std::stringstream ss;
+	static const int BUFF_SIZE = 50;
+	static char buff[BUFF_SIZE];
 	
 	switch(infos->info->reflect_type)
 	{
-		case TypeReflectInfo::REFLECT_TYPE_BOOL:      ss << As< bool >();               break;
-		case TypeReflectInfo::REFLECT_TYPE_CHAR:      ss << (int)As< char >();          break;
-		case TypeReflectInfo::REFLECT_TYPE_UCHAR:     ss << (int)As< unsigned char >(); break;
-		case TypeReflectInfo::REFLECT_TYPE_SHORT:     ss << As< short >();              break;
-		case TypeReflectInfo::REFLECT_TYPE_USHORT:    ss << As< unsigned short >();     break;
-		case TypeReflectInfo::REFLECT_TYPE_INT:       ss << As< int >();                break;
-		case TypeReflectInfo::REFLECT_TYPE_UINT:      ss << As< unsigned int >();       break;
-		case TypeReflectInfo::REFLECT_TYPE_LONG:      ss << As< long >();               break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONG:     ss << As< unsigned long >();      break;
-		case TypeReflectInfo::REFLECT_TYPE_LONGLONG:  ss << As< long long >();          break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: ss << As< unsigned long long >(); break;
-		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     ss << As< float >();              break;
-		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    ss << As< double >();             break;
-		case TypeReflectInfo::REFLECT_TYPE_STRING:    ss << As< STRING >();        break;
-		case TypeReflectInfo::REFLECT_TYPE_POINTER:   ss << '\"' << ReflectablePtr()->ToReflectString() << '\"'; break;
+		case TypeReflectInfo::REFLECT_TYPE_BOOL:      TO_STRING("%d", bool);                 break;
+		case TypeReflectInfo::REFLECT_TYPE_CHAR:      TO_STRING("%c", char);                 break;
+		case TypeReflectInfo::REFLECT_TYPE_UCHAR:     TO_STRING("%u", unsigned char);        break;
+		case TypeReflectInfo::REFLECT_TYPE_SHORT:     TO_STRING("%hd", short);               break;
+		case TypeReflectInfo::REFLECT_TYPE_USHORT:    TO_STRING("%hu", unsigned short);      break;
+		case TypeReflectInfo::REFLECT_TYPE_INT:       TO_STRING("%d", int);                  break;
+		case TypeReflectInfo::REFLECT_TYPE_UINT:      TO_STRING("%u", unsigned int);         break;
+		case TypeReflectInfo::REFLECT_TYPE_LONG:      TO_STRING("%ld", long);                break;
+		case TypeReflectInfo::REFLECT_TYPE_ULONG:     TO_STRING("%lu", unsigned long);       break;
+		case TypeReflectInfo::REFLECT_TYPE_LONGLONG:  TO_STRING("%lld", long long);          break;
+		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: TO_STRING("%llu", unsigned long long); break;
+		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     TO_STRING("%f", float);                break;
+		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    TO_STRING("%lf", double);              break;
+		case TypeReflectInfo::REFLECT_TYPE_STRING:    return As< STRING >();
+		case TypeReflectInfo::REFLECT_TYPE_POINTER:   STRING() + '\"' + ReflectablePtr()->ToReflectString() + '\"'; break;
 		default: break;
 	}
 
-	return ss.str();
+	return STRING(buff);
 }
 
 class NullVectorHandler : public VectorHandlerI
@@ -243,7 +245,7 @@ ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)
 
 ReflectField ReflectInfoIterator::Next() 
 {
-	if(l.empty()) //Done
+	if(VECTOR_IS_EMPTY(l)) //Done
 		return ReflectField(0, 0);
 
 	void* reflectable  = VECTOR_GET(l, VECTOR_SIZE(l) - 1).reflectable;

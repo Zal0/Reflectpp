@@ -10,7 +10,9 @@
 #define VECTOR_POP(V) V.pop_back()
 #define VECTOR_CLEAR(V) V.clear()
 #define VECTOR_GET(V, n) V[n]
+#define VECTOR_IS_EMPTY(V) V.empty()
 
 #define STRING std::string
+#define STRING_TO_CHAR_PTR(STR) STR.c_str()
 
 #endif

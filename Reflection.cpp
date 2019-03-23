@@ -120,7 +120,7 @@ ReflectField& ReflectField::operator=(const char* str)
 		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: As< unsigned long long >()  = (unsigned long long)atoll(str); break;
 		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     As< float >()               = (float)atof(str);               break;
 		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    As< double >()              = (double)atof(str);              break;
-		case TypeReflectInfo::REFLECT_TYPE_STRING:    As< std::string >()         = str;                            break;
+		case TypeReflectInfo::REFLECT_TYPE_STRING:    As< STRING >()              = str;                            break;
 		case TypeReflectInfo::REFLECT_TYPE_POINTER:   ReflectablePtr()->FromReflectString(str);                     break;
 		default: break;
 	}
@@ -131,7 +131,7 @@ ReflectField& ReflectField::operator=(const char* str)
 std::string ReflectField::ToString()const
 {
 	std::stringstream ss;
-
+	
 	switch(infos->info->reflect_type)
 	{
 		case TypeReflectInfo::REFLECT_TYPE_BOOL:      ss << As< bool >();               break;
@@ -147,7 +147,7 @@ std::string ReflectField::ToString()const
 		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: ss << As< unsigned long long >(); break;
 		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     ss << As< float >();              break;
 		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    ss << As< double >();             break;
-		case TypeReflectInfo::REFLECT_TYPE_STRING:    ss << As< std::string >();        break;
+		case TypeReflectInfo::REFLECT_TYPE_STRING:    ss << As< STRING >();        break;
 		case TypeReflectInfo::REFLECT_TYPE_POINTER:   ss << '\"' << ReflectablePtr()->ToReflectString() << '\"'; break;
 		default: break;
 	}
@@ -233,11 +233,11 @@ ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)
 	//Ignore the reflectable TypeReflectInfo::REFLECT_TYPE_CLASS that was added during casting
 	if(reflectable.infos->id[0] == '\0' && reflectable.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_CLASS)
 	{
-		l.push_back(reflectable.ClassPtr());
+		VECTOR_PUSH(l, reflectable.ClassPtr());
 	}
 	else
 	{
-		l.push_back(reflectable);
+		VECTOR_PUSH(l, reflectable);
 	}
 }
 
@@ -246,23 +246,23 @@ ReflectField ReflectInfoIterator::Next()
 	if(l.empty()) //Done
 		return ReflectField(0, 0);
 
-	void* reflectable  = l[l.size() -1].reflectable;
-	ReflectInfo* infos = (l[l.size() - 1].infos) ++;
+	void* reflectable  = VECTOR_GET(l, VECTOR_SIZE(l) - 1).reflectable;
+	ReflectInfo* infos = (VECTOR_GET(l, VECTOR_SIZE(l) - 1).infos) ++;
 	if(infos->id[0] == '\0') //table end
 	{
-		l.pop_back();
+		VECTOR_POP(l);
 		return Next();
 	}
 
 	switch(infos->info->reflect_type)
 	{
 		case TypeReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE:
-			l.push_back(ReflectField(reflectable, ((ReflectInfosFunc)(infos->ptr))()));
+			VECTOR_PUSH(l, ReflectField(reflectable, ((ReflectInfosFunc)(infos->ptr))()));
 			return Next();
 
 		case TypeReflectInfo::REFLECT_TYPE_PARENT_CLASS: {
 			Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-			l.push_back(ReflectField(classObj, (ReflectInfo*)(((ReflectInfosFunc)(infos->info->extra))()->info->extra)));
+			VECTOR_PUSH(l, ReflectField(classObj, (ReflectInfo*)(((ReflectInfosFunc)(infos->info->extra))()->info->extra)));
 			return Next();
 		}
 
@@ -331,4 +331,4 @@ ReflectInfo* DefaultReflectInfo(long long*)          {DEF_INFO(long long,       
 ReflectInfo* DefaultReflectInfo(unsigned long long*) {DEF_INFO(unsigned long long, TypeReflectInfo::REFLECT_TYPE_ULONGLONG)}
 ReflectInfo* DefaultReflectInfo(float*)              {DEF_INFO(float,              TypeReflectInfo::REFLECT_TYPE_FLOAT)}
 ReflectInfo* DefaultReflectInfo(double*)             {DEF_INFO(double,             TypeReflectInfo::REFLECT_TYPE_DOUBLE)}
-ReflectInfo* DefaultReflectInfo(std::string*)        {DEF_INFO(std::string,        TypeReflectInfo::REFLECT_TYPE_STRING)}
+ReflectInfo* DefaultReflectInfo(STRING*)             {DEF_INFO(STRING,             TypeReflectInfo::REFLECT_TYPE_STRING)}

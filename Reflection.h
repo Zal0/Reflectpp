@@ -6,11 +6,9 @@
 #undef new
 #endif
 
-#include <vector>
-#include <string.h>
-
 #include <iostream>
 #include <memory>
+#include "ReflectSTLConfig.h"
 
 #ifdef cached_new
 #define new cached_new
@@ -165,19 +163,19 @@ template< class T >
 class VectorHandlerT : public VectorHandlerI
 {
 private:
-	std::vector< T >& v;
-	VectorHandlerT(void* ptr) : v(*((std::vector< T >*)ptr)){}
+	VECTOR(T)& v;
+	VectorHandlerT(void* ptr) : v(*((VECTOR(T)*)ptr)){}
 
 public:
 	static VectorHandler GetVectorHandler(void* ptr) {return VectorHandler(new VectorHandlerT< T >(ptr));}
 	
-	virtual int GetNumElems() {return (int)v.size();}
-	virtual void Push() {v.push_back(T());}
-	virtual void Pop() {v.pop_back();}
-	virtual void Clear() {v.clear();}
+	virtual int GetNumElems() {return (int)VECTOR_SIZE(v);}
+	virtual void Push() {VECTOR_PUSH(v, T());}
+	virtual void Pop() {VECTOR_POP(v);}
+	virtual void Clear() {VECTOR_CLEAR(v);}
 
 protected:
-	virtual void* GetElemPtr(int idx) {return &v[idx];}
+	virtual void* GetElemPtr(int idx) {return &VECTOR_GET(v, idx);}
 	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo((T*)0);}
 };
 
@@ -201,10 +199,10 @@ ReflectInfo* DefaultReflectInfo(long long*);
 ReflectInfo* DefaultReflectInfo(unsigned long long*);
 ReflectInfo* DefaultReflectInfo(float*);
 ReflectInfo* DefaultReflectInfo(double*);
-ReflectInfo* DefaultReflectInfo(std::string*);
+ReflectInfo* DefaultReflectInfo(STRING*);
 
-template< class T > ReflectInfo* DefaultReflectInfo(std::vector< T >*) {
-	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_VECTOR, sizeof(std::vector< T >), (PTR)VectorHandlerT< T >::GetVectorHandler);
+template< class T > ReflectInfo* DefaultReflectInfo(VECTOR(T)*) {
+	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_VECTOR, sizeof(VECTOR(T)), (PTR)VectorHandlerT< T >::GetVectorHandler);
 	static ReflectInfo ret(&t_info, "", 0); 
 	return &ret;
 }
@@ -231,7 +229,7 @@ ReflectInfo* DefaultReflectInfo()
 
 class ReflectInfoIterator {
 public:
-	std::vector< ReflectField > l;
+	VECTOR(ReflectField) l;
 
 public:
 	ReflectInfoIterator(const ReflectField& reflectable);

@@ -27,6 +27,9 @@
     <ClInclude Include="ReflectEnumDecl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReflectSTLConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

@@ -146,6 +146,7 @@
     <ClInclude Include="ReflectionJsonTools.h" />
     <ClInclude Include="ReflectDecl.h" />
     <ClInclude Include="Reflection.h" />
+    <ClInclude Include="ReflectSTLConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReflectionJsonTools.cpp" />

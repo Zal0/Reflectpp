@@ -13,6 +13,7 @@ private:
 
 public:
 	ENUM_NAME()  {}
+	ENUM_NAME(int val) : value((ENUM_NAME_)val) {}
 	ENUM_NAME(ENUM_NAME_ val) : value(val) {}
 	operator ENUM_NAME_() const {return value;}
 

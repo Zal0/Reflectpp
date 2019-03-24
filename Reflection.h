@@ -207,6 +207,8 @@ template< class T > ReflectInfo* DefaultReflectInfo(VECTOR(T)*) {
 	return &ret;
 }
 
+TypeReflectInfo::ReflectType ReflectTypeBySize(int size);
+
 template< class R >
 ReflectInfo* DefaultReflectInfo(R*)
 {
@@ -236,7 +238,6 @@ public:
 	ReflectField Next();
 };
 
-TypeReflectInfo::ReflectType ReflectTypeBySize(int size);
 class EnumReflectData {
 public:
 	const char* str;

@@ -1,16 +1,7 @@
 #ifndef REFLECTION_H
 #define REFLECTION_H
 
-#ifdef new
-#define cached_new new
-#undef new
-#endif
-
 #include "ReflectSTLConfig.h"
-
-#ifdef cached_new
-#define new cached_new
-#endif
 
 #ifdef _WIN64
 	typedef long long PTR;
@@ -146,6 +137,7 @@ public:
 class VectorHandlerI
 {
 public:
+	virtual ~VectorHandlerI() {}
 	virtual int GetNumElems() = 0;
 	virtual void Push() = 0;
 	virtual void Pop() = 0;

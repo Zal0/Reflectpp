@@ -1,5 +1,6 @@
 #include "Reflection.h"
 #include <string.h>
+#include <stdio.h>
 
 TypeReflectInfo TypeReflectInfo::InheritanceTable(TypeReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE, 0, 0);
 ReflectInfo ReflectInfo::End(0, "", 0); 

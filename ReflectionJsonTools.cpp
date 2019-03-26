@@ -1,7 +1,17 @@
 #include "ReflectionJsonTools.h"
 
-#include <fstream>
 #include <stdlib.h>
+
+#ifdef new
+#define cached_new new
+#undef new
+#endif
+
+#include <fstream>
+
+#ifdef cached_new
+#define new cached_new
+#endif
 
 void Serialize(std::ofstream& out, const ReflectField& reflectable)
 {

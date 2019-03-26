@@ -2,7 +2,8 @@
 #define REFLECT_STL_CONFIG_H
 
 #include <vector>
-#include <string.h>
+#include <string>
+#include <memory>
 
 #define VECTOR(TYPE) std::vector< TYPE >
 #define VECTOR_SIZE(V) V.size()
@@ -14,5 +15,7 @@
 
 #define STRING std::string
 #define STRING_TO_CHAR_PTR(STR) STR.c_str()
+
+#define SMART_PTR(A) std::auto_ptr< A >
 
 #endif

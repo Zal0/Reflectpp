@@ -6,8 +6,6 @@
 #undef new
 #endif
 
-#include <iostream>
-#include <memory>
 #include "ReflectSTLConfig.h"
 
 #ifdef cached_new
@@ -45,7 +43,7 @@ class ReflectInfo;
 class Reflectable;
 class VectorHandlerI;
 typedef ReflectInfo*(*ReflectInfosFunc)();
-typedef std::auto_ptr< VectorHandlerI > VectorHandler;
+typedef SMART_PTR(VectorHandlerI) VectorHandler;
 typedef VectorHandler(*VectorHandlerFunc)(void*);
 typedef Reflectable*(*ReflectablePtrFunc)(void*);
 

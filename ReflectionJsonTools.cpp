@@ -1,36 +1,23 @@
 #include "ReflectionJsonTools.h"
 
-#include <stdlib.h>
-
-#ifdef new
-#define cached_new new
-#undef new
-#endif
-
-#include <fstream>
-
-#ifdef cached_new
-#define new cached_new
-#endif
-
-void Serialize(std::ofstream& out, const ReflectField& reflectable)
+void Serialize(FILE_OUT out, const ReflectField& reflectable)
 {
 	if(reflectable.IsArray())
 	{
-		out << "[";
+		FILE_WRITE_STRING(out, "[");
 		for(int i = 0; i < reflectable.GetNumElems(); ++i)
 		{
-			if(i != 0) out << ", ";
+			if(i != 0) FILE_WRITE_STRING(out, ", ");
 			Serialize(out, ReflectField(reflectable.GetElem(i)));
 		}
-		out << "]";
+		FILE_WRITE_STRING(out, "]");
 	}
 	else
 	{
 		switch(reflectable.infos->info->reflect_type)
 		{
 			case TypeReflectInfo::REFLECT_TYPE_CLASS: {
-				out << "{";
+				FILE_WRITE_STRING(out, "{");
 				ReflectInfoIterator it(reflectable.ClassPtr());
 				ReflectField info(0,0);
 				bool first_field = true;
@@ -42,27 +29,29 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 					}
 					else
 					{
-						out << ", ";
+						FILE_WRITE_STRING(out, ", ");
 					}
 
-					out << "\"";
+					FILE_WRITE_STRING(out, "\"");
 					for(const char* c = info.infos->id; *c != '[' && *c != '\0'; ++c)
 					{
-						out << *c;
+						FILE_WRITE_CHAR(out, *c);
 					}
-					out << "\"" << ":";
+					FILE_WRITE_STRING(out, "\":");
 					Serialize(out, info);
 				}
-				out << "}";
+				FILE_WRITE_STRING(out, "}");
 				break;
 			}
 		
 			case TypeReflectInfo::REFLECT_TYPE_STRING:
-				out << '\"' << STRING_TO_CHAR_PTR(reflectable.ToString()) << '\"';
+				FILE_WRITE_STRING(out, "\"");
+				FILE_WRITE_STRING(out, STRING_TO_CHAR_PTR(reflectable.ToString()));
+				FILE_WRITE_STRING(out, "\"");
 				break;
 
 			default:
-				out << STRING_TO_CHAR_PTR(reflectable.ToString());
+				FILE_WRITE_STRING(out, STRING_TO_CHAR_PTR(reflectable.ToString()));
 				break;
 		}
 	}
@@ -70,22 +59,22 @@ void Serialize(std::ofstream& out, const ReflectField& reflectable)
 
 void Serialize(Reflectable* reflectable, char* path)
 {
-	std::ofstream fout(path);
+	FILE_OUT_LOAD(fout, path);
 	Serialize(fout, reflectable);
-	fout.close();
+	FILE_OUT_CLOSE(fout);
 }
 
 class PeekStream 
 {
 private:
-	void Get() {c = stream.get();}
+	void Get() {c = FILE_READ_CHAR(stream);}
 	char c; //The next token available (already read, is cached here)
 
 public:
 	char buffer[255];
-	std::ifstream& stream;
+	FILE_IN stream;
 
-	PeekStream(std::ifstream& stream) : stream(stream) {c = stream.get(); NextToken();}
+	PeekStream(FILE_IN stream) : stream(stream) {c = FILE_READ_CHAR(stream); NextToken();}
 
 	bool IsWhiteSpace()
 	{
@@ -187,9 +176,9 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 
 void Deserialize(Reflectable* reflectable, char* path)
 {
-	std::ifstream fin(path, std::ios::binary);
+	FILE_IN_LOAD(fin, path);
 	PeekStream p(fin);
 	ReflectField rf(reflectable);
 	Deserialize(rf, p);
-	fin.close();
+	FILE_IN_CLOSE(fin);
 }

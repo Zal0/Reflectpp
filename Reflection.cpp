@@ -147,8 +147,8 @@ STRING ReflectField::ToString()const
 		case TypeReflectInfo::REFLECT_TYPE_ULONG:     TO_STRING("%lu", unsigned long);       break;
 		case TypeReflectInfo::REFLECT_TYPE_LONGLONG:  TO_STRING("%lld", long long);          break;
 		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: TO_STRING("%llu", unsigned long long); break;
-		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     TO_STRING("%f", float);                break;
-		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    TO_STRING("%lf", double);              break;
+		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     TO_STRING("%g", float);                break;
+		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    TO_STRING("%g", double);              break;
 		case TypeReflectInfo::REFLECT_TYPE_STRING:    return As< STRING >();
 		case TypeReflectInfo::REFLECT_TYPE_POINTER:   STRING() + '\"' + ReflectablePtr()->ToReflectString() + '\"'; break;
 		default: break;

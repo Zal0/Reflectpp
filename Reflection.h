@@ -281,11 +281,11 @@ template< class T, class V >
 class Property : public PropertyI
 {
 private:
-	V(T::*getter)();
+	const V&(T::*getter)();
 	void(T::*setter)(const V& v);
 
 public:
-	Property(V(T::*getter)(), void(T::*setter)(const V& v)) : getter(getter), setter(setter) {}
+	Property(const V&(T::*getter)(), void(T::*setter)(const V& v)) : getter(getter), setter(setter) {}
 	
 	void Get(void* t, void* ret) {*((V*)ret) = (((T*)t)->*getter)();}
 	void Set(void* t, void* val) {(((T*)t)->*setter)(*(V*)val);}

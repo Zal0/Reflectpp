@@ -58,13 +58,17 @@ public:
 		SERIALIZED_FIELD(private, A, testC) \
 		SERIALIZED_FIELD(public, std::vector< std::vector< testEnum > >, v_table) \
 		SERIALIZED_FIELD(public, B*, bPtr) \
-		SERIALIZED_PROPERTY(short, X, GetX, SetX)
+		SERIALIZED_PROPERTY(short, X, GetX, SetX) \
+		SERIALIZED_PROPERTY(STRING, nm, GetName, SetName)
 
 	#include "ReflectDecl.h"
 
 public:
 	short GetX() { return Ci; }
 	void SetX(const short& value) {Ci = value;}
+
+	std::string GetName() {return name;}
+	void SetName(const std::string& _name) {name = _name;}
 };
 
 REFLECTABLE_CLASS(D)

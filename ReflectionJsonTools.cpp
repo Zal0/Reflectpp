@@ -43,16 +43,25 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 				FILE_WRITE_STRING(out, "}");
 				break;
 			}
-		
-			case TypeReflectInfo::REFLECT_TYPE_STRING:
-				FILE_WRITE_STRING(out, "\"");
-				FILE_WRITE_STRING(out, STRING_TO_CHAR_PTR(reflectable.ToString()));
-				FILE_WRITE_STRING(out, "\"");
-				break;
 
 			default:
-				FILE_WRITE_STRING(out, STRING_TO_CHAR_PTR(reflectable.ToString()));
+			{
+				TypeReflectInfo::ReflectType reflect_type = reflectable.infos->info->reflect_type;
+				if(reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
+				{
+					reflect_type = ((TypeReflectInfo*)reflectable.infos->info->extra)->reflect_type;
+				}
+				
+				if(reflect_type == TypeReflectInfo::REFLECT_TYPE_STRING)
+				{
+					FILE_WRITE_STRING(out, "\"");
+					FILE_WRITE_STRING(out, STRING_TO_CHAR_PTR(reflectable.ToString()));
+					FILE_WRITE_STRING(out, "\"");
+				}
+				else
+					FILE_WRITE_STRING(out, STRING_TO_CHAR_PTR(reflectable.ToString()));
 				break;
+			}
 		}
 	}
 }

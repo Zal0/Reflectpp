@@ -54,11 +54,17 @@ public:
 	#define REFLECTION_DATA   \
 		SERIALIZED_FIELD(public, std::string, name) \
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
-		SERIALIZED_FIELD(public, float, Cf, 6.0f) \
+		SERIALIZED_FIELD(public, float, Cf, 6.7f) \
 		SERIALIZED_FIELD(private, A, testC) \
 		SERIALIZED_FIELD(public, std::vector< std::vector< testEnum > >, v_table) \
-		SERIALIZED_FIELD(public, B*, bPtr)
+		SERIALIZED_FIELD(public, B*, bPtr) \
+		SERIALIZED_PROPERTY(short, X, GetX, SetX)
+
 	#include "ReflectDecl.h"
+
+public:
+	short GetX() { return Ci; }
+	void SetX(const short& value) {Ci = value;}
 };
 
 REFLECTABLE_CLASS(D)
@@ -110,7 +116,9 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 			}
 
 			default:
-				if(reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_POINTER || reflectable.EnumData() == 0)
+				if(reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_POINTER ||
+					 reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_PROPERTY ||
+					 reflectable.EnumData() == 0)
 				{
 					printf("%s\n", reflectable.ToString().c_str());
 				}

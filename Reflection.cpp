@@ -105,36 +105,48 @@ ReflectField ReflectField::Get(const char* field) const
 
 ReflectField& ReflectField::operator=(const char* str)
 {
-	switch(infos->info->reflect_type)
+	TypeReflectInfo::ReflectType reflect_type = infos->info->reflect_type;
+	if(reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
 	{
-		case TypeReflectInfo::REFLECT_TYPE_BOOL:      As< bool >()                = str[0] == '0' ? false : true;   break;
-		case TypeReflectInfo::REFLECT_TYPE_CHAR:      As< char >()                = (char)atoi(str);                break;
-		case TypeReflectInfo::REFLECT_TYPE_UCHAR:     As< unsigned char >()       = (unsigned char)atoi(str);       break;
-		case TypeReflectInfo::REFLECT_TYPE_SHORT:     As< short >()               = (short)atoi(str);               break;
-		case TypeReflectInfo::REFLECT_TYPE_USHORT:    As< unsigned short >()      = (unsigned short)atoi(str);      break;
-		case TypeReflectInfo::REFLECT_TYPE_INT:       As< int >()                 = (int)atoi(str);                 break;
-		case TypeReflectInfo::REFLECT_TYPE_UINT:      As< unsigned int >()        = (unsigned int)atoi(str);        break;
-		case TypeReflectInfo::REFLECT_TYPE_LONG:      As< long >()                = (long)atol(str);                break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONG:     As< unsigned long >()       = (unsigned long)atol(str);       break;
-		case TypeReflectInfo::REFLECT_TYPE_LONGLONG:  As< long long >()           = (long long)atoll(str);          break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: As< unsigned long long >()  = (unsigned long long)atoll(str); break;
-		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     As< float >()               = (float)atof(str);               break;
-		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    As< double >()              = (double)atof(str);              break;
-		case TypeReflectInfo::REFLECT_TYPE_STRING:    As< STRING >()              = str;                            break;
-		case TypeReflectInfo::REFLECT_TYPE_POINTER:   ReflectablePtr()->FromReflectString(str);                     break;
+		reflect_type = ((TypeReflectInfo*)infos->info->extra)->reflect_type;
+	}
+
+	switch(reflect_type)
+	{
+		case TypeReflectInfo::REFLECT_TYPE_BOOL:      Set< bool >              (str[0] == '0' ? false : true);   break;
+		case TypeReflectInfo::REFLECT_TYPE_CHAR:      Set< char >              ((char)atoi(str));                break;
+		case TypeReflectInfo::REFLECT_TYPE_UCHAR:     Set< unsigned char >     ((unsigned char)atoi(str));       break;
+		case TypeReflectInfo::REFLECT_TYPE_SHORT:     Set< short >             ((short)atoi(str));               break;
+		case TypeReflectInfo::REFLECT_TYPE_USHORT:    Set< unsigned short >    ((unsigned short)atoi(str));      break;
+		case TypeReflectInfo::REFLECT_TYPE_INT:       Set< int >               ((int)atoi(str));                 break;
+		case TypeReflectInfo::REFLECT_TYPE_UINT:      Set< unsigned int >      ((unsigned int)atoi(str));        break;
+		case TypeReflectInfo::REFLECT_TYPE_LONG:      Set< long >              ((long)atol(str));                break;
+		case TypeReflectInfo::REFLECT_TYPE_ULONG:     Set< unsigned long >     ((unsigned long)atol(str));       break;
+		case TypeReflectInfo::REFLECT_TYPE_LONGLONG:  Set< long long >         ((long long)atoll(str));          break;
+		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: Set< unsigned long long >((unsigned long long)atoll(str)); break;
+		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     Set< float >             ((float)atof(str));               break;
+		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    Set< double >            ((double)atof(str));              break;
+		case TypeReflectInfo::REFLECT_TYPE_STRING:    Set< STRING >            (str);                            break;
+		case TypeReflectInfo::REFLECT_TYPE_POINTER:   ReflectablePtr()->FromReflectString(str);                  break;
 		default: break;
 	}
 
 	return *this;
 }
 
-#define TO_STRING(STR, TYPE) snprintf(buff, BUFF_SIZE, STR, As< TYPE >());
+#define TO_STRING(STR, TYPE) snprintf(buff, BUFF_SIZE, STR, Get< TYPE >());
 STRING ReflectField::ToString()const
 {
 	static const int BUFF_SIZE = 50;
 	static char buff[BUFF_SIZE];
 	
-	switch(infos->info->reflect_type)
+	TypeReflectInfo::ReflectType reflect_type = infos->info->reflect_type;
+	if(reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
+	{
+		reflect_type = ((TypeReflectInfo*)infos->info->extra)->reflect_type;
+	}
+
+	switch(reflect_type)
 	{
 		case TypeReflectInfo::REFLECT_TYPE_BOOL:      TO_STRING("%d", bool);                 break;
 		case TypeReflectInfo::REFLECT_TYPE_CHAR:      TO_STRING("%c", char);                 break;
@@ -149,7 +161,7 @@ STRING ReflectField::ToString()const
 		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: TO_STRING("%llu", unsigned long long); break;
 		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     TO_STRING("%g", float);                break;
 		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    TO_STRING("%g", double);              break;
-		case TypeReflectInfo::REFLECT_TYPE_STRING:    return As< STRING >();
+		case TypeReflectInfo::REFLECT_TYPE_STRING:    return Get< STRING >();
 		case TypeReflectInfo::REFLECT_TYPE_POINTER:   STRING() + '\"' + ReflectablePtr()->ToReflectString() + '\"'; break;
 		default: break;
 	}
@@ -310,9 +322,9 @@ const char* EnumStrValue(const ReflectField& reflectable)
 	int index;
 	switch(reflectable.infos->info->reflect_type) 
 	{
-		case TypeReflectInfo::REFLECT_TYPE_CHAR:  index = (int)reflectable.As< char >(); break;
-		case TypeReflectInfo::REFLECT_TYPE_SHORT: index = (int)reflectable.As< short >(); break;
-		default: index = reflectable.As< int >(); break;
+		case TypeReflectInfo::REFLECT_TYPE_CHAR:  index = (int)reflectable.Get< char >(); break;
+		case TypeReflectInfo::REFLECT_TYPE_SHORT: index = (int)reflectable.Get< short >(); break;
+		default: index = reflectable.Get< int >(); break;
 	}
 
 	return reflectDatas[EnumIndex(index, reflectDatas)].str;

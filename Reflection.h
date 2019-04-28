@@ -106,13 +106,38 @@ public:
 	ReflectField(void* reflectable = 0, ReflectInfo* infos = 0);
 	ReflectField(const ReflectField& r);
 
-	template< class T > T& As() const
+	template< class T > T Get() const
 	{
 		static T default_t;
 		if(infos->info->reflect_type == DefaultReflectInfo< T >()->info->reflect_type)
+		{
 			return *REFLECT_PTR(T, reflectable, infos->ptr);
+		}
+		else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY && 
+			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  DefaultReflectInfo< T >()->info->reflect_type)
+		{
+			PropertyI* prop = (PropertyI*)infos->ptr;
+			prop->Get(reflectable, &default_t);
+			return default_t;
+		}
 		else
 			return default_t; //This way we avoid memory issues
+	}
+
+	template< class T > void Set(const T& t) const
+	{
+		static T default_t;
+		if(infos->info->reflect_type == DefaultReflectInfo< T >()->info->reflect_type)
+		{
+			*REFLECT_PTR(T, reflectable, infos->ptr) = t;
+		}
+		else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY && 
+			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  DefaultReflectInfo< T >()->info->reflect_type)
+		{
+			PropertyI* prop = (PropertyI*)infos->ptr;
+			default_t = t;
+			prop->Set(reflectable, &default_t);
+		}
 	}
 
 	//Content REFLECT_TYPE_CLASS
@@ -125,7 +150,7 @@ public:
 	EnumReflectData* EnumData() const {return infos->info->extra ? ((EnumReflectData*)infos->info->extra) : 0;}
 
 	//Content REFLECT_TYPE_POINTER
-	Reflectable* ReflectablePtr() const {return ((ReflectablePtrFunc)infos->info->extra)(As< void* >());}
+	Reflectable* ReflectablePtr() const {return ((ReflectablePtrFunc)infos->info->extra)(Get< void* >());}
 
 	bool IsArray() const;
 	int GetNumElems() const;

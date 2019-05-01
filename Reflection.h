@@ -106,6 +106,8 @@ public:
 	ReflectField(void* reflectable = 0, ReflectInfo* infos = 0);
 	ReflectField(const ReflectField& r);
 
+	TypeReflectInfo* GetTypeReflectInfo() const;
+
 	template< class T > T Get() const
 	{
 		static T default_t;
@@ -147,7 +149,8 @@ public:
 	//Content REFLECT_TYPE_VECTOR
 	VectorHandler GetVectorHandler() const;
 
-	EnumReflectData* EnumData() const {return infos->info->extra ? ((EnumReflectData*)infos->info->extra) : 0;}
+	//Content Enum
+	EnumReflectData* EnumData() const {return GetTypeReflectInfo()->extra ? ((EnumReflectData*)GetTypeReflectInfo()->extra) : 0;}
 
 	//Content REFLECT_TYPE_POINTER
 	Reflectable* ReflectablePtr() const {return ((ReflectablePtrFunc)infos->info->extra)(Get< void* >());}

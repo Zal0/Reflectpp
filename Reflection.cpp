@@ -58,6 +58,16 @@ ReflectField::ReflectField(const ReflectField& r) :
 	}
 }
 
+TypeReflectInfo* ReflectField::GetTypeReflectInfo() const
+{
+	TypeReflectInfo* ret = infos->info;
+	if(ret->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
+	{
+		ret = ((TypeReflectInfo*)infos->info->extra);
+	}
+	return ret;
+}
+
 static int strcmpidx(const char* str0, const char* str1)
 {
 	int ret = 0;

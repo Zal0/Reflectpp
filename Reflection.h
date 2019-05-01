@@ -93,6 +93,27 @@ public:
 
 template< class R > ReflectInfo* DefaultReflectInfo();
 
+class PropertyI
+{
+public:
+	virtual void Get(void* t, void* ret) = 0;
+	virtual void Set(void* t, void* val) = 0;
+};
+
+template< class T, class V >
+class Property : public PropertyI
+{
+private:
+	V(T::*getter)() const;
+	void(T::*setter)(const V& v);
+
+public:
+	Property(V(T::*getter)() const, void(T::*setter)(const V& v)) : getter(getter), setter(setter) {}
+	
+	void Get(void* t, void* ret) {*((V*)ret) = (((T*)t)->*getter)();}
+	void Set(void* t, void* val) {(((T*)t)->*setter)(*(V*)val);}
+};
+
 class EnumReflectData;
 class ReflectField {
 private:
@@ -272,27 +293,6 @@ public:
 };
 int EnumIndex(int value, const EnumReflectData* reflectDatas);
 const char* EnumStrValue(const ReflectField& reflectable);
-
-class PropertyI
-{
-public:
-	virtual void Get(void* t, void* ret) = 0;
-	virtual void Set(void* t, void* val) = 0;
-};
-
-template< class T, class V >
-class Property : public PropertyI
-{
-private:
-	V(T::*getter)();
-	void(T::*setter)(const V& v);
-
-public:
-	Property(V(T::*getter)(), void(T::*setter)(const V& v)) : getter(getter), setter(setter) {}
-	
-	void Get(void* t, void* ret) {*((V*)ret) = (((T*)t)->*getter)();}
-	void Set(void* t, void* val) {(((T*)t)->*setter)(*(V*)val);}
-};
 
 class Reflectable
 {

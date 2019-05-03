@@ -28,11 +28,10 @@ public:
 		return reflect_datas;
 	}
 
-	static ReflectInfo* DefaultReflectInfo() 
+	static TypeReflectInfo* GetTypeReflectInfo() 
 	{
 		static TypeReflectInfo t_info(ReflectTypeBySize(sizeof(ENUM_NAME)), sizeof(ENUM_NAME), (PTR)(ReflectDatas()));
-		static ReflectInfo ret(&t_info, "", 0);
-		return &ret;
+		return &t_info;
 	}
 };
 

@@ -31,7 +31,7 @@ ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(
 ReflectField::ReflectField(Reflectable* reflectable)
 {
 	//Instead of directly point to reflectable infos, create a dummy table (simplifies things, see PrintReflectable or Serialize)
-	classDummyInfos[0] = *reflectable->DefaultReflectInfoF()();
+	classDummyInfos[0] = ReflectInfo(reflectable->GetTypeReflectInfoF()(), "", 0);//TODO: get class name
 	classDummyInfos[1] = ReflectInfo::End;
 
 	this->reflectable = reflectable->This();
@@ -98,7 +98,7 @@ ReflectField ReflectField::Get(const char* field) const
 	}
 	else
 	{
-		ReflectField info(0,0);
+		ReflectField info(0, 0);
 		ReflectInfoIterator it(ClassPtr());
 		int n;
 		while((info = it.Next()).reflectable)
@@ -286,7 +286,8 @@ ReflectField ReflectInfoIterator::Next()
 
 		case TypeReflectInfo::REFLECT_TYPE_PARENT_CLASS: {
 			Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
-			VECTOR_PUSH(l, ReflectField(classObj, (ReflectInfo*)(((ReflectInfosFunc)(infos->info->extra))()->info->extra)));
+			TypeReflectInfo* rf = ((TypeReflectInfosFunc)(infos->info->extra))();
+			VECTOR_PUSH(l, ReflectField(classObj, (ReflectInfo*)(rf->extra)));
 			return Next();
 		}
 
@@ -340,19 +341,19 @@ const char* EnumStrValue(const ReflectField& reflectable)
 	return reflectDatas[EnumIndex(index, reflectDatas)].str;
 }
 
-#define DEF_INFO(TYPE, RTYPE) static TypeReflectInfo t_info(RTYPE, sizeof(TYPE), 0); static ReflectInfo ret(&t_info, "", 0); return &ret;
+#define DEF_INFO(TYPE, RTYPE) static TypeReflectInfo t_info(RTYPE, sizeof(TYPE), 0); return &t_info;
 
-ReflectInfo* DefaultReflectInfo(bool*)               {DEF_INFO(bool,               TypeReflectInfo::REFLECT_TYPE_BOOL)}
-ReflectInfo* DefaultReflectInfo(char*)               {DEF_INFO(char,               TypeReflectInfo::REFLECT_TYPE_CHAR)}
-ReflectInfo* DefaultReflectInfo(unsigned char*)      {DEF_INFO(unsigned char,      TypeReflectInfo::REFLECT_TYPE_UCHAR)}
-ReflectInfo* DefaultReflectInfo(short*)              {DEF_INFO(short,              TypeReflectInfo::REFLECT_TYPE_SHORT)}
-ReflectInfo* DefaultReflectInfo(unsigned short*)     {DEF_INFO(unsigned short,     TypeReflectInfo::REFLECT_TYPE_USHORT)}
-ReflectInfo* DefaultReflectInfo(int*)                {DEF_INFO(int,                TypeReflectInfo::REFLECT_TYPE_INT)}
-ReflectInfo* DefaultReflectInfo(unsigned int*)       {DEF_INFO(unsigned int,       TypeReflectInfo::REFLECT_TYPE_UINT)}
-ReflectInfo* DefaultReflectInfo(long*)               {DEF_INFO(long,               TypeReflectInfo::REFLECT_TYPE_LONG)}
-ReflectInfo* DefaultReflectInfo(unsigned long*)      {DEF_INFO(unsigned long,      TypeReflectInfo::REFLECT_TYPE_ULONG)}
-ReflectInfo* DefaultReflectInfo(long long*)          {DEF_INFO(long long,          TypeReflectInfo::REFLECT_TYPE_LONGLONG)}
-ReflectInfo* DefaultReflectInfo(unsigned long long*) {DEF_INFO(unsigned long long, TypeReflectInfo::REFLECT_TYPE_ULONGLONG)}
-ReflectInfo* DefaultReflectInfo(float*)              {DEF_INFO(float,              TypeReflectInfo::REFLECT_TYPE_FLOAT)}
-ReflectInfo* DefaultReflectInfo(double*)             {DEF_INFO(double,             TypeReflectInfo::REFLECT_TYPE_DOUBLE)}
-ReflectInfo* DefaultReflectInfo(STRING*)             {DEF_INFO(STRING,             TypeReflectInfo::REFLECT_TYPE_STRING)}
+TypeReflectInfo* GetTypeReflectInfo(bool*)               {DEF_INFO(bool,               TypeReflectInfo::REFLECT_TYPE_BOOL)}
+TypeReflectInfo* GetTypeReflectInfo(char*)               {DEF_INFO(char,               TypeReflectInfo::REFLECT_TYPE_CHAR)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned char*)      {DEF_INFO(unsigned char,      TypeReflectInfo::REFLECT_TYPE_UCHAR)}
+TypeReflectInfo* GetTypeReflectInfo(short*)              {DEF_INFO(short,              TypeReflectInfo::REFLECT_TYPE_SHORT)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned short*)     {DEF_INFO(unsigned short,     TypeReflectInfo::REFLECT_TYPE_USHORT)}
+TypeReflectInfo* GetTypeReflectInfo(int*)                {DEF_INFO(int,                TypeReflectInfo::REFLECT_TYPE_INT)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned int*)       {DEF_INFO(unsigned int,       TypeReflectInfo::REFLECT_TYPE_UINT)}
+TypeReflectInfo* GetTypeReflectInfo(long*)               {DEF_INFO(long,               TypeReflectInfo::REFLECT_TYPE_LONG)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned long*)      {DEF_INFO(unsigned long,      TypeReflectInfo::REFLECT_TYPE_ULONG)}
+TypeReflectInfo* GetTypeReflectInfo(long long*)          {DEF_INFO(long long,          TypeReflectInfo::REFLECT_TYPE_LONGLONG)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned long long*) {DEF_INFO(unsigned long long, TypeReflectInfo::REFLECT_TYPE_ULONGLONG)}
+TypeReflectInfo* GetTypeReflectInfo(float*)              {DEF_INFO(float,              TypeReflectInfo::REFLECT_TYPE_FLOAT)}
+TypeReflectInfo* GetTypeReflectInfo(double*)             {DEF_INFO(double,             TypeReflectInfo::REFLECT_TYPE_DOUBLE)}
+TypeReflectInfo* GetTypeReflectInfo(STRING*)             {DEF_INFO(STRING,             TypeReflectInfo::REFLECT_TYPE_STRING)}

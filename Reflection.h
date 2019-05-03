@@ -31,9 +31,11 @@
 #define ENUM_ENTRY(...) EXPAND(GET_MACRO_ENUM_ENTRY(__VA_ARGS__, ENUM_ENTRY2, ENUM_ENTRY1)(__VA_ARGS__))
 
 class ReflectInfo;
+class TypeReflectInfo;
 class Reflectable;
 class VectorHandlerI;
 typedef ReflectInfo*(*ReflectInfosFunc)();
+typedef TypeReflectInfo*(*TypeReflectInfosFunc)();
 typedef SMART_PTR(VectorHandlerI) VectorHandler;
 typedef VectorHandler(*VectorHandlerFunc)(void*);
 typedef Reflectable*(*ReflectablePtrFunc)(void*);
@@ -91,7 +93,7 @@ public:
 	static ReflectInfo End;
 };
 
-template< class R > ReflectInfo* DefaultReflectInfo();
+template< class R > TypeReflectInfo* GetTypeReflectInfo();
 
 class PropertyI
 {
@@ -132,12 +134,12 @@ public:
 	template< class T > T Get() const
 	{
 		static T default_t;
-		if(infos->info->reflect_type == DefaultReflectInfo< T >()->info->reflect_type)
+		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			return *REFLECT_PTR(T, reflectable, infos->ptr);
 		}
 		else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY && 
-			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  DefaultReflectInfo< T >()->info->reflect_type)
+			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			PropertyI* prop = (PropertyI*)infos->ptr;
 			prop->Get(reflectable, &default_t);
@@ -150,12 +152,12 @@ public:
 	template< class T > void Set(const T& t) const
 	{
 		static T default_t;
-		if(infos->info->reflect_type == DefaultReflectInfo< T >()->info->reflect_type)
+		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			*REFLECT_PTR(T, reflectable, infos->ptr) = t;
 		}
 		else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY && 
-			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  DefaultReflectInfo< T >()->info->reflect_type)
+			((TypeReflectInfo*)infos->info->extra)->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			PropertyI* prop = (PropertyI*)infos->ptr;
 			default_t = t;
@@ -216,7 +218,7 @@ public:
 
 protected:
 	virtual void* GetElemPtr(int idx) {return &VECTOR_GET(v, idx);}
-	virtual ReflectInfo* GetItemsReflectInfos() {return DefaultReflectInfo((T*)0);}
+	virtual ReflectInfo* GetItemsReflectInfos() {static ReflectInfo r_info(GetTypeReflectInfo((T*)0), "", 0); return &r_info;}
 };
 
 //Given a void* this returns the pointer to Reflectable* (void* must be pointing to a T* inheriting Reflectable)
@@ -226,53 +228,51 @@ Reflectable* ReflectablePtr(void* ptr) {
 	return (Reflectable*)t_ptr;
 }
 
-ReflectInfo* DefaultReflectInfo(bool*);
-ReflectInfo* DefaultReflectInfo(char*);
-ReflectInfo* DefaultReflectInfo(unsigned char*);
-ReflectInfo* DefaultReflectInfo(short*);
-ReflectInfo* DefaultReflectInfo(unsigned short*);
-ReflectInfo* DefaultReflectInfo(int*);
-ReflectInfo* DefaultReflectInfo(unsigned int*);
-ReflectInfo* DefaultReflectInfo(long*);
-ReflectInfo* DefaultReflectInfo(unsigned long*);
-ReflectInfo* DefaultReflectInfo(long long*);
-ReflectInfo* DefaultReflectInfo(unsigned long long*);
-ReflectInfo* DefaultReflectInfo(float*);
-ReflectInfo* DefaultReflectInfo(double*);
-ReflectInfo* DefaultReflectInfo(STRING*);
+TypeReflectInfo* GetTypeReflectInfo(bool*);
+TypeReflectInfo* GetTypeReflectInfo(char*);
+TypeReflectInfo* GetTypeReflectInfo(unsigned char*);
+TypeReflectInfo* GetTypeReflectInfo(short*);
+TypeReflectInfo* GetTypeReflectInfo(unsigned short*);
+TypeReflectInfo* GetTypeReflectInfo(int*);
+TypeReflectInfo* GetTypeReflectInfo(unsigned int*);
+TypeReflectInfo* GetTypeReflectInfo(long*);
+TypeReflectInfo* GetTypeReflectInfo(unsigned long*);
+TypeReflectInfo* GetTypeReflectInfo(long long*);
+TypeReflectInfo* GetTypeReflectInfo(unsigned long long*);
+TypeReflectInfo* GetTypeReflectInfo(float*);
+TypeReflectInfo* GetTypeReflectInfo(double*);
+TypeReflectInfo* GetTypeReflectInfo(STRING*);
 
-template< class T > ReflectInfo* DefaultReflectInfo(VECTOR(T)*) {
+template< class T > TypeReflectInfo* GetTypeReflectInfo(VECTOR(T)*) {
 	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_VECTOR, sizeof(VECTOR(T)), (PTR)VectorHandlerT< T >::GetVectorHandler);
-	static ReflectInfo ret(&t_info, "", 0); 
-	return &ret;
+	return &t_info;
 }
 
 TypeReflectInfo::ReflectType ReflectTypeBySize(int size);
 
 template< class R >
-ReflectInfo* DefaultReflectInfo(R*)
+TypeReflectInfo* GetTypeReflectInfo(R*)
 {
-	return R::DefaultReflectInfo();
+	return R::GetTypeReflectInfo();
 }
 
 template< class R >
-ReflectInfo* DefaultReflectInfo(R**)
+TypeReflectInfo* GetTypeReflectInfo(R**)
 {
 	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_POINTER, sizeof(R*), (PTR)(ReflectablePtrFunc)ReflectablePtr< R >);
-	static ReflectInfo ret(&t_info, "", 0); 
-	return &ret;
+	return &t_info;
 }
 
 template< class R >
-ReflectInfo* DefaultReflectInfo()
+TypeReflectInfo* GetTypeReflectInfo()
 {
-	return DefaultReflectInfo((R*)0);
+	return GetTypeReflectInfo((R*)0);
 }
 
 template< class T >
 TypeReflectInfo* PropertyReflectInfo()
 {
-	static TypeReflectInfo ret(TypeReflectInfo::REFLECT_TYPE_PROPERTY, sizeof(void*) * 2, (PTR)DefaultReflectInfo((T*)0)->info);
+	static TypeReflectInfo ret(TypeReflectInfo::REFLECT_TYPE_PROPERTY, sizeof(void*) * 2, (PTR)GetTypeReflectInfo((T*)0));
 	return &ret;
 }
 
@@ -297,18 +297,17 @@ const char* EnumStrValue(const ReflectField& reflectable);
 class Reflectable
 {
 public:
-	static ReflectInfo* DefaultReflectInfo()
+	static TypeReflectInfo* GetTypeReflectInfo()
 	{
 		static ReflectInfo info[] = {
 			ReflectInfo::End
 		};
 		static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_CLASS, sizeof(Reflectable), (PTR)info);
-		static ReflectInfo ret(&t_info, "Reflectable", 0);
-		return &ret;
+		return &t_info;
 	}
 
 public:
-	virtual ReflectInfosFunc DefaultReflectInfoF() {return DefaultReflectInfo;}
+	virtual TypeReflectInfosFunc GetTypeReflectInfoF() {return GetTypeReflectInfo;}
 	virtual void* This() {return this;}
 
 	ReflectField Get(const char* field);
@@ -328,10 +327,9 @@ public:
 		((*(T*)(this)).*init)();
 	}
 
-	static ReflectInfo* DefaultReflectInfo() {
+	static TypeReflectInfo* GetTypeReflectInfo() {
 		static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_CLASS, sizeof(T), (PTR)T::InheritanceTable());
-		static ReflectInfo ret(&t_info, T::ReflectableClassName(), 0);
-		return &ret;
+		return &t_info;
 	}
 };
 
@@ -347,12 +345,12 @@ class A : private ReflectableInit< A >, public virtual Reflectable {
 #define REFLECTABLE_CLASS_COMMON_PROPS(A)                                      \
 public:                                                                        \
 	typedef A CLASS_NAME;                                                        \
-	using ReflectableInit< A >::DefaultReflectInfo;                              \
+	using ReflectableInit< A >::GetTypeReflectInfo;                              \
 	using ReflectableInit< A >::ReflectInit;                                     \
-	virtual ReflectInfosFunc DefaultReflectInfoF() {return &DefaultReflectInfo;} \
+	virtual TypeReflectInfosFunc GetTypeReflectInfoF() {return &GetTypeReflectInfo;} \
 	virtual void* This() {return this;}                                          \
 	static const char* ReflectableClassName() {return #A;}                       \
-	static TypeReflectInfo* TypeReflectInfoParent() {static TypeReflectInfo ret(TypeReflectInfo::REFLECT_TYPE_PARENT_CLASS, sizeof(A), (PTR)A::DefaultReflectInfo); return &ret;} \
+	static TypeReflectInfo* TypeReflectInfoParent() {static TypeReflectInfo ret(TypeReflectInfo::REFLECT_TYPE_PARENT_CLASS, sizeof(A), (PTR)A::GetTypeReflectInfo); return &ret;} \
 private:                                                                       \
 	friend class ReflectableInit< A >;                                           \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}

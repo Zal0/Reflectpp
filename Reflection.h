@@ -309,6 +309,7 @@ public:
 public:
 	virtual TypeReflectInfosFunc GetTypeReflectInfoF() {return GetTypeReflectInfo;}
 	virtual void* This() {return this;}
+	virtual const char* ReflectableClassName() {return 0;}
 
 	ReflectField Get(const char* field);
 
@@ -342,17 +343,17 @@ public:
 #define REFLECTABLE_CLASS_DECL(A)                                   \
 class A : private ReflectableInit< A >, public virtual Reflectable { 
 
-#define REFLECTABLE_CLASS_COMMON_PROPS(A)                                      \
-public:                                                                        \
-	typedef A CLASS_NAME;                                                        \
-	using ReflectableInit< A >::GetTypeReflectInfo;                              \
-	using ReflectableInit< A >::ReflectInit;                                     \
-	virtual TypeReflectInfosFunc GetTypeReflectInfoF() {return &GetTypeReflectInfo;} \
-	virtual void* This() {return this;}                                          \
-	static const char* ReflectableClassName() {return #A;}                       \
+#define REFLECTABLE_CLASS_COMMON_PROPS(A)                                            \
+public:                                                                              \
+	typedef A CLASS_NAME;                                                              \
+	using ReflectableInit< A >::GetTypeReflectInfo;                                    \
+	using ReflectableInit< A >::ReflectInit;                                           \
+	virtual TypeReflectInfosFunc GetTypeReflectInfoF() {return &GetTypeReflectInfo;}   \
+	virtual void* This() {return this;}                                                \
+	virtual const char* ReflectableClassName() {static const char* nm = #A; return nm;}\
 	static TypeReflectInfo* TypeReflectInfoParent() {static TypeReflectInfo ret(TypeReflectInfo::REFLECT_TYPE_PARENT_CLASS, sizeof(A), (PTR)A::GetTypeReflectInfo); return &ret;} \
-private:                                                                       \
-	friend class ReflectableInit< A >;                                           \
+private:                                                                             \
+	friend class ReflectableInit< A >;                                                 \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}
 
 

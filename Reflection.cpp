@@ -31,7 +31,7 @@ ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(
 ReflectField::ReflectField(Reflectable* reflectable)
 {
 	//Instead of directly point to reflectable infos, create a dummy table (simplifies things, see PrintReflectable or Serialize)
-	classDummyInfos[0] = ReflectInfo(reflectable->GetTypeReflectInfoF()(), "", 0);//TODO: get class name
+	classDummyInfos[0] = ReflectInfo(reflectable->GetTypeReflectInfoF()(), reflectable->ReflectableClassName(), 0);
 	classDummyInfos[1] = ReflectInfo::End;
 
 	this->reflectable = reflectable->This();

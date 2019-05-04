@@ -50,9 +50,12 @@ public:
 };
 
 REFLECTABLE_CLASS_INHERITS_2(C, A, B)
+private:
+	std::string name;
+	short x;
+
 public:
 	#define REFLECTION_DATA   \
-		SERIALIZED_FIELD(public, std::string, name) \
 		SERIALIZED_FIELD(public, short, Ci, 5)    \
 		SERIALIZED_FIELD(public, float, Cf, 6.7f) \
 		SERIALIZED_FIELD(private, A, testC) \
@@ -64,10 +67,10 @@ public:
 	#include "ReflectDecl.h"
 
 public:
-	short GetX() { return Ci; }
-	void SetX(const short& value) {Ci = value;}
+	short GetX() const { return x; }
+	void SetX(const short& value) {x = value;}
 
-	std::string GetName() {return name;}
+	std::string GetName() const {return name;}
 	void SetName(const std::string& _name) {name = _name;}
 };
 
@@ -110,7 +113,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 					printf("\nclass %s", reflectable.infos->id);
 				printf("\n");
 				ReflectInfoIterator it(reflectable.ClassPtr());
-				ReflectField info(0,0);
+				ReflectField info(0, 0);
 				while((info = it.Next()).reflectable)
 				{
 					printf("%s%s: ", tabs, info.infos->id);
@@ -124,7 +127,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 					 reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_PROPERTY ||
 					 reflectable.EnumData() == 0)
 				{
-					printf("%s\n", reflectable.ToString().c_str());
+				printf("%s\n", reflectable.ToString().c_str());
 				}
 				else
 				{
@@ -171,6 +174,7 @@ int main()
 	c->v_table[1].push_back(enum1);
 	c->v_table[1].push_back(enum500);
 	c->bPtr = b;
+	c->SetName("Name");
 	reflectables[2] = c;
 
 	reflectables[3] = new F();

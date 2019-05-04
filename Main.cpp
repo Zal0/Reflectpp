@@ -179,21 +179,22 @@ int main()
 
 	reflectables[3] = new F();
 	
-	//int& n = reflectables[2]->Get("v_test0[2].y").Int();
-	//n = 12345;
+	//ReflectField n = reflectables[2]->Get("v_test0[2].y");
+	//int n_int = n.Get< int >();
+	//n.Set(12345);
 
 	//ReflectField r = reflectables[2]->Get("v_test0");
 	//VectorHandler v_h = r.GetVectorHandler();
 	//v_h->Push();
-	//v_h->GetElem(0).Get("x").Int() = 33;
+	//v_h->GetElem(0).Get("x").Set(33);
 	
 	//ReflectField r2 = reflectables[2]->Get("v_test0");
 	//VectorHandler v_h2 = r2.GetVectorHandler();
 	//r2 = ReflectField(v_h2->GetElem(0));
-	//r2.Get("x").Int() = 786;
+	//r2.Get("x").Set(786);
 
 	//ReflectField r_class = reflectables[2]->Get("test");
-	//r_class.Get("As").Short() = 321;
+	//r_class.Get("As").Set< short >(321);
 
 	Serialize(reflectables[2], "test.json");
 	//Deserialize(reflectables[2], "test.json");

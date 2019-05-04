@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-TypeReflectInfo TypeReflectInfo::InheritanceTable(TypeReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE, 0, 0);
+TypeReflectInfo TypeReflectInfo::InheritanceTable(Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE, 0, 0);
 ReflectInfo ReflectInfo::End(0, "", 0); 
 
 int ArrayOffset(const char* id, int accum = 0) 
@@ -61,7 +61,7 @@ ReflectField::ReflectField(const ReflectField& r) :
 TypeReflectInfo* ReflectField::GetTypeReflectInfo() const
 {
 	TypeReflectInfo* ret = infos->info;
-	if(ret->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
+	if(ret->reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY)
 	{
 		ret = ((TypeReflectInfo*)infos->info->extra);
 	}
@@ -113,70 +113,35 @@ ReflectField ReflectField::Get(const char* field) const
 	}
 }
 
+void FromString(ReflectField& field, const Reflectpp::Type reflect_type, const char* str);
 ReflectField& ReflectField::operator=(const char* str)
 {
-	TypeReflectInfo::ReflectType reflect_type = infos->info->reflect_type;
-	if(reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
+	Reflectpp::Type reflect_type = infos->info->reflect_type;
+	if(reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY)
 	{
 		reflect_type = ((TypeReflectInfo*)infos->info->extra)->reflect_type;
 	}
 
-	switch(reflect_type)
-	{
-		case TypeReflectInfo::REFLECT_TYPE_BOOL:      Set< bool >              (str[0] == '0' ? false : true);   break;
-		case TypeReflectInfo::REFLECT_TYPE_CHAR:      Set< char >              ((char)atoi(str));                break;
-		case TypeReflectInfo::REFLECT_TYPE_UCHAR:     Set< unsigned char >     ((unsigned char)atoi(str));       break;
-		case TypeReflectInfo::REFLECT_TYPE_SHORT:     Set< short >             ((short)atoi(str));               break;
-		case TypeReflectInfo::REFLECT_TYPE_USHORT:    Set< unsigned short >    ((unsigned short)atoi(str));      break;
-		case TypeReflectInfo::REFLECT_TYPE_INT:       Set< int >               ((int)atoi(str));                 break;
-		case TypeReflectInfo::REFLECT_TYPE_UINT:      Set< unsigned int >      ((unsigned int)atoi(str));        break;
-		case TypeReflectInfo::REFLECT_TYPE_LONG:      Set< long >              ((long)atol(str));                break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONG:     Set< unsigned long >     ((unsigned long)atol(str));       break;
-		case TypeReflectInfo::REFLECT_TYPE_LONGLONG:  Set< long long >         ((long long)atoll(str));          break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: Set< unsigned long long >((unsigned long long)atoll(str)); break;
-		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     Set< float >             ((float)atof(str));               break;
-		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    Set< double >            ((double)atof(str));              break;
-		case TypeReflectInfo::REFLECT_TYPE_STRING:    Set< STRING >            (str);                            break;
-		case TypeReflectInfo::REFLECT_TYPE_POINTER:   ReflectablePtr()->FromReflectString(str);                  break;
-		default: break;
-	}
+	if(reflect_type == Reflectpp::REFLECT_TYPE_POINTER)
+		ReflectablePtr()->FromReflectString(str);
 
+	FromString(*this, reflect_type, str); 
 	return *this;
 }
 
-#define TO_STRING(STR, TYPE) snprintf(buff, BUFF_SIZE, STR, Get< TYPE >());
+STRING ToString(const ReflectField& field, const Reflectpp::Type reflect_type);
 STRING ReflectField::ToString()const
 {
-	static const int BUFF_SIZE = 50;
-	static char buff[BUFF_SIZE];
-	
-	TypeReflectInfo::ReflectType reflect_type = infos->info->reflect_type;
-	if(reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
+	Reflectpp::Type reflect_type = infos->info->reflect_type;
+	if(reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY)
 	{
 		reflect_type = ((TypeReflectInfo*)infos->info->extra)->reflect_type;
 	}
 
-	switch(reflect_type)
-	{
-		case TypeReflectInfo::REFLECT_TYPE_BOOL:      TO_STRING("%d", bool);                 break;
-		case TypeReflectInfo::REFLECT_TYPE_CHAR:      TO_STRING("%c", char);                 break;
-		case TypeReflectInfo::REFLECT_TYPE_UCHAR:     TO_STRING("%u", unsigned char);        break;
-		case TypeReflectInfo::REFLECT_TYPE_SHORT:     TO_STRING("%hd", short);               break;
-		case TypeReflectInfo::REFLECT_TYPE_USHORT:    TO_STRING("%hu", unsigned short);      break;
-		case TypeReflectInfo::REFLECT_TYPE_INT:       TO_STRING("%d", int);                  break;
-		case TypeReflectInfo::REFLECT_TYPE_UINT:      TO_STRING("%u", unsigned int);         break;
-		case TypeReflectInfo::REFLECT_TYPE_LONG:      TO_STRING("%ld", long);                break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONG:     TO_STRING("%lu", unsigned long);       break;
-		case TypeReflectInfo::REFLECT_TYPE_LONGLONG:  TO_STRING("%lld", long long);          break;
-		case TypeReflectInfo::REFLECT_TYPE_ULONGLONG: TO_STRING("%llu", unsigned long long); break;
-		case TypeReflectInfo::REFLECT_TYPE_FLOAT:     TO_STRING("%g", float);                break;
-		case TypeReflectInfo::REFLECT_TYPE_DOUBLE:    TO_STRING("%g", double);              break;
-		case TypeReflectInfo::REFLECT_TYPE_STRING:    return Get< STRING >();
-		case TypeReflectInfo::REFLECT_TYPE_POINTER:   STRING() + '\"' + ReflectablePtr()->ToReflectString() + '\"'; break;
-		default: break;
-	}
+	if(reflect_type == Reflectpp::REFLECT_TYPE_POINTER)
+		return STRING() + '\"' + ReflectablePtr()->ToReflectString() + '\"';
 
-	return STRING(buff);
+	return ::ToString(*this, reflect_type);
 }
 
 class NullVectorHandler : public VectorHandlerI
@@ -202,7 +167,7 @@ VectorHandler ReflectField::GetVectorHandler() const
 
 bool ReflectField::IsArray() const
 {
-	return infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR || strchr(infos->id, '[');
+	return infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR || strchr(infos->id, '[');
 }
 
 int ReflectField::GetNumElems() const
@@ -211,7 +176,7 @@ int ReflectField::GetNumElems() const
 	{
 		return atoi(++ idx);
 	}
-	else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR) 
+	else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR) 
 	{
 		VectorHandler vector_handler = GetVectorHandler();
 		return vector_handler->GetNumElems();
@@ -244,7 +209,7 @@ ReflectField ReflectField::GetElem(int idx) const
 		ret.infos->ptr = 0;
 		return ret;
 	}
-	else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR) 
+	else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR) 
 	{
 		VectorHandler vector_handler = GetVectorHandler();
 		return vector_handler->GetElem(idx);
@@ -254,8 +219,8 @@ ReflectField ReflectField::GetElem(int idx) const
 
 ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)
 {
-	//Ignore the reflectable TypeReflectInfo::REFLECT_TYPE_CLASS that was added during casting
-	if(reflectable.infos->id[0] == '\0' && reflectable.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_CLASS)
+	//Ignore the reflectable Reflectpp::REFLECT_TYPE_CLASS that was added during casting
+	if(reflectable.infos->id[0] == '\0' && reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_CLASS)
 	{
 		VECTOR_PUSH(l, reflectable.ClassPtr());
 	}
@@ -280,11 +245,11 @@ ReflectField ReflectInfoIterator::Next()
 
 	switch(infos->info->reflect_type)
 	{
-		case TypeReflectInfo::REFLECT_TYPE_INHERITANCE_TABLE:
+		case Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE:
 			VECTOR_PUSH(l, ReflectField(reflectable, ((ReflectInfosFunc)(infos->ptr))()));
 			return Next();
 
-		case TypeReflectInfo::REFLECT_TYPE_PARENT_CLASS: {
+		case Reflectpp::REFLECT_TYPE_PARENT_CLASS: {
 			Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
 			TypeReflectInfo* rf = ((TypeReflectInfosFunc)(infos->info->extra))();
 			VECTOR_PUSH(l, ReflectField(classObj, (ReflectInfo*)(rf->extra)));
@@ -301,13 +266,13 @@ ReflectField Reflectable::Get(const char* field)
 	return ReflectField(this).Get(field);
 }
 
-TypeReflectInfo::ReflectType ReflectTypeBySize(int size) {
+Reflectpp::Type ReflectTypeBySize(int size) {
 	switch (size)
 	{
-		case 1:  return TypeReflectInfo::REFLECT_TYPE_CHAR;
-		case 2:  return TypeReflectInfo::REFLECT_TYPE_SHORT;
-		case 8:  return TypeReflectInfo::REFLECT_TYPE_LONGLONG; 
-		default: return TypeReflectInfo::REFLECT_TYPE_INT;
+		case 1:  return Reflectpp::REFLECT_TYPE_CHAR;
+		case 2:  return Reflectpp::REFLECT_TYPE_SHORT;
+		case 8:  return Reflectpp::REFLECT_TYPE_LONGLONG; 
+		default: return Reflectpp::REFLECT_TYPE_INT;
 	}
 }
 
@@ -333,8 +298,8 @@ const char* EnumStrValue(const ReflectField& reflectable)
 	int index;
 	switch(reflectable.infos->info->reflect_type) 
 	{
-		case TypeReflectInfo::REFLECT_TYPE_CHAR:  index = (int)reflectable.Get< char >(); break;
-		case TypeReflectInfo::REFLECT_TYPE_SHORT: index = (int)reflectable.Get< short >(); break;
+		case Reflectpp::REFLECT_TYPE_CHAR:  index = (int)reflectable.Get< char >(); break;
+		case Reflectpp::REFLECT_TYPE_SHORT: index = (int)reflectable.Get< short >(); break;
 		default: index = reflectable.Get< int >(); break;
 	}
 
@@ -343,17 +308,17 @@ const char* EnumStrValue(const ReflectField& reflectable)
 
 #define DEF_INFO(TYPE, RTYPE) static TypeReflectInfo t_info(RTYPE, sizeof(TYPE), 0); return &t_info;
 
-TypeReflectInfo* GetTypeReflectInfo(bool*)               {DEF_INFO(bool,               TypeReflectInfo::REFLECT_TYPE_BOOL)}
-TypeReflectInfo* GetTypeReflectInfo(char*)               {DEF_INFO(char,               TypeReflectInfo::REFLECT_TYPE_CHAR)}
-TypeReflectInfo* GetTypeReflectInfo(unsigned char*)      {DEF_INFO(unsigned char,      TypeReflectInfo::REFLECT_TYPE_UCHAR)}
-TypeReflectInfo* GetTypeReflectInfo(short*)              {DEF_INFO(short,              TypeReflectInfo::REFLECT_TYPE_SHORT)}
-TypeReflectInfo* GetTypeReflectInfo(unsigned short*)     {DEF_INFO(unsigned short,     TypeReflectInfo::REFLECT_TYPE_USHORT)}
-TypeReflectInfo* GetTypeReflectInfo(int*)                {DEF_INFO(int,                TypeReflectInfo::REFLECT_TYPE_INT)}
-TypeReflectInfo* GetTypeReflectInfo(unsigned int*)       {DEF_INFO(unsigned int,       TypeReflectInfo::REFLECT_TYPE_UINT)}
-TypeReflectInfo* GetTypeReflectInfo(long*)               {DEF_INFO(long,               TypeReflectInfo::REFLECT_TYPE_LONG)}
-TypeReflectInfo* GetTypeReflectInfo(unsigned long*)      {DEF_INFO(unsigned long,      TypeReflectInfo::REFLECT_TYPE_ULONG)}
-TypeReflectInfo* GetTypeReflectInfo(long long*)          {DEF_INFO(long long,          TypeReflectInfo::REFLECT_TYPE_LONGLONG)}
-TypeReflectInfo* GetTypeReflectInfo(unsigned long long*) {DEF_INFO(unsigned long long, TypeReflectInfo::REFLECT_TYPE_ULONGLONG)}
-TypeReflectInfo* GetTypeReflectInfo(float*)              {DEF_INFO(float,              TypeReflectInfo::REFLECT_TYPE_FLOAT)}
-TypeReflectInfo* GetTypeReflectInfo(double*)             {DEF_INFO(double,             TypeReflectInfo::REFLECT_TYPE_DOUBLE)}
-TypeReflectInfo* GetTypeReflectInfo(STRING*)             {DEF_INFO(STRING,             TypeReflectInfo::REFLECT_TYPE_STRING)}
+TypeReflectInfo* GetTypeReflectInfo(bool*)               {DEF_INFO(bool,               Reflectpp::REFLECT_TYPE_BOOL)}
+TypeReflectInfo* GetTypeReflectInfo(char*)               {DEF_INFO(char,               Reflectpp::REFLECT_TYPE_CHAR)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned char*)      {DEF_INFO(unsigned char,      Reflectpp::REFLECT_TYPE_UCHAR)}
+TypeReflectInfo* GetTypeReflectInfo(short*)              {DEF_INFO(short,              Reflectpp::REFLECT_TYPE_SHORT)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned short*)     {DEF_INFO(unsigned short,     Reflectpp::REFLECT_TYPE_USHORT)}
+TypeReflectInfo* GetTypeReflectInfo(int*)                {DEF_INFO(int,                Reflectpp::REFLECT_TYPE_INT)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned int*)       {DEF_INFO(unsigned int,       Reflectpp::REFLECT_TYPE_UINT)}
+TypeReflectInfo* GetTypeReflectInfo(long*)               {DEF_INFO(long,               Reflectpp::REFLECT_TYPE_LONG)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned long*)      {DEF_INFO(unsigned long,      Reflectpp::REFLECT_TYPE_ULONG)}
+TypeReflectInfo* GetTypeReflectInfo(long long*)          {DEF_INFO(long long,          Reflectpp::REFLECT_TYPE_LONGLONG)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned long long*) {DEF_INFO(unsigned long long, Reflectpp::REFLECT_TYPE_ULONGLONG)}
+TypeReflectInfo* GetTypeReflectInfo(float*)              {DEF_INFO(float,              Reflectpp::REFLECT_TYPE_FLOAT)}
+TypeReflectInfo* GetTypeReflectInfo(double*)             {DEF_INFO(double,             Reflectpp::REFLECT_TYPE_DOUBLE)}
+TypeReflectInfo* GetTypeReflectInfo(STRING*)             {DEF_INFO(STRING,             Reflectpp::REFLECT_TYPE_STRING)}

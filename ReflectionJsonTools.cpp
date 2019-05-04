@@ -16,7 +16,7 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 	{
 		switch(reflectable.infos->info->reflect_type)
 		{
-			case TypeReflectInfo::REFLECT_TYPE_CLASS: {
+			case Reflectpp::REFLECT_TYPE_CLASS: {
 				FILE_WRITE_STRING(out, "{");
 				ReflectInfoIterator it(reflectable.ClassPtr());
 				ReflectField info(0,0);
@@ -46,13 +46,13 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 
 			default:
 			{
-				TypeReflectInfo::ReflectType reflect_type = reflectable.infos->info->reflect_type;
-				if(reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY)
+				Reflectpp::Type reflect_type = reflectable.infos->info->reflect_type;
+				if(reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY)
 				{
 					reflect_type = ((TypeReflectInfo*)reflectable.infos->info->extra)->reflect_type;
 				}
 				
-				if(reflect_type == TypeReflectInfo::REFLECT_TYPE_STRING)
+				if(reflect_type == Reflectpp::REFLECT_TYPE_STRING)
 				{
 					FILE_WRITE_STRING(out, "\"");
 					FILE_WRITE_STRING(out, STRING_TO_CHAR_PTR(reflectable.ToString()));
@@ -152,7 +152,7 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 	else if(token[0] == '[')
 	{
 		VectorHandler v;
-		if(reflectable.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR)
+		if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR)
 		{
 			v = reflectable.GetVectorHandler();
 			v->Clear();
@@ -162,7 +162,7 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 		int elem_idx = 0;
 		while(token[0] != ']')
 		{
-			if(reflectable.infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_VECTOR)
+			if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR)
 				v->Push();
 
 			ReflectField new_elem = reflectable.GetElem(elem_idx);

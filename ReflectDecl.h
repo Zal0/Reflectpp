@@ -30,7 +30,7 @@ static TypeReflectInfo* GetTypeReflectInfo()
 		REFLECTION_DATA
 		ReflectInfo::End
 	};
-	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_CLASS, sizeof(*ReflectClass()), (PTR)info);
+	static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_CLASS, sizeof(*ReflectClass()), (PTR)info);
 	return &t_info;
 }
 

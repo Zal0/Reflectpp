@@ -108,7 +108,7 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 	{
 		switch(reflectable.infos->info->reflect_type)
 		{
-			case TypeReflectInfo::ReflectType::REFLECT_TYPE_CLASS: {
+			case Reflectpp::Type::REFLECT_TYPE_CLASS: {
 				if(depth == 0)
 					printf("\nclass %s", reflectable.infos->id);
 				printf("\n");
@@ -123,8 +123,8 @@ void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 			}
 
 			default:
-				if(reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_POINTER ||
-					 reflectable.infos->info->reflect_type == TypeReflectInfo::ReflectType::REFLECT_TYPE_PROPERTY ||
+				if(reflectable.infos->info->reflect_type == Reflectpp::Type::REFLECT_TYPE_POINTER ||
+					 reflectable.infos->info->reflect_type == Reflectpp::Type::REFLECT_TYPE_PROPERTY ||
 					 reflectable.EnumData() == 0)
 				{
 				printf("%s\n", reflectable.ToString().c_str());

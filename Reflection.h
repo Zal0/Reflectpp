@@ -1,7 +1,7 @@
 #ifndef REFLECTION_H
 #define REFLECTION_H
 
-#include "ReflectSTLConfig.h"
+#include "ReflectConfig.h"
 
 #ifdef _WIN64
 	typedef long long PTR;
@@ -43,40 +43,13 @@ typedef Reflectable*(*ReflectablePtrFunc)(void*);
 class TypeReflectInfo
 {
 public:
-	enum ReflectType 
-	{
-		REFLECT_TYPE_INHERITANCE_TABLE,
-		REFLECT_TYPE_PARENT_CLASS,
-
-		REFLECT_TYPE_BOOL,
-		REFLECT_TYPE_CHAR,
-		REFLECT_TYPE_UCHAR,
-		REFLECT_TYPE_SHORT,
-		REFLECT_TYPE_USHORT,
-		REFLECT_TYPE_INT,
-		REFLECT_TYPE_UINT,
-		REFLECT_TYPE_LONG,
-		REFLECT_TYPE_ULONG,
-		REFLECT_TYPE_LONGLONG,
-		REFLECT_TYPE_ULONGLONG,
-		REFLECT_TYPE_FLOAT,
-		REFLECT_TYPE_DOUBLE,
-		REFLECT_TYPE_STRING,
-
-		REFLECT_TYPE_CLASS,
-
-		REFLECT_TYPE_VECTOR,
-		REFLECT_TYPE_POINTER,
-		REFLECT_TYPE_PROPERTY
-	};
-
-	ReflectType reflect_type;
+	Reflectpp::Type reflect_type;
 	unsigned int size;
 	PTR extra;
 
 public:
 	TypeReflectInfo() {};
-	TypeReflectInfo(ReflectType reflect_type, unsigned int size, PTR extra) : reflect_type(reflect_type), size(size), extra(extra) {}
+	TypeReflectInfo(Reflectpp::Type reflect_type, unsigned int size, PTR extra) : reflect_type(reflect_type), size(size), extra(extra) {}
 	static TypeReflectInfo InheritanceTable;
 };
 
@@ -138,7 +111,7 @@ public:
 		{
 			return *REFLECT_PTR(T, reflectable, infos->ptr);
 		}
-		else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY && 
+		else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY && 
 			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			PropertyI* prop = (PropertyI*)infos->ptr;
@@ -156,7 +129,7 @@ public:
 		{
 			*REFLECT_PTR(T, reflectable, infos->ptr) = t;
 		}
-		else if(infos->info->reflect_type == TypeReflectInfo::REFLECT_TYPE_PROPERTY && 
+		else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY && 
 			((TypeReflectInfo*)infos->info->extra)->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			PropertyI* prop = (PropertyI*)infos->ptr;
@@ -228,27 +201,13 @@ Reflectable* ReflectablePtr(void* ptr) {
 	return (Reflectable*)t_ptr;
 }
 
-TypeReflectInfo* GetTypeReflectInfo(bool*);
-TypeReflectInfo* GetTypeReflectInfo(char*);
-TypeReflectInfo* GetTypeReflectInfo(unsigned char*);
-TypeReflectInfo* GetTypeReflectInfo(short*);
-TypeReflectInfo* GetTypeReflectInfo(unsigned short*);
-TypeReflectInfo* GetTypeReflectInfo(int*);
-TypeReflectInfo* GetTypeReflectInfo(unsigned int*);
-TypeReflectInfo* GetTypeReflectInfo(long*);
-TypeReflectInfo* GetTypeReflectInfo(unsigned long*);
-TypeReflectInfo* GetTypeReflectInfo(long long*);
-TypeReflectInfo* GetTypeReflectInfo(unsigned long long*);
-TypeReflectInfo* GetTypeReflectInfo(float*);
-TypeReflectInfo* GetTypeReflectInfo(double*);
-TypeReflectInfo* GetTypeReflectInfo(STRING*);
-
-template< class T > TypeReflectInfo* GetTypeReflectInfo(VECTOR(T)*) {
-	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_VECTOR, sizeof(VECTOR(T)), (PTR)VectorHandlerT< T >::GetVectorHandler);
+template< class T > 
+TypeReflectInfo* GetTypeReflectInfo(VECTOR(T)*) {
+	static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_VECTOR, sizeof(VECTOR(T)), (PTR)VectorHandlerT< T >::GetVectorHandler);
 	return &t_info;
 }
 
-TypeReflectInfo::ReflectType ReflectTypeBySize(int size);
+Reflectpp::Type ReflectTypeBySize(int size);
 
 template< class R >
 TypeReflectInfo* GetTypeReflectInfo(R*)
@@ -259,7 +218,7 @@ TypeReflectInfo* GetTypeReflectInfo(R*)
 template< class R >
 TypeReflectInfo* GetTypeReflectInfo(R**)
 {
-	static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_POINTER, sizeof(R*), (PTR)(ReflectablePtrFunc)ReflectablePtr< R >);
+	static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_POINTER, sizeof(R*), (PTR)(ReflectablePtrFunc)ReflectablePtr< R >);
 	return &t_info;
 }
 
@@ -272,7 +231,7 @@ TypeReflectInfo* GetTypeReflectInfo()
 template< class T >
 TypeReflectInfo* PropertyReflectInfo()
 {
-	static TypeReflectInfo ret(TypeReflectInfo::REFLECT_TYPE_PROPERTY, sizeof(void*) * 2, (PTR)GetTypeReflectInfo((T*)0));
+	static TypeReflectInfo ret(Reflectpp::REFLECT_TYPE_PROPERTY, sizeof(void*) * 2, (PTR)GetTypeReflectInfo((T*)0));
 	return &ret;
 }
 
@@ -302,7 +261,7 @@ public:
 		static ReflectInfo info[] = {
 			ReflectInfo::End
 		};
-		static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_CLASS, sizeof(Reflectable), (PTR)info);
+		static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_CLASS, sizeof(Reflectable), (PTR)info);
 		return &t_info;
 	}
 
@@ -329,7 +288,7 @@ public:
 	}
 
 	static TypeReflectInfo* GetTypeReflectInfo() {
-		static TypeReflectInfo t_info(TypeReflectInfo::REFLECT_TYPE_CLASS, sizeof(T), (PTR)T::InheritanceTable());
+		static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_CLASS, sizeof(T), (PTR)T::InheritanceTable());
 		return &t_info;
 	}
 };
@@ -351,7 +310,7 @@ public:                                                                         
 	virtual TypeReflectInfosFunc GetTypeReflectInfoF() {return &GetTypeReflectInfo;}   \
 	virtual void* This() {return this;}                                                \
 	virtual const char* ReflectableClassName() {static const char* nm = #A; return nm;}\
-	static TypeReflectInfo* TypeReflectInfoParent() {static TypeReflectInfo ret(TypeReflectInfo::REFLECT_TYPE_PARENT_CLASS, sizeof(A), (PTR)A::GetTypeReflectInfo); return &ret;} \
+	static TypeReflectInfo* TypeReflectInfoParent() {static TypeReflectInfo ret(Reflectpp::REFLECT_TYPE_PARENT_CLASS, sizeof(A), (PTR)A::GetTypeReflectInfo); return &ret;} \
 private:                                                                             \
 	friend class ReflectableInit< A >;                                                 \
 	static A* ReflectClass() { return (A*)DUMMY_ADDRESS;}

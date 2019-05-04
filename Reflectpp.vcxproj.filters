@@ -27,7 +27,7 @@
     <ClInclude Include="ReflectEnumDecl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ReflectSTLConfig.h">
+    <ClInclude Include="ReflectConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -39,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReflectionJsonTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReflectConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

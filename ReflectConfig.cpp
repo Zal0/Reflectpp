@@ -1,6 +1,23 @@
 #include "ReflectConfig.h"
 #include "Reflection.h"
 
+#define DEF_INFO(TYPE, RTYPE) static TypeReflectInfo t_info(RTYPE, sizeof(TYPE), 0); return &t_info;
+
+TypeReflectInfo* GetTypeReflectInfo(bool*)               {DEF_INFO(bool,               Reflectpp::REFLECT_TYPE_BOOL)}
+TypeReflectInfo* GetTypeReflectInfo(char*)               {DEF_INFO(char,               Reflectpp::REFLECT_TYPE_CHAR)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned char*)      {DEF_INFO(unsigned char,      Reflectpp::REFLECT_TYPE_UCHAR)}
+TypeReflectInfo* GetTypeReflectInfo(short*)              {DEF_INFO(short,              Reflectpp::REFLECT_TYPE_SHORT)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned short*)     {DEF_INFO(unsigned short,     Reflectpp::REFLECT_TYPE_USHORT)}
+TypeReflectInfo* GetTypeReflectInfo(int*)                {DEF_INFO(int,                Reflectpp::REFLECT_TYPE_INT)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned int*)       {DEF_INFO(unsigned int,       Reflectpp::REFLECT_TYPE_UINT)}
+TypeReflectInfo* GetTypeReflectInfo(long*)               {DEF_INFO(long,               Reflectpp::REFLECT_TYPE_LONG)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned long*)      {DEF_INFO(unsigned long,      Reflectpp::REFLECT_TYPE_ULONG)}
+TypeReflectInfo* GetTypeReflectInfo(long long*)          {DEF_INFO(long long,          Reflectpp::REFLECT_TYPE_LONGLONG)}
+TypeReflectInfo* GetTypeReflectInfo(unsigned long long*) {DEF_INFO(unsigned long long, Reflectpp::REFLECT_TYPE_ULONGLONG)}
+TypeReflectInfo* GetTypeReflectInfo(float*)              {DEF_INFO(float,              Reflectpp::REFLECT_TYPE_FLOAT)}
+TypeReflectInfo* GetTypeReflectInfo(double*)             {DEF_INFO(double,             Reflectpp::REFLECT_TYPE_DOUBLE)}
+TypeReflectInfo* GetTypeReflectInfo(STRING*)             {DEF_INFO(STRING,             Reflectpp::REFLECT_TYPE_STRING)}
+
 void FromString(ReflectField& field, const Reflectpp::Type reflect_type, const char* str)
 {
 	switch(reflect_type)

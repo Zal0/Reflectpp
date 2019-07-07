@@ -28,7 +28,7 @@ static TypeReflectInfo* GetTypeReflectInfo()
 	static ReflectInfo info[] = {
 		ReflectInfo(&TypeReflectInfo::InheritanceTable, "rht", (PTR)InheritanceTable),
 		REFLECTION_DATA
-		ReflectInfo::End
+		REFLECTINFO_END
 	};
 	static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_CLASS, sizeof(*ReflectClass()), (PTR)info);
 	return &t_info;

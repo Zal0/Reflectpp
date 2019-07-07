@@ -2,7 +2,6 @@
 #include <string.h>
 
 TypeReflectInfo TypeReflectInfo::InheritanceTable(Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE, 0, 0);
-ReflectInfo ReflectInfo::End(0, "", 0); 
 
 int ArrayOffset(const char* id, int accum = 0) 
 {
@@ -31,7 +30,7 @@ ReflectField::ReflectField(Reflectable* reflectable)
 {
 	//Instead of directly point to reflectable infos, create a dummy table (simplifies things, see PrintReflectable or Serialize)
 	classDummyInfos[0] = ReflectInfo(reflectable->GetTypeReflectInfoF()(), reflectable->ReflectableClassName(), 0);
-	classDummyInfos[1] = ReflectInfo::End;
+	classDummyInfos[1] = REFLECTINFO_END;
 
 	this->reflectable = reflectable->This();
 	this->infos = classDummyInfos;
@@ -41,8 +40,8 @@ ReflectField::ReflectField(void* reflectable, ReflectInfo* infos) :
 	reflectable(reflectable), 
 	infos(infos) 
 {
-	classDummyInfos[0] = ReflectInfo::End;
-	classDummyInfos[1] = ReflectInfo::End;
+	classDummyInfos[0] = REFLECTINFO_END;
+	classDummyInfos[1] = REFLECTINFO_END;
 }
 
 ReflectField::ReflectField(const ReflectField& r) :

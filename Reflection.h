@@ -30,6 +30,8 @@
 #define GET_MACRO_ENUM_ENTRY(_1,_2,NAME,...) NAME
 #define ENUM_ENTRY(...) EXPAND(GET_MACRO_ENUM_ENTRY(__VA_ARGS__, ENUM_ENTRY2, ENUM_ENTRY1)(__VA_ARGS__))
 
+#define REFLECTINFO_END ReflectInfo(0, "", 0)
+
 class ReflectInfo;
 class TypeReflectInfo;
 class Reflectable;
@@ -63,7 +65,6 @@ public:
 public:
 	ReflectInfo() {};
 	ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr);
-	static ReflectInfo End;
 };
 
 template< class R > TypeReflectInfo* GetTypeReflectInfo();
@@ -259,7 +260,7 @@ public:
 	static TypeReflectInfo* GetTypeReflectInfo()
 	{
 		static ReflectInfo info[] = {
-			ReflectInfo::End
+			REFLECTINFO_END
 		};
 		static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_CLASS, sizeof(Reflectable), (PTR)info);
 		return &t_info;
@@ -321,7 +322,7 @@ private:                                                                        
                                                                     \
 	static ReflectInfo* InheritanceTable() {                          \
 			static ReflectInfo info[] = {                                 \
-				ReflectInfo::End                                            \
+				REFLECTINFO_END                                            \
 			};                                                            \
 			return info;                                                  \
 		}
@@ -340,7 +341,7 @@ class A : private ReflectableInit< A >, public B {
 	static ReflectInfo* InheritanceTable() {              \
 		static ReflectInfo info[] = {                       \
 			REFLECT_INHERIT(B)                                \
-			ReflectInfo::End                                  \
+			REFLECTINFO_END                                  \
 		};                                                  \
 		return info;                                        \
 	}
@@ -359,7 +360,7 @@ class A : private ReflectableInit< A >, public B, public C {
 		static ReflectInfo info[] = {                           \
 			REFLECT_INHERIT(B)                                    \
 			REFLECT_INHERIT(C)                                    \
-			ReflectInfo::End                                      \
+			REFLECTINFO_END                                      \
 		};                                                      \
 		return info;                                            \
 	}
@@ -380,7 +381,7 @@ class A : private ReflectableInit< A >, public B, public C, public D {
 			REFLECT_INHERIT(B)                                    \
 			REFLECT_INHERIT(C)                                    \
 			REFLECT_INHERIT(D)                                    \
-			ReflectInfo::End                                      \
+			REFLECTINFO_END                                      \
 		};                                                      \
 		return info;                                            \
 	}

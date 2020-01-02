@@ -38,3 +38,33 @@ public:
 	#include "ReflectDecl.h"
 };
 ```
+
+##Acccessing fields using reflection
+Given the class A initialized like this
+```cpp
+A a;
+a.a_int = 1;
+```
+Use the ReflectField class to access fields using reflection
+```cpp
+ReflectField a_field = a.Get("a_int");
+```
+You can then get or set the values using the methods Get and Set
+```cpp
+int a_int = a_field.Get< int >(); //a_int == 1
+a_field.Set(2); //a.aint == 2
+```
+Some extra info from the field can be extracted using the Reflectfield class like the field name
+```cpp
+const char* id = a_field.infos->id; //id == "a_int"
+```
+the field type
+```cpp
+Reflectpp::Type type = a_field.GetTypeReflectInfo()->reflect_type; //type == REFLECT_TYPE_INT
+```
+or the field size
+```cpp
+unsigned int size = a_field.GetTypeReflectInfo()->size; //size == sizeof(int)
+```
+There are also some helper functions that makes it easier to retrieve the data depending on the field type
+

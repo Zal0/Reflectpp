@@ -39,7 +39,7 @@ public:
 };
 ```
 
-##Acccessing fields using reflection
+## Acccessing fields using reflection
 Given the class A initialized like this
 ```cpp
 A a;
@@ -66,5 +66,23 @@ or the field size
 ```cpp
 unsigned int size = a_field.GetTypeReflectInfo()->size; //size == sizeof(int)
 ```
-There are also some helper functions that makes it easier to retrieve the data depending on the field type
+There are also some helper functions that makes it easier to retrieve the data depending on the field type. We will see them below
+
+## Fields iterator
+Given the class A initialized like this
+```cpp
+A a;
+a.a_int = 1;
+a.a_float = 10.0f;
+```
+you can iterate its fields creating a Reflectfield that points to the class itself and then using a ReflectInfoIterator initialized using the method ClassPtr
+```cpp
+ReflectField r(&a);
+ReflectInfoIterator it(r.ClassPtr());
+ReflectField info(0, 0);
+while((info = it.Next()).reflectable)
+{
+	printf("%s: %s\n", info.infos->id, info.ToString().c_str());
+}
+```
 

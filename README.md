@@ -18,6 +18,9 @@ An easy to use reflection library for C++
 	- pointers
 - json import/export
 
+##Installation
+Copy the folder Reflectpp/ into your project and add it to your include paths
+
 ## Basic usage
 In order to add serialization to a simple class like this
 ```cpp
@@ -103,7 +106,8 @@ while((info = it.Next()).reflectable)
 }
 ```
 Output:
+```
     a_int: 1
     a_float: 10
-
+```
 

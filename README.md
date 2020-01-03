@@ -75,14 +75,16 @@ A a;
 a.a_int = 1;
 a.a_float = 10.0f;
 ```
-you can iterate its fields creating a Reflectfield that points to the class itself and then using a ReflectInfoIterator initialized using the method ClassPtr
+you can iterate its fields using a ReflectInfoIterator 
 ```cpp
-ReflectField r(&a);
-ReflectInfoIterator it(r.ClassPtr());
-ReflectField info(0, 0);
+ReflectInfoIterator it(&a);
+ReflectField info;
 while((info = it.Next()).reflectable)
 {
 	printf("%s: %s\n", info.infos->id, info.ToString().c_str());
 }
 ```
+    a_int: 1
+    a_float: 10
+
 

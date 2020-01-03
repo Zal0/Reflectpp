@@ -2,6 +2,22 @@
 
 An easy to use reflection library for C++
 
+## Features
+- User friendly, just a couple of lines on the declaration of your clases
+- Declaration+Reflection on the same line
+- public, private and protected fields
+- Inheritance
+- Composition
+- Supported types:
+ - Basic types:  bool, char, short, int, long, float, double
+  - std::string
+  - std::vector
+  - arrays, multidimensional arrays
+  - enums
+  - properties (get/set)
+  - pointers
+- json import/export
+
 ## Basic usage
 In order to add serialization to a simple class like this
 ```cpp
@@ -86,6 +102,7 @@ while((info = it.Next()).reflectable)
 	printf("%s: %s\n", info.infos->id, info.ToString().c_str());
 }
 ```
+Output:
     a_int: 1
     a_float: 10
 

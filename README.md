@@ -2,6 +2,22 @@
 
 An easy to use reflection library for C++
 
+## Features
+- User friendly, just a couple of lines on the declaration of your clases
+- Declaration+Reflection on the same line
+- public, private and protected fields
+- Inheritance
+- Composition
+- Supported types:
+	- Basic types:  bool, char, short, int, long, float, double
+	- std::string
+	- std::vector
+	- arrays, multidimensional arrays
+	- enums
+	- properties (get/set)
+	- pointers
+- json import/export
+
 ## Basic usage
 In order to add serialization to a simple class like this
 ```cpp
@@ -25,7 +41,9 @@ public:
 	#include "ReflectDecl.h"
 };
 ```
-Notice that because REFLECTION_DATA is a macro each line must end in '\' or have everything declared on one single line. You can also use EXPOSED_FIELD(type, name) to separate fields declaration from serialization definition (and keep your class intact)
+###### Notice that because REFLECTION_DATA is a macro each line must end in '\' or have everything declared on one single line. 
+
+You can also use EXPOSED_FIELD(type, name) to separate fields declaration from serialization definition (and keep your class intact)
 ```cpp
 REFLECTABLE_CLASS(A)
 public:
@@ -75,14 +93,17 @@ A a;
 a.a_int = 1;
 a.a_float = 10.0f;
 ```
-you can iterate its fields creating a Reflectfield that points to the class itself and then using a ReflectInfoIterator initialized using the method ClassPtr
+you can iterate its fields using a ReflectInfoIterator 
 ```cpp
-ReflectField r(&a);
-ReflectInfoIterator it(r.ClassPtr());
-ReflectField info(0, 0);
+ReflectInfoIterator it(&a);
+ReflectField info;
 while((info = it.Next()).reflectable)
 {
 	printf("%s: %s\n", info.infos->id, info.ToString().c_str());
 }
 ```
+Output:
+    a_int: 1
+    a_float: 10
+
 

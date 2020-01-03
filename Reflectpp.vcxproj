@@ -88,6 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./Reflectpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,6 +117,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./Reflectpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,17 +144,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ReflectEnumDecl.h" />
-    <ClInclude Include="ReflectionJsonTools.h" />
-    <ClInclude Include="ReflectDecl.h" />
-    <ClInclude Include="Reflection.h" />
-    <ClInclude Include="ReflectConfig.h" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Reflectpp\ReflectConfig\ReflectConfig.cpp" />
+    <ClCompile Include="Reflectpp\Reflection.cpp" />
+    <ClCompile Include="Reflectpp\ReflectionJsonTools.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReflectionJsonTools.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Reflection.cpp" />
-    <ClCompile Include="ReflectConfig.cpp" />
+    <ClInclude Include="Reflectpp\ReflectConfig\ReflectConfig.h" />
+    <ClInclude Include="Reflectpp\ReflectDecl.h" />
+    <ClInclude Include="Reflectpp\ReflectEnumDecl.h" />
+    <ClInclude Include="Reflectpp\Reflection.h" />
+    <ClInclude Include="Reflectpp\ReflectionJsonTools.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,44 +5,39 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Config">
+      <UniqueIdentifier>{fab3b458-6aa1-49da-938e-676ac7195f03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Reflection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReflectDecl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReflectionJsonTools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReflectEnumDecl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReflectConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Reflection.cpp">
+    <ClCompile Include="Reflectpp\Reflection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReflectionJsonTools.cpp">
+    <ClCompile Include="Reflectpp\ReflectionJsonTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReflectConfig.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Reflectpp\ReflectConfig\ReflectConfig.cpp">
+      <Filter>Config</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Reflectpp\ReflectDecl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectEnumDecl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\Reflection.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectionJsonTools.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectConfig\ReflectConfig.h">
+      <Filter>Config</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

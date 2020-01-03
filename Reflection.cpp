@@ -215,7 +215,17 @@ ReflectField ReflectField::GetElem(int idx) const
 	return ReflectField(0, 0);
 }
 
+ReflectInfoIterator::ReflectInfoIterator(Reflectable* reflectable)
+{
+	Init(ReflectField(reflectable).ClassPtr());
+}
+
 ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)
+{
+	Init(reflectable);
+}
+
+void ReflectInfoIterator::Init(const ReflectField& reflectable)
 {
 	//Ignore the reflectable Reflectpp::REFLECT_TYPE_CLASS that was added during casting
 	if(reflectable.infos->id[0] == '\0' && reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_CLASS)

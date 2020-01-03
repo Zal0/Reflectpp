@@ -240,7 +240,11 @@ class ReflectInfoIterator {
 public:
 	VECTOR(ReflectField) l;
 
+private:
+	void Init(const ReflectField& reflectable);
+
 public:
+	ReflectInfoIterator(Reflectable* reflectable);
 	ReflectInfoIterator(const ReflectField& reflectable);
 	ReflectField Next();
 };

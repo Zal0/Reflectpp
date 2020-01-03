@@ -19,10 +19,10 @@ An easy to use reflection library for C++
 - json import/export
 
 ##Installation
-Copy the folder Reflectpp/ into your project and add it to your include paths
+Copy the folder Reflectpp/ into your project and add it to your include path
 
 ## Basic usage
-In order to add serialization to a simple class like this
+Given a simple class like this one
 ```cpp
 class A 
 {
@@ -31,22 +31,11 @@ public:
 	float a_float;
 };
 ```
+Add reflection data to it following the next steps:
+- Include "Reflection.h"
 - Declare your class using the macro REFLECTABLE_CLASS (remove the open bracket '{')
-- Declare each field using the macro SERIALIZED_FIELD(access, type, name)
 - Insert all your reflectable fields between #define REFLECTION_DATA and #include "ReflectDecl.h"
-
-```cpp
-REFLECTABLE_CLASS(A)
-public:
-	#define REFLECTION_DATA   \
-		SERIALIZED_FIELD(public, int, a_int) \
-		SERIALIZED_FIELD(public, float, a_float)
-	#include "ReflectDecl.h"
-};
-```
-###### Notice that because REFLECTION_DATA is a macro each line must end in '\' or have everything declared on one single line. 
-
-You can also use EXPOSED_FIELD(type, name) to separate fields declaration from serialization definition (and keep your class intact)
+- Declare each field using the macro EXPOSED_FIELD(type, name)
 ```cpp
 REFLECTABLE_CLASS(A)
 public:
@@ -59,6 +48,18 @@ public:
 	#include "ReflectDecl.h"
 };
 ```
+###### Notice that because REFLECTION_DATA is a macro each line must end in '\' or have everything declared on a single line. 
+
+You can also use SERIALIZED_FIELD(access, type, name) to declare and add reflection info to your fields
+```cpp
+REFLECTABLE_CLASS(A)
+public:
+	#define REFLECTION_DATA   \
+		SERIALIZED_FIELD(public, int, a_int) \
+		SERIALIZED_FIELD(public, float, a_float)
+	#include "ReflectDecl.h"
+};
+```
 
 ## Acccessing fields using reflection
 Given the class A initialized like this
@@ -66,38 +67,28 @@ Given the class A initialized like this
 A a;
 a.a_int = 1;
 ```
-Use the ReflectField class to access fields using reflection
+
 ```cpp
+//Getting and setting values
 ReflectField a_field = a.Get("a_int");
-```
-You can then get or set the values using the methods Get and Set
-```cpp
 int a_int = a_field.Get< int >(); //a_int == 1
 a_field.Set(2); //a.aint == 2
-```
-Some extra info from the field can be extracted using the Reflectfield class like the field name
-```cpp
+
+//Retriving field basic info
 const char* id = a_field.infos->id; //id == "a_int"
-```
-the field type
-```cpp
-Reflectpp::Type type = a_field.GetTypeReflectInfo()->reflect_type; //type == REFLECT_TYPE_INT
-```
-or the field size
-```cpp
+Reflectpp::Type type = a_field.GetTypeReflectInfo()->reflect_type; //type == REFLECT_TYPE_INT (supported types are in ReflectConfig.h)
 unsigned int size = a_field.GetTypeReflectInfo()->size; //size == sizeof(int)
 ```
-There are also some helper functions that makes it easier to retrieve the data depending on the field type. We will see them below
 
-## Fields iterator
+## Iterating Fields
 Given the class A initialized like this
 ```cpp
 A a;
 a.a_int = 1;
 a.a_float = 10.0f;
 ```
-you can iterate its fields using a ReflectInfoIterator 
 ```cpp
+//Iterating class fields
 ReflectInfoIterator it(&a);
 ReflectField info;
 while((info = it.Next()).reflectable)

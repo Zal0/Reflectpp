@@ -25,7 +25,9 @@ public:
 	#include "ReflectDecl.h"
 };
 ```
-Notice that because REFLECTION_DATA is a macro each line must end in '\' or have everything declared on one single line. You can also use EXPOSED_FIELD(type, name) to separate fields declaration from serialization definition (and keep your class intact)
+###### Notice that because REFLECTION_DATA is a macro each line must end in '\' or have everything declared on one single line. 
+
+You can also use EXPOSED_FIELD(type, name) to separate fields declaration from serialization definition (and keep your class intact)
 ```cpp
 REFLECTABLE_CLASS(A)
 public:

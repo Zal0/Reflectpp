@@ -9,13 +9,13 @@ An easy to use reflection library for C++
 - Inheritance
 - Composition
 - Supported types:
- - Basic types:  bool, char, short, int, long, float, double
-  - std::string
-  - std::vector
-  - arrays, multidimensional arrays
-  - enums
-  - properties (get/set)
-  - pointers
+	- Basic types:  bool, char, short, int, long, float, double
+	- std::string
+	- std::vector
+	- arrays, multidimensional arrays
+	- enums
+	- properties (get/set)
+	- pointers
 - json import/export
 
 ## Basic usage

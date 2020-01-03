@@ -62,7 +62,7 @@ STRING ToString(const ReflectField& field, const Reflectpp::Type reflect_type)
 		case Reflectpp::REFLECT_TYPE_FLOAT:     TO_STRING("%g", float);                break;
 		case Reflectpp::REFLECT_TYPE_DOUBLE:    TO_STRING("%g", double);              break;
 		case Reflectpp::REFLECT_TYPE_STRING:    return field.Get< STRING >();
-		default: break;
+		default: buff[0] = '\0';break;
 	}
 
 	return STRING(buff);

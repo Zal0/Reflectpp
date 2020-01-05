@@ -4,6 +4,7 @@ An easy to use reflection library for C++
 
 ## Features
 - User friendly, just a couple of lines on the declaration of your clases
+- Portable, works on any c++ compiler
 - Declaration+Reflection on the same line
 - public, private and protected fields
 - Inheritance

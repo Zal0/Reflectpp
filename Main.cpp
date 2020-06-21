@@ -86,6 +86,10 @@ REFLECTABLE_CLASS_INHERITS_1(G, A)
 REFLECTABLE_CLASS_INHERITS_3(F, A, B, D)
 };
 
+REFLECTABLE_CLASS_INHERITS_2(M, D, C)
+};
+
+
 void PrintReflectable(const ReflectField& reflectable, int depth = 0)
 {
 	char* tabs = new char[depth + 1];
@@ -179,6 +183,18 @@ int main()
 
 	reflectables[3] = new F();
 	
+	Reflectable* r = new M();
+	ReflectField rf = r;
+	A* _a = rf.DynamicCast< A >();
+	B* _b = rf.DynamicCast< B >();
+	C* _c = rf.DynamicCast< C >();
+	D* _d = rf.DynamicCast< D >();
+	M* m = rf.DynamicCast< M >();
+	Reflectable* _r = rf.DynamicCast< Reflectable >(); //this fails
+	r = _a;
+	
+	
+
 	//ReflectField n = reflectables[2]->Get("v_test0[2].y");
 	//int n_int = n.Get< int >();
 	//n.Set(12345);
@@ -187,6 +203,7 @@ int main()
 	//VectorHandler v_h = r.GetVectorHandler();
 	//v_h->Push();
 	//v_h->GetElem(0).Get("x").Set(33);
+
 	
 	//ReflectField r2 = reflectables[2]->Get("v_test0");
 	//VectorHandler v_h2 = r2.GetVectorHandler();

@@ -163,6 +163,16 @@ public:
 
 	ReflectField& operator=(const char* str);
 	STRING ToString()const;
+
+	template <class T> T* DynamicCast()
+	{
+		PTR offset = DynamicCast(infos->info, T::GetTypeReflectInfo());
+		if(offset == -1)
+			return 0;
+		else
+			return REFLECT_PTR(T, reflectable, offset);
+	}
+	static PTR DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t);
 };
 
 class VectorHandlerI

@@ -142,6 +142,34 @@ STRING ReflectField::ToString()const
 	return ::ToString(*this, reflect_type);
 }
 
+PTR ReflectField::DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t)
+{
+	if(rf->reflect_type != Reflectpp::REFLECT_TYPE_CLASS)
+		return -1; //If it's not a class  it cannot be casted for sure
+
+	if(rf == t)
+		return 0;
+
+	//The REFLECT_TYPE_INHERITANCE_TABLE ptr is only present when there is REFLECTION_DATA declared
+	ReflectInfo* parent_class = (ReflectInfo*)(rf->extra);
+	if(parent_class->info->reflect_type == Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE)
+	{
+		parent_class = ((ReflectInfosFunc)parent_class->ptr)();
+	}
+	
+	PTR offset;
+	for(; parent_class->id[0] != 0; parent_class ++)
+	{
+		offset = DynamicCast(((TypeReflectInfosFunc)parent_class->info->extra)(), t);
+		if(offset != -1)
+		{
+			return parent_class->ptr + offset;
+		}
+	}
+
+	return -1; //Not found
+}
+
 class NullVectorHandler : public VectorHandlerI
 {
 public:

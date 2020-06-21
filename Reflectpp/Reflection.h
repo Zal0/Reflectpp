@@ -110,16 +110,19 @@ public:
 		static T default_t;
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
+			//The type matches the requested type
 			return *REFLECT_PTR(T, reflectable, infos->ptr);
 		}
 		else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY && 
 			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  ::GetTypeReflectInfo< T >()->reflect_type)
 		{
+			//This is a property and the type matches
 			PropertyI* prop = (PropertyI*)infos->ptr;
 			prop->Get(reflectable, &default_t);
 			return default_t;
 		}
 		else
+			//The types doesn't match
 			return default_t; //This way we avoid memory issues
 	}
 
@@ -128,11 +131,13 @@ public:
 		static T default_t;
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
+			//The type matches the requested type
 			*REFLECT_PTR(T, reflectable, infos->ptr) = t;
 		}
 		else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY && 
 			((TypeReflectInfo*)infos->info->extra)->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
+			//This is a property and the type matches
 			PropertyI* prop = (PropertyI*)infos->ptr;
 			default_t = t;
 			prop->Set(reflectable, &default_t);

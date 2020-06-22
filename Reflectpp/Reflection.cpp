@@ -142,6 +142,15 @@ STRING ReflectField::ToString()const
 	return ::ToString(*this, reflect_type);
 }
 
+void* ReflectField::DynamicCast(TypeReflectInfo* t)
+{
+	PTR offset = DynamicCast(infos->info, t);
+	if(offset == -1)
+		return 0;
+	else
+		return REFLECT_PTR(void, reflectable, offset);
+}
+
 PTR ReflectField::DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t)
 {
 	if(rf->reflect_type != Reflectpp::REFLECT_TYPE_CLASS)

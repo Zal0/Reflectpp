@@ -166,12 +166,11 @@ public:
 
 	template <class T> T* DynamicCast()
 	{
-		PTR offset = DynamicCast(infos->info, T::GetTypeReflectInfo());
-		if(offset == -1)
-			return 0;
-		else
-			return REFLECT_PTR(T, reflectable, offset);
+		return (T*)DynamicCast(T::GetTypeReflectInfo());
 	}
+
+	void* DynamicCast(TypeReflectInfo* t);
+
 	static PTR DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t);
 };
 

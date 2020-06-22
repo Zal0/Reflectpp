@@ -152,6 +152,9 @@ PTR ReflectField::DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t)
 
 	//The REFLECT_TYPE_INHERITANCE_TABLE ptr is only present when there is REFLECTION_DATA declared
 	ReflectInfo* parent_class = (ReflectInfo*)(rf->extra);
+	if(parent_class->id[0] == 0)
+		return -1; //Class directly inheriting from Reflectable and without reflectable fields
+
 	if(parent_class->info->reflect_type == Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE)
 	{
 		parent_class = ((ReflectInfosFunc)parent_class->ptr)();

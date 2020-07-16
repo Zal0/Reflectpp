@@ -319,7 +319,7 @@ public:
 #define REFLECT_INHERIT(A) ReflectInfo(A::TypeReflectInfoParent(), #A, CLASS_OFFSET(A)),
 
 #define REFLECTABLE_CLASS_DECL(A)                                   \
-class A : private ReflectableInit< A >, public virtual Reflectable { 
+class A : private ReflectableInit< A >, public virtual Reflectable
 
 #define REFLECTABLE_CLASS_COMMON_PROPS(A)                                            \
 public:                                                                              \
@@ -340,18 +340,18 @@ private:                                                                        
                                                                     \
 	static ReflectInfo* InheritanceTable() {                          \
 			static ReflectInfo info[] = {                                 \
-				REFLECTINFO_END                                            \
+				REFLECTINFO_END                                             \
 			};                                                            \
 			return info;                                                  \
 		}
 
 #define REFLECTABLE_CLASS(A) \
-REFLECTABLE_CLASS_DECL(A)    \
+REFLECTABLE_CLASS_DECL(A) {  \
 REFLECTABLE_CLASS_PROPS(A)
 
 
 #define REFLECTABLE_CLASS_INHERITS_1_DECL(A, B)         \
-class A : private ReflectableInit< A >, public B {       
+class A : private ReflectableInit< A >, public B      
 
 #define REFLECTABLE_CLASS_INHERITS_1_PROPS(A, B)        \
 	REFLECTABLE_CLASS_COMMON_PROPS(A)                     \
@@ -365,11 +365,11 @@ class A : private ReflectableInit< A >, public B {
 	}
 
 #define REFLECTABLE_CLASS_INHERITS_1(A, B) \
-REFLECTABLE_CLASS_INHERITS_1_DECL(A, B)    \
+REFLECTABLE_CLASS_INHERITS_1_DECL(A, B) {  \
 REFLECTABLE_CLASS_INHERITS_1_PROPS(A, B)
 
 #define REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C)          \
-class A : private ReflectableInit< A >, public B, public C { 
+class A : private ReflectableInit< A >, public B, public C 
 
 #define REFLECTABLE_CLASS_INHERITS_2_PROPS(A, B, C)         \
 	REFLECTABLE_CLASS_COMMON_PROPS(A)                         \
@@ -385,11 +385,11 @@ class A : private ReflectableInit< A >, public B, public C {
 
 
 #define REFLECTABLE_CLASS_INHERITS_2(A, B, C) \
-REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C)    \
+REFLECTABLE_CLASS_INHERITS_2_DECL(A, B, C) {  \
 REFLECTABLE_CLASS_INHERITS_2_PROPS(A, B, C)
 
 #define REFLECTABLE_CLASS_INHERITS_3_DECL(A, B, C, D)                 \
-class A : private ReflectableInit< A >, public B, public C, public D { 
+class A : private ReflectableInit< A >, public B, public C, public D
 
 #define REFLECTABLE_CLASS_INHERITS_3_PROPS(A, B, C, D)      \
 	REFLECTABLE_CLASS_COMMON_PROPS(A)                         \
@@ -406,7 +406,7 @@ class A : private ReflectableInit< A >, public B, public C, public D {
 
 
 #define REFLECTABLE_CLASS_INHERITS_3(A, B, C, D) \
-REFLECTABLE_CLASS_INHERITS_3_DECL(A, B, C, D)    \
+REFLECTABLE_CLASS_INHERITS_3_DECL(A, B, C, D) {  \
 REFLECTABLE_CLASS_INHERITS_3_PROPS(A, B, C, D)
 
 #endif

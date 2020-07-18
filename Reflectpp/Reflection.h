@@ -60,11 +60,11 @@ class ReflectInfo
 public:
 	TypeReflectInfo* info;
 	const char* id;
-	PTR ptr;
+	PTR offset;
 
 public:
 	ReflectInfo() {};
-	ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr);
+	ReflectInfo(TypeReflectInfo* info, const char* id, PTR offset);
 };
 
 template< class R > TypeReflectInfo* GetTypeReflectInfo();
@@ -111,13 +111,13 @@ public:
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//The type matches the requested type
-			return *REFLECT_PTR(T, reflectable, infos->ptr);
+			return *REFLECT_PTR(T, reflectable, infos->offset);
 		}
 		else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY && 
 			((TypeReflectInfo*)infos->info->extra)->reflect_type ==  ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//This is a property and the type matches
-			PropertyI* prop = (PropertyI*)infos->ptr;
+			PropertyI* prop = (PropertyI*)infos->offset;
 			prop->Get(reflectable, &default_t);
 			return default_t;
 		}
@@ -132,20 +132,20 @@ public:
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//The type matches the requested type
-			*REFLECT_PTR(T, reflectable, infos->ptr) = t;
+			*REFLECT_PTR(T, reflectable, infos->offset) = t;
 		}
 		else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_PROPERTY && 
 			((TypeReflectInfo*)infos->info->extra)->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//This is a property and the type matches
-			PropertyI* prop = (PropertyI*)infos->ptr;
+			PropertyI* prop = (PropertyI*)infos->offset;
 			default_t = t;
 			prop->Set(reflectable, &default_t);
 		}
 	}
 
 	//Content REFLECT_TYPE_CLASS
-	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->ptr), ((ReflectInfo*)infos->info->extra));}
+	ReflectField ClassPtr() const {return ReflectField(REFLECT_PTR(Reflectable, reflectable, infos->offset), ((ReflectInfo*)infos->info->extra));}
 	ReflectField Get(const char* field) const;
 
 	//Content REFLECT_TYPE_VECTOR

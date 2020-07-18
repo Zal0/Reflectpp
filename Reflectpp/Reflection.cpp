@@ -17,12 +17,12 @@ int ArrayOffset(const char* id, int accum = 0)
 	return accum;
 }
 
-ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR ptr) : info(info), id(id), ptr(ptr) {
+ReflectInfo::ReflectInfo(TypeReflectInfo* info, const char* id, PTR offset) : info(info), id(id), offset(offset) {
 	//Offset address in arrays have been calculated based on the last element, fix it
 	//In case of bidimensional arrays is a bit more complex: [2][3][4] offste is 2*3*4 + 3*4 + 4
 	if(strchr(id, '['))
 	{
-		this->ptr -= ArrayOffset(id) * info->size;
+		this->offset -= ArrayOffset(id) * info->size;
 	}
 }
 
@@ -166,7 +166,7 @@ PTR ReflectField::DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t)
 
 	if(parent_class->info->reflect_type == Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE)
 	{
-		parent_class = ((ReflectInfosFunc)parent_class->ptr)();
+		parent_class = ((ReflectInfosFunc)parent_class->offset)();
 	}
 	
 	PTR offset;
@@ -175,7 +175,7 @@ PTR ReflectField::DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t)
 		offset = DynamicCast(((TypeReflectInfosFunc)parent_class->info->extra)(), t);
 		if(offset != -1)
 		{
-			return parent_class->ptr + offset;
+			return parent_class->offset + offset;
 		}
 	}
 
@@ -198,7 +198,7 @@ protected:
 VectorHandler ReflectField::GetVectorHandler() const
 {
 	if(reflectable)
-		return ((VectorHandlerFunc)infos->info->extra)(REFLECT_PTR(void, reflectable, infos->ptr));
+		return ((VectorHandlerFunc)infos->info->extra)(REFLECT_PTR(void, reflectable, infos->offset));
 	else
 		return VectorHandler(new NullVectorHandler());
 }
@@ -240,11 +240,11 @@ ReflectField ReflectField::GetElem(int idx) const
 	{
 		const char* array_end = strchr(infos->id, ']');
 
-		ReflectField ret(((unsigned char*)reflectable) + infos->ptr + idx * GetArrayElemSize(), infos);
+		ReflectField ret(((unsigned char*)reflectable) + infos->offset + idx * GetArrayElemSize(), infos);
 		ret.infos = &ret.classDummyInfos[0];
 		*ret.infos = *infos;
 		ret.infos->id = array_end + 1;
-		ret.infos->ptr = 0;
+		ret.infos->offset = 0;
 		return ret;
 	}
 	else if(infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR) 
@@ -294,11 +294,11 @@ ReflectField ReflectInfoIterator::Next()
 	switch(infos->info->reflect_type)
 	{
 		case Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE:
-			VECTOR_PUSH(l, ReflectField(reflectable, ((ReflectInfosFunc)(infos->ptr))()));
+			VECTOR_PUSH(l, ReflectField(reflectable, ((ReflectInfosFunc)(infos->offset))()));
 			return Next();
 
 		case Reflectpp::REFLECT_TYPE_PARENT_CLASS: {
-			Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->ptr);
+			Reflectable* classObj = REFLECT_PTR(Reflectable, reflectable, infos->offset);
 			TypeReflectInfo* rf = ((TypeReflectInfosFunc)(infos->info->extra))();
 			VECTOR_PUSH(l, ReflectField(classObj, (ReflectInfo*)(rf->extra)));
 			return Next();

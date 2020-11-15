@@ -107,7 +107,7 @@ public:
 
 	template< class T > T Get() const
 	{
-		static T default_t;
+		static const T default_t;
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//The type matches the requested type
@@ -118,8 +118,9 @@ public:
 		{
 			//This is a property and the type matches
 			PropertyI* prop = (PropertyI*)infos->offset;
-			prop->Get(reflectable, &default_t);
-			return default_t;
+			T ret;
+			prop->Get(reflectable, &ret);
+			return ret;
 		}
 		else
 			//The types doesn't match

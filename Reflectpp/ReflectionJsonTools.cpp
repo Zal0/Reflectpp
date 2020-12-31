@@ -1,23 +1,61 @@
 #include "ReflectionJsonTools.h"
 
+static int n_tabs = 0;
+
+void WriteTabs(FILE_OUT out)
+{
+	for(int i = 0; i < n_tabs; ++i)
+		FILE_WRITE_STRING(out, "\t");
+}
+
+void Comma(FILE_OUT out)
+{
+	FILE_WRITE_STRING(out, ",\n");
+	WriteTabs(out);
+}
+
+void OpenBracket(FILE_OUT out, char bracket)
+{
+	//FILE_WRITE_STRING(out, "\n");
+	//WriteTabs(out);
+	FILE_WRITE_STRING(out, bracket);
+	n_tabs ++;
+}
+
+void CloseBracket(FILE_OUT out, char bracket)
+{
+	FILE_WRITE_STRING(out, "\n");
+	n_tabs --;
+	WriteTabs(out);
+	FILE_WRITE_STRING(out, bracket);
+}
+
 void Serialize(FILE_OUT out, const ReflectField& reflectable)
 {
 	if(reflectable.IsArray())
 	{
-		FILE_WRITE_STRING(out, "[");
+		OpenBracket(out, '[');
 		for(int i = 0; i < reflectable.GetNumElems(); ++i)
 		{
-			if(i != 0) FILE_WRITE_STRING(out, ", ");
+			if(i == 0) 
+			{
+				FILE_WRITE_STRING(out, '\n');
+				WriteTabs(out);
+			}
+			else
+			{
+				Comma(out);
+			}
 			Serialize(out, ReflectField(reflectable.GetElem(i)));
 		}
-		FILE_WRITE_STRING(out, "]");
+		CloseBracket(out, ']');
 	}
 	else
 	{
 		switch(reflectable.infos->info->reflect_type)
 		{
 			case Reflectpp::REFLECT_TYPE_CLASS: {
-				FILE_WRITE_STRING(out, "{");
+				OpenBracket(out, '{');
 				ReflectInfoIterator it(reflectable.ClassPtr());
 				ReflectField info(0,0);
 				bool first_field = true;
@@ -26,10 +64,12 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 					if(first_field) 
 					{
 						first_field = false;
+						FILE_WRITE_STRING(out, '\n');
+						WriteTabs(out);
 					}
 					else
 					{
-						FILE_WRITE_STRING(out, ", ");
+						Comma(out);
 					}
 
 					FILE_WRITE_STRING(out, "\"");
@@ -40,7 +80,7 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 					FILE_WRITE_STRING(out, "\":");
 					Serialize(out, info);
 				}
-				FILE_WRITE_STRING(out, "}");
+				CloseBracket(out, '}');
 				break;
 			}
 

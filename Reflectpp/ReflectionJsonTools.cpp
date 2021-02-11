@@ -106,7 +106,7 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 	}
 }
 
-void Serialize(Reflectable* reflectable, char* path)
+void Serialize(Reflectable* reflectable, const char* path)
 {
 	FILE_OUT_LOAD(fout, path);
 	Serialize(fout, reflectable);
@@ -223,11 +223,17 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 	}
 }
 
-void Deserialize(Reflectable* reflectable, char* path)
+bool Deserialize(Reflectable* reflectable, const char* path)
 {
 	FILE_IN_LOAD(fin, path);
-	PeekStream p(fin);
-	ReflectField rf(reflectable);
-	Deserialize(rf, p);
-	FILE_IN_CLOSE(fin);
+	if(fin)
+	{
+		PeekStream p(fin);
+		ReflectField rf(reflectable);
+		Deserialize(rf, p);
+		FILE_IN_CLOSE(fin);
+		
+		return true;
+	}
+	return false;
 }

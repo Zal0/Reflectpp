@@ -7,7 +7,7 @@
 	typedef int PTR;
 #endif
 
-#include "ReflectConfig.h"
+#include "ReflectConfig/ReflectConfig.h"
 
 #define DUMMY_ADDRESS 0x10000
 

@@ -1,4 +1,3 @@
-#include "ReflectConfig/ReflectConfig.h"
 #include "Reflection.h"
 
 #define DEF_INFO(TYPE, RTYPE) static TypeReflectInfo t_info(RTYPE, sizeof(TYPE), 0); return &t_info;

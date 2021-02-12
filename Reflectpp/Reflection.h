@@ -1,13 +1,13 @@
 #ifndef REFLECTION_H
 #define REFLECTION_H
 
-#include "ReflectConfig/ReflectConfig.h"
-
 #ifdef _WIN64
 	typedef long long PTR;
 #else
 	typedef int PTR;
 #endif
+
+#include "ReflectConfig.h"
 
 #define DUMMY_ADDRESS 0x10000
 
@@ -41,19 +41,6 @@ typedef TypeReflectInfo*(*TypeReflectInfosFunc)();
 typedef SMART_PTR(VectorHandlerI) VectorHandler;
 typedef VectorHandler(*VectorHandlerFunc)(void*);
 typedef Reflectable*(*ReflectablePtrFunc)(void*);
-
-class TypeReflectInfo
-{
-public:
-	Reflectpp::Type reflect_type;
-	unsigned int size;
-	PTR extra;
-
-public:
-	TypeReflectInfo() {};
-	TypeReflectInfo(Reflectpp::Type reflect_type, unsigned int size, PTR extra) : reflect_type(reflect_type), size(size), extra(extra) {}
-	static TypeReflectInfo InheritanceTable;
-};
 
 class ReflectInfo 
 {
@@ -107,7 +94,7 @@ public:
 
 	template< class T > T Get() const
 	{
-		static const T default_t;
+		static const T default_t = T();
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//The type matches the requested type

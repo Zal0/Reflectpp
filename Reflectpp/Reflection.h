@@ -159,7 +159,7 @@ public:
 
 	void* DynamicCast(TypeReflectInfo* t);
 
-	static PTR DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t);
+	static bool DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t, int* offset = 0);
 };
 
 class VectorHandlerI

@@ -144,42 +144,47 @@ STRING ReflectField::ToString()const
 
 void* ReflectField::DynamicCast(TypeReflectInfo* t)
 {
-	PTR offset = DynamicCast(infos->info, t);
-	if(offset == -1)
-		return 0;
-	else
+	int offset;
+	if(DynamicCast(infos->info, t, &offset))
 		return REFLECT_PTR(void, reflectable, offset);
+	else
+		return 0;
 }
 
-PTR ReflectField::DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t)
+bool ReflectField::DynamicCast(TypeReflectInfo* rf, TypeReflectInfo* t, int* _offset)
 {
-	if(rf->reflect_type != Reflectpp::REFLECT_TYPE_CLASS)
-		return -1; //If it's not a class  it cannot be casted for sure
+	int __offset;
+	int& offset = _offset ? *_offset : __offset;
 
-	if(rf == t)
-		return 0;
+	if(rf->reflect_type != Reflectpp::REFLECT_TYPE_CLASS)
+		return false; //If it's not a class  it cannot be casted for sure
+
+	if(rf == t) 
+	{
+		offset = 0;
+		return true;
+	}
 
 	//The REFLECT_TYPE_INHERITANCE_TABLE ptr is only present when there is REFLECTION_DATA declared
 	ReflectInfo* parent_class = (ReflectInfo*)(rf->extra);
 	if(parent_class->id[0] == 0)
-		return -1; //Class directly inheriting from Reflectable and without reflectable fields
+		return false; //Class directly inheriting from Reflectable and without reflectable fields
 
 	if(parent_class->info->reflect_type == Reflectpp::REFLECT_TYPE_INHERITANCE_TABLE)
 	{
 		parent_class = ((ReflectInfosFunc)parent_class->offset)();
 	}
 	
-	PTR offset;
 	for(; parent_class->id[0] != 0; parent_class ++)
 	{
-		offset = DynamicCast(((TypeReflectInfosFunc)parent_class->info->extra)(), t);
-		if(offset != -1)
+		if(DynamicCast(((TypeReflectInfosFunc)parent_class->info->extra)(), t, &offset))
 		{
-			return parent_class->offset + offset;
+			offset = parent_class->offset + offset;
+			return true;
 		}
 	}
 
-	return -1; //Not found
+	return false; //Not found
 }
 
 class NullVectorHandler : public VectorHandlerI

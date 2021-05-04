@@ -166,6 +166,26 @@ public:
 		(*buf) = '\0';
 		return buffer;
 	}
+
+	const char* ReadUntil(char end_char)
+	{
+		char* buf = buffer;
+		while(*buf != '\0')
+			buf ++;
+
+		do
+		{
+			Get();
+			*(buf ++) = c;
+		}
+		while(c != end_char);
+
+		Get();
+
+		*(buf ++) = '\0';
+
+		return buffer;
+	}
 };
 
 void Deserialize(ReflectField& reflectable, PeekStream& in)
@@ -173,48 +193,62 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 	char* token = in.buffer; // Value
 	if(token[0] == '{')
 	{
-		char* token = in.NextToken();
-		while(token[0] != '}')
+		if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_CLASS)
 		{
-			ReflectField r_info = reflectable.Get(token);
-			in.NextToken(); // :
-
-			in.NextToken();
-			Deserialize(r_info, in);
-
-			token = in.NextToken(); //,
-			if(token[0] == ',')
+			char* token = in.NextToken();
+			while(token[0] != '}')
 			{
-				token = in.NextToken();
+				ReflectField r_info = reflectable.Get(token);
+				in.NextToken(); // :
+
+				in.NextToken();
+				Deserialize(r_info, in);
+
+				token = in.NextToken(); //,
+				if(token[0] == ',')
+				{
+					token = in.NextToken();
+				}
 			}
+		} 
+		else 
+		{
+			reflectable =  in.ReadUntil('}');
 		}
 	}
 	else if(token[0] == '[')
 	{
-		VectorHandler v;
-		if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR)
+		if(reflectable.IsArray())
 		{
-			v = reflectable.GetVectorHandler();
-			v->Clear();
-		}
-		
-		token = in.NextToken();
-		int elem_idx = 0;
-		while(token[0] != ']')
-		{
+			VectorHandler v;
 			if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR)
-				v->Push();
-
-			ReflectField new_elem = reflectable.GetElem(elem_idx);
-			Deserialize(new_elem, in);
-
-			token = in.NextToken();
-			if(token[0] == ',')
 			{
-				token = in.NextToken();
+				v = reflectable.GetVectorHandler();
+				v->Clear();
 			}
+		
+			token = in.NextToken();
+			int elem_idx = 0;
+			while(token[0] != ']')
+			{
+				if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR)
+					v->Push();
 
-			elem_idx ++;
+				ReflectField new_elem = reflectable.GetElem(elem_idx);
+				Deserialize(new_elem, in);
+
+				token = in.NextToken();
+				if(token[0] == ',')
+				{
+					token = in.NextToken();
+				}
+
+				elem_idx ++;
+			}
+		}
+		else
+		{
+			reflectable =  in.ReadUntil(']');
 		}
 	}
 	else if(reflectable.reflectable)

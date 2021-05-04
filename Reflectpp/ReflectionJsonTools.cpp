@@ -8,25 +8,28 @@ void WriteTabs(FILE_OUT out)
 		FILE_WRITE_STRING(out, "\t");
 }
 
+void NewLine(FILE_OUT out)
+{
+	FILE_WRITE_CHAR(out, '\n');
+	WriteTabs(out);
+}
+
 void Comma(FILE_OUT out)
 {
-	FILE_WRITE_STRING(out, ",\n");
-	WriteTabs(out);
+	FILE_WRITE_CHAR(out, ',');
+	NewLine(out);
 }
 
 void OpenBracket(FILE_OUT out, char bracket)
 {
-	//FILE_WRITE_STRING(out, "\n");
-	//WriteTabs(out);
 	FILE_WRITE_CHAR(out, bracket);
 	n_tabs ++;
 }
 
 void CloseBracket(FILE_OUT out, char bracket)
 {
-	FILE_WRITE_STRING(out, "\n");
 	n_tabs --;
-	WriteTabs(out);
+	NewLine(out);
 	FILE_WRITE_CHAR(out, bracket);
 }
 
@@ -39,8 +42,7 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 		{
 			if(i == 0) 
 			{
-				FILE_WRITE_CHAR(out, '\n');
-				WriteTabs(out);
+				NewLine(out);
 			}
 			else
 			{
@@ -64,8 +66,7 @@ void Serialize(FILE_OUT out, const ReflectField& reflectable)
 					if(first_field) 
 					{
 						first_field = false;
-						FILE_WRITE_CHAR(out, '\n');
-						WriteTabs(out);
+						NewLine(out);
 					}
 					else
 					{

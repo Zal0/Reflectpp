@@ -94,7 +94,6 @@ public:
 
 	template< class T > T Get() const
 	{
-		static const T default_t = T();
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//The type matches the requested type
@@ -110,13 +109,12 @@ public:
 			return ret;
 		}
 		else
-			//The types doesn't match
-			return default_t; //This way we avoid memory issues
+			//The types don't match
+			return T(); //This way we avoid memory issues
 	}
 
 	template< class T > void Set(const T& t) const
 	{
-		static T default_t;
 		if(infos->info->reflect_type == ::GetTypeReflectInfo< T >()->reflect_type)
 		{
 			//The type matches the requested type
@@ -127,8 +125,7 @@ public:
 		{
 			//This is a property and the type matches
 			PropertyI* prop = (PropertyI*)infos->offset;
-			default_t = t;
-			prop->Set(reflectable, &default_t);
+			prop->Set(reflectable, (T*)&t);
 		}
 	}
 

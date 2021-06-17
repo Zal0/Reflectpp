@@ -272,15 +272,7 @@ ReflectInfoIterator::ReflectInfoIterator(const ReflectField& reflectable)
 
 void ReflectInfoIterator::Init(const ReflectField& reflectable)
 {
-	//Ignore the reflectable Reflectpp::REFLECT_TYPE_CLASS that was added during casting
-	if(reflectable.infos->id[0] == '\0' && reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_CLASS)
-	{
-		VECTOR_PUSH(l, reflectable.ClassPtr());
-	}
-	else
-	{
-		VECTOR_PUSH(l, reflectable);
-	}
+	VECTOR_PUSH(l, reflectable);
 }
 
 ReflectField ReflectInfoIterator::Next() 

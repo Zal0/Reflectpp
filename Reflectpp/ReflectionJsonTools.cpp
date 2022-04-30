@@ -121,7 +121,7 @@ private:
 	char c; //The next token available (already read, is cached here)
 
 public:
-	char buffer[255];
+	STRING buffer;
 	FILE_IN stream;
 
 	PeekStream(FILE_IN stream) : stream(stream) {c = FILE_READ_CHAR(stream); NextToken();}
@@ -136,14 +136,14 @@ public:
 		return c == '{' || c == '}' || c == ':' || c == ',' || c == '[' || c == ']';
 	}
 
-	char* NextToken() 
+	STRING& NextToken() 
 	{
-		char* buf = buffer;
+		STRING_CLEAR(buffer);
 		while(IsWhiteSpace()) {Get();}
 
 		if(IsSpecialChar())
 		{
-			*(buf ++) = c;
+			STRING_APPEND(buffer, c);
 			Get();
 		}
 		else if(c == '\"')
@@ -151,7 +151,7 @@ public:
 			Get();
 			while(c != '\"')
 			{
-				*(buf ++) = c;
+				STRING_APPEND(buffer, c);
 				Get();
 			}
 			Get();
@@ -160,46 +160,60 @@ public:
 		{
 			while(!IsWhiteSpace() && !IsSpecialChar())
 			{
-				*(buf ++) = c;
+				STRING_APPEND(buffer, c);
 				Get();
 			}
 		}
-		(*buf) = '\0';
 		return buffer;
 	}
 
-	const char* ReadUntil(char end_char)
+	STRING& ReadBlock(char open_char, char end_char)
 	{
-		char* buf = buffer;
-		while(*buf != '\0')
-			buf ++;
-
+		int level = 1;
 		do
 		{
 			Get();
-			*(buf ++) = c;
+			if(c == open_char)
+				level ++;
+			if(c == end_char)
+				level --;
+			STRING_APPEND(buffer, c);
 		}
-		while(c != end_char);
+		while(level != 0 || c != end_char);
 
 		Get();
 
-		*(buf ++) = '\0';
-
 		return buffer;
+	}
+
+	void SkipBlock(char open_char, char end_char)
+	{
+		int level = 1;
+		do
+		{
+			Get();
+			if(c == open_char)
+				level ++;
+			if(c == end_char)
+				level --;
+		}
+		while(level != 0);
+		
+		Get();
 	}
 };
 
 void Deserialize(ReflectField& reflectable, PeekStream& in)
 {
-	char* token = in.buffer; // Value
+	STRING& token = in.buffer; // Value
 	if(token[0] == '{')
 	{
-		if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_CLASS)
+		if(reflectable.reflectable && reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_CLASS)
 		{
-			char* token = in.NextToken();
+			STRING& token = in.NextToken();
 			while(token[0] != '}')
 			{
-				ReflectField r_info = reflectable.Get(token);
+				ReflectField r_info = reflectable.Get(STRING_TO_CHAR_PTR(token));
 				in.NextToken(); // :
 
 				in.NextToken();
@@ -214,12 +228,15 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 		} 
 		else 
 		{
-			reflectable =  in.ReadUntil('}');
+			if(reflectable.reflectable)
+				reflectable = STRING_TO_CHAR_PTR(in.ReadBlock('{', '}'));
+			else
+				in.SkipBlock('{', '}');
 		}
 	}
 	else if(token[0] == '[')
 	{
-		if(reflectable.IsArray())
+		if(reflectable.reflectable && reflectable.IsArray())
 		{
 			VectorHandler v;
 			if(reflectable.infos->info->reflect_type == Reflectpp::REFLECT_TYPE_VECTOR)
@@ -249,12 +266,15 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 		}
 		else
 		{
-			reflectable =  in.ReadUntil(']');
+			if(reflectable.reflectable)
+				reflectable = STRING_TO_CHAR_PTR(in.ReadBlock('[', ']'));
+			else
+				in.SkipBlock('[', ']');
 		}
 	}
 	else if(reflectable.reflectable)
 	{
-		reflectable = token;
+		reflectable = STRING_TO_CHAR_PTR(token);
 	}
 }
 

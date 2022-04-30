@@ -16,6 +16,8 @@
 
 #define STRING std::string
 #define STRING_TO_CHAR_PTR(STR) STR.c_str()
+#define STRING_CLEAR(STR) STR.clear()
+#define STRING_APPEND(STR, C) STR += c
 
 #define SMART_PTR(A) std::auto_ptr< A >
 

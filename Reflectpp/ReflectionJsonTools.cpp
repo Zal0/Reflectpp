@@ -117,23 +117,42 @@ void Serialize(Reflectable* reflectable, const char* path)
 class PeekStream 
 {
 private:
-	void Get() {c = FILE_READ_CHAR(stream);}
 	char c; //The next token available (already read, is cached here)
+	int depth;
 
-public:
-	STRING buffer;
-	FILE_IN stream;
+	void Get() 
+	{
+		if(depth)
+			c = FILE_READ_CHAR(stream);
+		else
+			c = ' ';
 
-	PeekStream(FILE_IN stream) : stream(stream) {c = FILE_READ_CHAR(stream); NextToken();}
+		if(c == '{')
+			depth ++;
+		else if(c == '}')
+			depth --;
+	}
 
 	bool IsWhiteSpace()
 	{
 		return c == ' ' || c == '\t' || c == '\r' || c == '\n';
 	}
 
-	bool IsSpecialChar() 
+	bool IsSpecialChar()
 	{
 		return c == '{' || c == '}' || c == ':' || c == ',' || c == '[' || c == ']';
+	}
+
+public:
+	STRING buffer;
+	FILE_IN stream;
+
+	PeekStream(FILE_IN stream) : stream(stream) 
+	{
+		depth = -1;
+		c = FILE_READ_CHAR(stream); 
+		NextToken();
+		depth = 1;
 	}
 
 	STRING& NextToken() 
@@ -276,6 +295,11 @@ void Deserialize(ReflectField& reflectable, PeekStream& in)
 	{
 		reflectable = STRING_TO_CHAR_PTR(token);
 	}
+}
+
+void Deserialize(FILE_IN in, const ReflectField& reflectable)
+{
+	Deserialize(ReflectField(reflectable), PeekStream(in));
 }
 
 bool Deserialize(Reflectable* reflectable, const char* path)

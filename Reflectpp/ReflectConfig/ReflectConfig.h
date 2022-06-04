@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <iostream>
 #include <fstream>
 
 #define VECTOR(TYPE) std::vector< TYPE >
@@ -21,13 +22,13 @@
 
 #define SMART_PTR(A) std::auto_ptr< A >
 
-#define FILE_OUT std::ofstream&
+#define FILE_OUT std::ostream&
 #define FILE_OUT_LOAD(FILE,PATH) std::ofstream FILE(PATH)
 #define FILE_WRITE_STRING(FILE,STR) FILE << STR
 #define FILE_WRITE_CHAR(FILE,C) FILE << C
 #define FILE_OUT_CLOSE(FILE) FILE.close()
 
-#define FILE_IN std::ifstream&
+#define FILE_IN std::istream&
 #define FILE_IN_LOAD(FILE, PATH) std::ifstream FILE(PATH, std::ios::binary)
 #define FILE_READ_CHAR(FILE) FILE.get()
 #define FILE_IN_CLOSE(FILE) FILE.close()

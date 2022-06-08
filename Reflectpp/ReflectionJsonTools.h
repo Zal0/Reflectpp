@@ -7,8 +7,8 @@ void Serialize(Reflectable* reflectable, const char* path);
 bool Deserialize(Reflectable* reflectable, const char* path);
 
 //Tools
-void Serialize(FILE_OUT out, const ReflectField& reflectable);
-void Deserialize(FILE_IN in, const ReflectField& reflectable);
+void Serialize(Reflectable* reflectable, FILE_OUT out);
+void Deserialize(Reflectable* reflectable, FILE_IN in);
 void NewLine(FILE_OUT out);
 void Comma(FILE_OUT out);
 void OpenBracket(FILE_OUT out, char bracket);

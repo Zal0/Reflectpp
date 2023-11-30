@@ -31,7 +31,8 @@ static TypeReflectInfo* GetTypeReflectInfo()
 		REFLECTINFO_END
 	};
 	static TypeReflectInfo t_info(Reflectpp::REFLECT_TYPE_CLASS, sizeof(*ReflectClass()), (PTR)info);
-	return &t_info;
+	TypeReflectInfo* trf_override = GetTypeReflectInfoOverride((CLASS_NAME*)0);
+	return trf_override ? trf_override : &t_info;
 }
 
 #undef EXPOSED_FIELD

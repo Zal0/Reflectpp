@@ -13,21 +13,39 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Reflectpp\ReflectConfig\ReflectConfig.cpp">
+      <Filter>Config</Filter>
+    </ClCompile>
     <ClCompile Include="Reflectpp\Reflection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Reflectpp\ReflectionJsonTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Reflectpp\ReflectConfig\ReflectConfig.cpp">
-      <Filter>Config</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Reflectpp\ReflectConfig\ReflectConfig.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectConfig\ReflectConfigTypes.h">
+      <Filter>Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\EnumReflectData.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="Reflectpp\ReflectDecl.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Reflectpp\ReflectEnumDecl.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectField.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectInfo.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectInfoIterator.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Reflectpp\Reflection.h">
@@ -36,8 +54,17 @@
     <ClInclude Include="Reflectpp\ReflectionJsonTools.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Reflectpp\ReflectConfig\ReflectConfig.h">
-      <Filter>Config</Filter>
+    <ClInclude Include="Reflectpp\ReflectProperty.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\ReflectTools.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\TypeReflectInfo.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflectpp\VectorHandler.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

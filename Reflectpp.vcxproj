@@ -150,11 +150,20 @@
     <ClCompile Include="Reflectpp\ReflectionJsonTools.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Reflectpp\EnumReflectData.h" />
     <ClInclude Include="Reflectpp\ReflectConfig\ReflectConfig.h" />
+    <ClInclude Include="Reflectpp\ReflectConfig\ReflectConfigTypes.h" />
     <ClInclude Include="Reflectpp\ReflectDecl.h" />
     <ClInclude Include="Reflectpp\ReflectEnumDecl.h" />
+    <ClInclude Include="Reflectpp\ReflectField.h" />
+    <ClInclude Include="Reflectpp\ReflectInfo.h" />
+    <ClInclude Include="Reflectpp\ReflectInfoIterator.h" />
     <ClInclude Include="Reflectpp\Reflection.h" />
     <ClInclude Include="Reflectpp\ReflectionJsonTools.h" />
+    <ClInclude Include="Reflectpp\ReflectProperty.h" />
+    <ClInclude Include="Reflectpp\ReflectTools.h" />
+    <ClInclude Include="Reflectpp\TypeReflectInfo.h" />
+    <ClInclude Include="Reflectpp\VectorHandler.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
